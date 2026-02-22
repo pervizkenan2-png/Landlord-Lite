@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Landlord Lite – Massenimport</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SheetJS für Excel/CSV-Parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #205624;
+      --red: #c62828;
+      --bg: #f4f4f4;
+      --shadow-soft: 0 2px 8px rgba(0,0,0,0.12);
+      --shadow-strong: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background-color: var(--bg);
+      color: #222;
+    }
+
+    /* SIDEBAR (gleich wie index.html, nur aktiver Punkt anders) */
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, #2e7d32, #1b5e20);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px 18px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+    }
+    .sidebar h1 {
+      margin: 0 0 16px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar h1 span.logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.18);
+      font-size: 16px;
+    }
+    .sidebar small {
+      opacity: 0.8;
+      display: block;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+    }
+    .sidebar-nav { margin-top: 20px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .nav-item span.icon { font-size: 1.1rem; }
+    .nav-item.active {
+      background: rgba(255,255,255,0.22);
+      box-shadow: var(--shadow-soft);
+    }
+    .nav-item:hover {
+      box-shadow: var(--shadow-strong);
+      transform: translateY(-1px);
+    }
+
+    .submenu {
+      margin-left: 10px;
+      display: block; /* hier ruhig sichtbar lassen */
+    }
+    .submenu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 0.85rem;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .submenu a:hover {
+      background: rgba(255,255,255,0.18);
+      box-shadow: var(--shadow-soft);
+      transform: translateY(-0.5px);
+    }
+    .submenu .icon { font-size: 1rem; }
+
+    /* CONTENT */
+    .content {
+      flex: 1;
+      padding: 22px 26px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-row h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0f2f1;
+      color: #00695c;
+      font-size: 0.8rem;
+    }
+    .badge span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #26a69a;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 18px;
+    }
+    .card-title {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+
+    .upload-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+    .file-input-label {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    #fileInput {
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .dropzone {
+      flex: 1;
+      min-height: 80px;
+      border-radius: 10px;
+      border: 2px dashed #bbb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 10px;
+      color: #555;
+    }
+    .dropzone.dragover {
+      border-color: var(--green);
+      background: #e8f5e9;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    button.btn {
+      border-radius: 7px;
+      border: none;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #222;
+    }
+
+    #previewWrapper {
+      margin-top: 10px;
+      max-height: 360px;
+      overflow: auto;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+    table.preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .preview-table th,
+    .preview-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .preview-table thead {
+      background: #f1f8e9;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .preview-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    .mapping-select {
+      width: 100%;
+      font-size: 0.75rem;
+    }
+
+    #importInfo {
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    #importInfo span.bad {
+      color: #b71c1c;
+    }
+    #importInfo span.good {
+      color: #2e7d32;
+    }
+
+    #statusBox {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    #statusBox.error { color: #b71c1c; }
+    #statusBox.success { color: #2e7d32; }
+
+    @media (max-width: 800px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+        position: static;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        margin-bottom: 8px;
+      }
+      .content { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h1><span class="logo">🏡</span> Landlord Lite</h1>
+    <small>Mieterverwaltung</small>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item">
+        <span class="icon">📁</span>
+        <span>Mieterverwaltung</span>
+      </div>
+      <div class="submenu">
+        <a href="index.html">
+          <span class="icon">👥</span>
+          <span>Übersicht</span>
+        </a>
+        <a href="mahnung.html">
+          <span class="icon">📧</span>
+          <span>Mahnungssystem</span>
+        </a>
+        <a href="reparatur.html">
+          <span class="icon">🛠️</span>
+          <span>Reparaturen</span>
+        </a>
+        <a href="mieterhoehung.html">
+          <span class="icon">📈</span>
+          <span>Mieterhöhung</span>
+        </a>
+        <a href="kuendigung.html">
+          <span class="icon">📄</span>
+          <span>Kündigung</span>
+        </a>
+        <a href="import.html" class="active">
+          <span class="icon">📥</span>
+          <span>Massenimport</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="header-row">
+      <h2>Massenimport von Mietern</h2>
+      <div class="badge">
+        <span class="dot"></span>
+        Import aus Excel / CSV
+      </div>
+    </div>
+
+    <div id="statusBox"></div>
+
+    <!-- Schritt 1: Datei -->
+    <section class="card">
+      <h3 class="card-title">1. Datei auswählen</h3>
+      <div class="upload-row">
+        <div>
+          <div class="file-input-label">Excel oder CSV hochladen</div>
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+          <div class="hint">
+            Unterstützt: .xlsx, .xls, .csv – erste Zeile sollte die Spaltenüberschrift sein (z.B. Name, Wohnung, Miete …)
+          </div>
+        </div>
+        <div id="dropzone" class="dropzone">
+          Datei hierher ziehen und loslassen
+        </div>
+      </div>
+    </section>
+
+    <!-- Schritt 2: Mapping & Vorschau -->
+    <section class="card">
+      <h3 class="card-title">2. Spalten zuordnen & Vorschau</h3>
+      <p style="font-size:0.85rem;">
+        Wir versuchen die Spalten automatisch zu erkennen. Du kannst die Zuordnung pro Spalte ändern.
+      </p>
+      <div id="previewWrapper">
+        <!-- Tabelle wird hier per JS eingefügt -->
+      </div>
+      <div id="importInfo"></div>
+    </section>
+
+    <!-- Schritt 3: Import -->
+    <section class="card">
+      <h3 class="card-title">3. Import starten</h3>
+      <p style="font-size:0.85rem;">
+        Name und Wohnung sind Pflichtfelder. Fehlt eines davon in einer Zeile, wird diese Zele übersprungen.
+      </p>
+      <button id="startImportBtn" class="btn btn-primary" disabled>Import starten</button>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = 'http://localhost:3000/api/tenants';
+
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const previewWrapper = document.getElementById('previewWrapper');
+    const importInfo = document.getElementById('importInfo');
+    const startImportBtn = document.getElementById('startImportBtn');
+    const statusBox = document.getElementById('statusBox');
+
+    let rows = [];            // 2D-Array aus der Datei
+    let columnMapping = [];   // pro Spalte: welches Feld?
+
+    const FIELDS = [
+      {key: '', label: '– ignorieren –'},
+      {key: 'name', label: 'Name (Pflicht)'},
+      {key: 'unit', label: 'Wohnung (Pflicht)'},
+      {key: 'rent', label: 'Miete (€)'},
+      {key: 'dueDay', label: 'Fälligkeitstag (1–31)'},
+      {key: 'status', label: 'Status (paid/unpaid)'},
+      {key: 'iban', label: 'IBAN'}
+    ];
+
+    function setStatus(msg, type = '') {
+      statusBox.textContent = msg || '';
+      statusBox.className = '';
+      if (!msg) return;
+      statusBox.classList.add(type);
+    }
+
+    // Drag & Drop Events
+    ;['dragenter','dragover'].forEach(ev => {
+      dropzone.addEventListener(ev, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ;['dragleave','drop'].forEach(ev => {
+      dropzone.addEventListener(ev, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+    });
+    dropzone.addEventListener('drop', e => {
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        fileInput.files = e.dataTransfer.files;
+        handleFile(file);
+      }
+    });
+
+    fileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    function handleFile(file) {
+      setStatus('Lese Datei …');
+      rows = [];
+      columnMapping = [];
+      startImportBtn.disabled = true;
+      previewWrapper.innerHTML = '';
+      importInfo.textContent = '';
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          const sheetName = wb.SheetNames[0];
+          const ws = wb.Sheets[sheetName];
+          const arr = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+          if (!arr || !arr.length) {
+            setStatus('Die Datei ist leer oder konnte nicht gelesen werden.', 'error');
+            return;
+          }
+          rows = arr;
+          autoMapColumns();
+          renderPreview();
+          startImportBtn.disabled = false;
+          setStatus('Datei geladen. Bitte Zuordnung prüfen und dann „Import starten“ klicken.', 'success');
+        } catch (err) {
+          console.error(err);
+          setStatus('Fehler beim Lesen der Datei: ' + err.message, 'error');
+        }
+      };
+      reader.onerror = () => setStatus('Fehler beim Datei-Lesen.', 'error');
+      reader.readAsArrayBuffer(file);
+    }
+
+    function autoMapColumns() {
+      if (!rows.length) return;
+      const header = rows[0].map(h => String(h).toLowerCase().trim());
+      columnMapping = header.map(h => {
+        if (!h) return '';
+
+        if (h.includes('name') && !h.includes('vermiet')) return 'name';
+        if (h.includes('mieter')) return 'name';
+
+        if (h.includes('wohn') || h.includes('unit')) return 'unit';
+
+        if (h.includes('miete') || h.includes('betrag') || h.includes('amount')) return 'rent';
+
+        if (h.includes('fällig') || h.includes('faellig') || h.includes('due')) return 'dueDay';
+
+        if (h.includes('status')) return 'status';
+
+        if (h.includes('iban')) return 'iban';
+
+        return '';
+      });
+    }
+
+    function renderPreview() {
+      if (!rows.length) {
+        previewWrapper.innerHTML = '';
+        importInfo.textContent = '';
+        return;
+      }
+
+      const headerRow = rows[0];
+      const dataRows = rows.slice(1, 1 + 20); // max 20 Zeilen Vorschau
+
+      let html = '<table class="preview-table"><thead><tr>';
+
+      // Erste Zeile: Mapping-Selects
+      const numCols = headerRow.length;
+      for (let c = 0; c < numCols; c++) {
+        html += '<th>';
+        html += `<select class="mapping-select" data-col="${c}">`;
+        FIELDS.forEach(f => {
+          const sel = columnMapping[c] === f.key ? 'selected' : '';
+          html += `<option value="${f.key}" ${sel}>${f.label}</option>`;
+        });
+        html += '</select><br>';
+        html += `<strong>${escapeHtml(String(headerRow[c] || 'Spalte '+(c+1)))}</strong>`;
+        html += '</th>';
+      }
+      html += '</tr></thead><tbody>';
+
+      // Datenzeilen
+      dataRows.forEach(r => {
+        html += '<tr>';
+        for (let c = 0; c < numCols; c++) {
+          html += `<td>${escapeHtml(String(r[c] ?? ''))}</td>`;
+        }
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      previewWrapper.innerHTML = html;
+
+      // Mapping-Selects verbinden
+      document.querySelectorAll('.mapping-select').forEach(sel => {
+        sel.addEventListener('change', e => {
+          const col = Number(e.target.getAttribute('data-col'));
+          columnMapping[col] = e.target.value;
+        });
+      });
+
+      const totalRows = rows.length - 1;
+      importInfo.innerHTML = `Gefundene Zeilen (ohne Überschrift): <strong>${totalRows}</strong>`;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    startImportBtn.addEventListener('click', () => {
+      if (!rows.length) return;
+      importTenants();
+    });
+
+    async function importTenants() {
+      setStatus('');
+      startImportBtn.disabled = true;
+
+      const dataRows = rows.slice(1);
+      const tenantsToImport = [];
+      let skippedNoNameOrUnit = 0;
+
+      dataRows.forEach(r => {
+        // leere Zeile überspringen
+        if (r.every(cell => String(cell).trim() === '')) return;
+
+        const tenant = {
+          name: '',
+          unit: '',
+          rent: 0,
+          dueDay: null,
+          iban: '',
+          status: 'unpaid'
+        };
+
+        for (let c = 0; c < columnMapping.length; c++) {
+          const field = columnMapping[c];
+          if (!field) continue;
+          const raw = r[c];
+
+          if (field === 'rent') {
+            const num = Number(String(raw).replace(',', '.').replace(/[^0-9.]/g, ''));
+            if (!Number.isNaN(num)) tenant.rent = Math.round(num);
+          } else if (field === 'dueDay') {
+            const num = parseInt(raw, 10);
+            if (!Number.isNaN(num)) tenant.dueDay = num;
+          } else if (field === 'status') {
+            const s = String(raw).toLowerCase();
+            if (s.includes('bezahlt') || s.includes('paid')) tenant.status = 'paid';
+            else tenant.status = 'unpaid';
+          } else if (field === 'name') {
+            tenant.name = String(raw).trim();
+          } else if (field === 'unit') {
+            tenant.unit = String(raw).trim();
+          } else if (field === 'iban') {
+            tenant.iban = String(raw).trim();
+          }
+        }
+
+        if (!tenant.name || !tenant.unit) {
+          skippedNoNameOrUnit++;
+          return;
+        }
+
+        tenantsToImport.push(tenant);
+      });
+
+      if (!tenantsToImport.length) {
+        setStatus('Keine gültigen Zeilen gefunden (Name und Wohnung fehlen).', 'error');
+        startImportBtn.disabled = false;
+        return;
+      }
+
+      importInfo.innerHTML =
+        `Bereit zum Import: <span class="good">${tenantsToImport.length} Mieter</span>` +
+        (skippedNoNameOrUnit
+          ? ` – übersprungen (ohne Name/Wohnung): <span class="bad">${skippedNoNameOrUnit}</span>`
+          : '');
+
+      let ok = 0;
+      let failed = 0;
+
+      setStatus('Import läuft …');
+
+      for (const t of tenantsToImport) {
+        try {
+          const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(t)
+          });
+          if (res.ok) ok++;
+          else failed++;
+        } catch (err) {
+          failed++;
+        }
+      }
+
+      setStatus(`Import abgeschlossen: ${ok} erfolgreich, ${failed} fehlgeschlagen.`, failed ? 'error' : 'success');
+      startImportBtn.disabled = false;
+    }
+  </script>
+</body>
+</html>

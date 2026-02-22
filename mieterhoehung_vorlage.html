@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mieterhöhung (Vorlage) – Landlord Lite</title>
+
+  <!-- TinyMCE lokal -->
+  <script src="vendor/tinymce/tinymce.min.js"></script>
+
+  <!-- jsPDF optional (wenn du PDF Export willst) -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f4f6f8; }
+    .wrap { max-width:1200px; margin:0 auto; padding:18px; }
+    .panel { background:#fff; border-radius:12px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,.06); margin-bottom:14px; }
+
+    h1 { margin:0 0 12px; font-size:28px; }
+    h2 { margin:0 0 10px; font-size:18px; }
+
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+    .field { display:flex; flex-direction:column; gap:6px; min-width:240px; flex:1; }
+    .label { font-size:12px; color:#555; }
+    .input { height:36px; padding:8px 10px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size:14px; }
+
+    .btn { border:none; border-radius:10px; padding:10px 12px; cursor:pointer; font-size:14px; }
+    .btn.green { background:#2e7d32; color:#fff; }
+    .btn.grey { background:#e9ecef; color:#222; }
+    .btn.red { background:#c62828; color:#fff; }
+
+    .hint { font-size:12px; color:#666; margin-top:6px; }
+
+    .placeholder-row { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 0; align-items:center; }
+    .placeholder-pill { border:1px solid #cfe3ff; background:#eaf3ff; color:#1a4b7a; padding:6px 10px; border-radius:999px; cursor:pointer; font-size:12px; }
+    .placeholder-pill:hover { filter:brightness(.97); }
+
+    .two { display:flex; gap:14px; flex-wrap:wrap; }
+    .left { flex: 1.2; min-width:520px; }
+    .right { flex: 0.8; min-width:320px; }
+
+    #previewBox {
+      border:1px solid #eee; border-radius:12px; padding:12px; min-height:220px; background:#fff;
+      overflow:auto;
+    }
+
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+
+    #msg { margin-top:10px; font-size:13px; }
+    #msg.success { color:#2e7d32; }
+    #msg.error { color:#c62828; }
+
+    .template-card { padding:10px; border:1px solid #e6e6e6; border-radius:12px; margin-bottom:10px; cursor:pointer; }
+    .template-card.active { border-color:#2e7d32; box-shadow:0 0 0 2px rgba(46,125,50,.12); }
+    .template-card-title { font-weight:700; }
+    .template-card-meta { font-size:12px; color:#777; margin-top:4px; }
+
+    .listWrap { display:flex; gap:12px; flex-wrap:wrap; }
+    .tplList { width:300px; min-width:260px; }
+    .tplEditor { flex:1; min-width:520px; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <h1>Mieterhöhung (Vorlage)</h1>
+
+  <!-- 1) Vermieterdaten -->
+  <div class="panel">
+    <h2>Vermieterdaten (werden gespeichert)</h2>
+
+    <div class="row">
+      <div class="field">
+        <div class="label">Name des Vermieters / der Verwaltung</div>
+        <input id="ll_name" class="input" placeholder="z.B. Kenan Perviz">
+      </div>
+
+      <div class="field">
+        <div class="label">Adresse</div>
+        <input id="ll_address" class="input" placeholder="z.B. Heinestraße 55, 64295 Darmstadt">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn green" id="btnSaveLandlord">Vermieterdaten speichern</button>
+      <button class="btn grey" id="btnClearLandlord">Löschen</button>
+    </div>
+
+    <div class="hint">Diese Daten werden automatisch in Vorlagen/Platzhaltern genutzt: <b>{VermieterName}</b>, <b>{AdresseVermieter}</b></div>
+  </div>
+
+  <!-- 2) Mieter Auswahl + Inputs -->
+  <div class="panel">
+    <h2>Mieter auswählen</h2>
+
+    <div class="row">
+      <div class="field">
+        <div class="label">Mieter</div>
+        <select id="tenantSelect" class="input">
+          <option value="">-- Bitte wählen --</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="label">Neue Miete (€)</div>
+        <input id="newRent" class="input" type="number" step="0.01" placeholder="z.B. 850">
+      </div>
+
+      <div class="field">
+        <div class="label">Wirksam ab</div>
+        <input id="effectiveDate" class="input" type="date">
+      </div>
+    </div>
+
+    <div class="hint">
+      Platzhalter ziehen sich Daten vom ausgewählten Mieter (Name/Wohnung/alte Miete) + neue Miete + Datum.
+    </div>
+  </div>
+
+  <!-- 3) Vorlagen Editor + Preview -->
+  <div class="panel">
+    <h2>Vorlage erstellen (TinyMCE) + Live Vorschau</h2>
+
+    <div class="placeholder-row">
+      <span><b>Platzhalter:</b></span>
+      <button type="button" class="placeholder-pill" data-placeholder="{VermieterName}">{VermieterName}</button>
+      <button type="button" class="placeholder-pill" data-placeholder="{AdresseVermieter}">{AdresseVermieter}</button>
+      <button type="button" class="placeholder-pill" data-placeholder="{MieterName}">{MieterName}</button>
+      <button type="button" class="placeholder-pill" data-placeholder="{Wohnung}">{Wohnung}</button>
+      <button type="button" class="placeholder-pill" data-placeholder="{AlteMiete}">{AlteMiete}</button>
+      <button type="button" class="placeholder-pill" data-placeholder="{NeueMiete}">{NeueMiete}</button>
+      <button type="button" class="placeholder-pill" data-placeholder="{DatumWirksam}">{DatumWirksam}</button>
+    </div>
+
+    <div class="listWrap" style="margin-top:12px;">
+      <!-- links: Template Liste -->
+      <div class="tplList">
+        <div class="panel" style="box-shadow:none;border:1px solid #eee;">
+          <h2 style="margin-bottom:10px;">Vorlagen</h2>
+          <div id="templateList"></div>
+
+          <div class="actions">
+            <button class="btn green" id="btnNewTemplate">Neue Vorlage</button>
+            <button class="btn red" id="btnDeleteTemplate">Löschen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- rechts: Editor + Preview -->
+      <div class="tplEditor">
+        <div class="two">
+          <div class="left">
+            <div class="field" style="margin-bottom:10px;">
+              <div class="label">Titel</div>
+              <input id="tplTitle" class="input" placeholder="z.B. Mieterhöhung Standard">
+            </div>
+
+            <div class="actions" style="margin-top:0;">
+              <button class="btn grey" id="btnSaveTitle">Titel speichern</button>
+              <button class="btn green" id="btnSaveTemplate">Vorlage speichern</button>
+              <button class="btn grey" id="btnSaveVersion">Version speichern</button>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+              <div class="field" style="min-width:260px;max-width:360px;">
+                <div class="label">Versionen</div>
+                <select id="versionSelect" class="input">
+                  <option value="">Keine Version ausgewählt</option>
+                </select>
+              </div>
+              <div class="field" style="min-width:160px;max-width:180px;">
+                <div class="label">&nbsp;</div>
+                <button class="btn grey" id="btnLoadVersion">Version laden</button>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <textarea id="editor"></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="btn grey" id="btnExportTxt">TXT</button>
+              <button class="btn grey" id="btnExportHtml">HTML</button>
+              <button class="btn grey" id="btnExportDoc">DOC</button>
+              <button class="btn grey" id="btnExportPdf">PDF</button>
+            </div>
+
+            <div id="msg"></div>
+          </div>
+
+          <div class="right">
+            <div class="label" style="margin-bottom:8px;"><b>Vorschau (mit Platzhaltern)</b></div>
+            <div id="previewBox"><p style="color:#777;">(Noch kein Inhalt)</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // =========================
+  // Keys
+  // =========================
+  const STORAGE_KEY_TPL = "llp_custom_templates_rich";
+  const KEY_LL_NAME = "llp_landlord_name";
+  const KEY_LL_ADDRESS = "llp_landlord_address";
+
+  // =========================
+  // DOM Vermieter
+  // =========================
+  const llNameEl = document.getElementById("ll_name");
+  const llAddrEl = document.getElementById("ll_address");
+  const btnSaveLandlord = document.getElementById("btnSaveLandlord");
+  const btnClearLandlord = document.getElementById("btnClearLandlord");
+
+  // =========================
+  // DOM Tenant
+  // =========================
+  const API_BASE = "http://127.0.0.1:3000";
+  const tenantSelect = document.getElementById("tenantSelect");
+  const newRentInput = document.getElementById("newRent");
+  const effectiveDateInput = document.getElementById("effectiveDate");
+
+  let tenantsCache = [];
+  let selectedTenant = null;
+
+  // =========================
+  // DOM Templates
+  // =========================
+  const msgEl = document.getElementById("msg");
+  const templateListEl = document.getElementById("templateList");
+  const btnNewTemplate = document.getElementById("btnNewTemplate");
+  const tplTitleInput = document.getElementById("tplTitle");
+  const btnSaveTitle = document.getElementById("btnSaveTitle");
+  const btnSaveTemplate = document.getElementById("btnSaveTemplate");
+  const btnSaveVersion = document.getElementById("btnSaveVersion");
+  const btnDeleteTemplate = document.getElementById("btnDeleteTemplate");
+  const previewBox = document.getElementById("previewBox");
+  const versionSelect = document.getElementById("versionSelect");
+  const btnLoadVersion = document.getElementById("btnLoadVersion");
+  const btnExportTxt = document.getElementById("btnExportTxt");
+  const btnExportHtml = document.getElementById("btnExportHtml");
+  const btnExportDoc = document.getElementById("btnExportDoc");
+  const btnExportPdf = document.getElementById("btnExportPdf");
+
+  // =========================
+  // State Templates
+  // =========================
+  let templates = [];
+  let activeIndex = null;
+
+  function safe(v){ return (v ?? "").toString(); }
+
+  function showMsg(text, type="success"){
+    if(!msgEl) return;
+    msgEl.textContent = text;
+    msgEl.className = "";
+    msgEl.classList.add(type === "success" ? "success" : "error");
+    setTimeout(() => { msgEl.textContent=""; msgEl.className=""; }, 2500);
+  }
+
+  // =========================
+  // Vermieter speichern/laden
+  // =========================
+  function loadLandlordIntoInputs(){
+    llNameEl.value = localStorage.getItem(KEY_LL_NAME) || "";
+    llAddrEl.value = localStorage.getItem(KEY_LL_ADDRESS) || "";
+  }
+
+  function getLandlordName(){
+    return localStorage.getItem(KEY_LL_NAME) || "";
+  }
+  function getLandlordAddress(){
+    return localStorage.getItem(KEY_LL_ADDRESS) || "";
+  }
+
+  btnSaveLandlord.addEventListener("click", () => {
+    localStorage.setItem(KEY_LL_NAME, (llNameEl.value || "").trim());
+    localStorage.setItem(KEY_LL_ADDRESS, (llAddrEl.value || "").trim());
+    showMsg("Vermieterdaten gespeichert.");
+    updatePreview();
+  });
+
+  btnClearLandlord.addEventListener("click", () => {
+    localStorage.removeItem(KEY_LL_NAME);
+    localStorage.removeItem(KEY_LL_ADDRESS);
+    loadLandlordIntoInputs();
+    showMsg("Vermieterdaten gelöscht.");
+    updatePreview();
+  });
+
+  // =========================
+  // Tenants laden
+  // =========================
+  async function fetchTenants(){
+    const endpoints = [
+      `${API_BASE}/tenants`,
+      `${API_BASE}/api/tenants`,
+      `${API_BASE}/tenant`,
+      `${API_BASE}/api/tenant`,
+    ];
+    let lastErr = null;
+
+    for(const url of endpoints){
+      try{
+        const res = await fetch(url);
+        if(!res.ok){ lastErr = new Error(`HTTP ${res.status} @ ${url}`); continue; }
+        const data = await res.json();
+        if(Array.isArray(data)) return data;
+        if(data && Array.isArray(data.tenants)) return data.tenants;
+        lastErr = new Error(`Unerwartetes JSON @ ${url}`);
+      }catch(e){ lastErr = e; }
+    }
+    throw lastErr || new Error("Backend nicht erreichbar");
+  }
+
+  async function loadTenants(){
+    try{
+      const data = await fetchTenants();
+      tenantsCache = Array.isArray(data) ? data : [];
+
+      tenantSelect.innerHTML = `<option value="">-- Bitte wählen --</option>`;
+      tenantsCache.forEach(t => {
+        const id = String(t._id || t.id || "");
+        const unit = t.unit || t.apartment || t.wohnung || t.flat || "";
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = `${safe(t.name)} (${safe(unit)})`;
+        tenantSelect.appendChild(opt);
+      });
+    }catch(err){
+      console.error(err);
+      tenantSelect.innerHTML = `<option value="">(Backend nicht erreichbar)</option>`;
+    }
+  }
+
+  tenantSelect.addEventListener("change", () => {
+    const id = String(tenantSelect.value || "");
+    selectedTenant = tenantsCache.find(t => String(t._id || t.id) === id) || null;
+    updatePreview();
+  });
+
+  newRentInput.addEventListener("input", updatePreview);
+  effectiveDateInput.addEventListener("change", updatePreview);
+
+  // =========================
+  // Placeholders
+  // =========================
+  function applyPlaceholders(html){
+    let out = html || "";
+
+    const landlordName = getLandlordName();
+    const landlordAddress = getLandlordAddress();
+
+    const oldRent =
+      safe(selectedTenant?.rent) ||
+      safe(selectedTenant?.miete) ||
+      safe(selectedTenant?.amount) ||
+      safe(selectedTenant?.mietbetrag) ||
+      "";
+
+    const map = {
+      "{VermieterName}": landlordName,
+      "{AdresseVermieter}": landlordAddress,
+
+      "{MieterName}": safe(selectedTenant?.name),
+      "{Wohnung}": safe(selectedTenant?.unit || selectedTenant?.apartment || selectedTenant?.wohnung || selectedTenant?.flat),
+
+      "{AlteMiete}": oldRent,
+      "{NeueMiete}": safe(newRentInput.value),
+      "{DatumWirksam}": safe(effectiveDateInput.value),
+    };
+
+    Object.keys(map).forEach(k => { out = out.split(k).join(map[k]); });
+    return out;
+  }
+
+  // =========================
+  // TinyMCE
+  // =========================
+  function getEd(){ return window.tinymce ? tinymce.get("editor") : null; }
+
+  if(!window.tinymce){
+    alert("TinyMCE fehlt. Prüfe vendor/tinymce/tinymce.min.js");
+    return;
+  }
+
+  function bindPlaceholderPills(){
+    document.querySelectorAll(".placeholder-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const ph = btn.getAttribute("data-placeholder") || btn.textContent || "";
+        const ed = getEd();
+        if(!ed) return;
+        ed.focus();
+        ed.selection.setContent(ph);
+        updatePreview();
+      });
+    });
+  }
+
+  function updatePreview(){
+    const ed = getEd();
+    if(!ed || !previewBox) return;
+
+    const rawHtml = ed.getContent() || "";
+
+    // wenn kein Mieter gewählt: trotzdem Vermieter ersetzen (damit er sieht ob Vermieter gespeichert ist)
+    const finalHtml = applyPlaceholders(rawHtml);
+    previewBox.innerHTML = finalHtml || '<p style="color:#777;">(Noch kein Inhalt)</p>';
+  }
+
+  tinymce.init({
+    selector: "#editor",
+    height: 320,
+    base_url: "vendor/tinymce",
+    suffix: ".min",
+    promotion: false,
+    license_key: "gpl",
+    plugins: "lists table link image code",
+    toolbar: "undo redo | bold italic underline | bullist numlist | link | code",
+    setup: function(editor){
+      editor.on("input keyup change", updatePreview);
+      editor.on("init", () => {
+        bindPlaceholderPills();
+        loadTemplates();
+        renderTemplateList();
+        loadActiveIntoEditor();
+        loadTenants();
+        loadLandlordIntoInputs();
+        updatePreview();
+      });
+    }
+  });
+
+  // =========================
+  // Templates localStorage
+  // =========================
+  function loadTemplates(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY_TPL);
+      templates = raw ? JSON.parse(raw) : [];
+    }catch(e){ templates = []; }
+  }
+
+  function saveTemplates(){
+    localStorage.setItem(STORAGE_KEY_TPL, JSON.stringify(templates));
+  }
+
+  function formatDateTime(iso){
+    const d = new Date(iso);
+    if(isNaN(d.getTime())) return iso;
+    return d.toLocaleString("de-DE");
+  }
+
+  function renderTemplateList(){
+    if(!templateListEl) return;
+    templateListEl.innerHTML = "";
+    templates.forEach((tpl, i) => {
+      const card = document.createElement("div");
+      card.className = "template-card" + (i === activeIndex ? " active" : "");
+      card.onclick = () => openTemplate(i);
+
+      const lastVersion = tpl.versions && tpl.versions.length ? tpl.versions[tpl.versions.length-1].savedAt : null;
+      card.innerHTML = `
+        <div class="template-card-title">${tpl.title || "Unbenannt"}</div>
+        <div class="template-card-meta">
+          ${lastVersion ? ("Letzte Version: " + formatDateTime(lastVersion)) : "Noch keine Version gespeichert"}
+        </div>
+      `;
+      templateListEl.appendChild(card);
+    });
+  }
+
+  function fillVersionSelect(){
+    if(!versionSelect) return;
+    versionSelect.innerHTML = `<option value="">Keine Version ausgewählt</option>`;
+    if(activeIndex === null) return;
+
+    const tpl = templates[activeIndex];
+    if(!tpl.versions || !tpl.versions.length) return;
+
+    tpl.versions.forEach((v, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = formatDateTime(v.savedAt);
+      versionSelect.appendChild(opt);
+    });
+  }
+
+  function newTemplate(){
+    const tpl = { id:"tpl_"+Date.now(), title:"Neue Vorlage", html:"", versions:[] };
+    templates.push(tpl);
+    activeIndex = templates.length - 1;
+    saveTemplates();
+    renderTemplateList();
+    loadActiveIntoEditor();
+    showMsg("Neue Vorlage erstellt.");
+  }
+
+  function openTemplate(i){
+    activeIndex = i;
+    renderTemplateList();
+    loadActiveIntoEditor();
+  }
+
+  function loadActiveIntoEditor(){
+    const ed = getEd();
+    if(!ed) return;
+
+    if(activeIndex === null || !templates[activeIndex]){
+      tplTitleInput.value = "";
+      ed.setContent("");
+      previewBox.innerHTML = '<p style="color:#777;">Keine Vorlage ausgewählt.</p>';
+      fillVersionSelect();
+      return;
+    }
+
+    const tpl = templates[activeIndex];
+    tplTitleInput.value = tpl.title || "";
+    ed.setContent(tpl.html || "");
+    fillVersionSelect();
+    updatePreview();
+  }
+
+  // Buttons Templates
+  btnNewTemplate.addEventListener("click", newTemplate);
+
+  btnSaveTitle.addEventListener("click", () => {
+    if(activeIndex === null) return showMsg("Bitte zuerst eine Vorlage anlegen.", "error");
+    templates[activeIndex].title = (tplTitleInput.value || "").trim() || "Unbenannt";
+    saveTemplates();
+    renderTemplateList();
+    showMsg("Titel gespeichert.");
+  });
+
+  btnSaveTemplate.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+    if(activeIndex === null) return showMsg("Bitte zuerst eine Vorlage anlegen.", "error");
+    templates[activeIndex].html = ed.getContent() || "";
+    saveTemplates();
+    renderTemplateList();
+    showMsg("Vorlage gespeichert.");
+  });
+
+  btnSaveVersion.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+    if(activeIndex === null) return showMsg("Bitte zuerst eine Vorlage anlegen.", "error");
+
+    const tpl = templates[activeIndex];
+    tpl.versions = tpl.versions || [];
+    tpl.versions.push({ savedAt: new Date().toISOString(), html: ed.getContent() || "" });
+
+    saveTemplates();
+    fillVersionSelect();
+    renderTemplateList();
+    showMsg("Version gespeichert.");
+  });
+
+  btnLoadVersion.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+    if(activeIndex === null) return showMsg("Keine Vorlage ausgewählt.", "error");
+    if(!versionSelect.value) return showMsg("Keine Version ausgewählt.", "error");
+
+    const idx = Number(versionSelect.value);
+    const tpl = templates[activeIndex];
+    if(!tpl.versions || !tpl.versions[idx]) return showMsg("Version nicht gefunden.", "error");
+
+    ed.setContent(tpl.versions[idx].html || "");
+    updatePreview();
+    showMsg("Version geladen.");
+  });
+
+  btnDeleteTemplate.addEventListener("click", () => {
+    if(activeIndex === null) return showMsg("Keine Vorlage ausgewählt.", "error");
+    if(!confirm("Diese Vorlage wirklich löschen?")) return;
+
+    templates.splice(activeIndex, 1);
+    activeIndex = null;
+    saveTemplates();
+    renderTemplateList();
+    loadActiveIntoEditor();
+    showMsg("Vorlage gelöscht.");
+  });
+
+  // =========================
+  // Export
+  // =========================
+  function downloadFile(content, filename, mimeType){
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function htmlToText(html){
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html || "";
+    return tmp.innerText || "";
+  }
+
+  btnExportTxt.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+    const rawHtml = ed.getContent() || "";
+    const finalHtml = applyPlaceholders(rawHtml);
+    downloadFile(htmlToText(finalHtml), "mieterhoehung_vorlage.txt", "text/plain;charset=utf-8");
+  });
+
+  btnExportHtml.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+    const rawHtml = ed.getContent() || "";
+    const finalHtml = applyPlaceholders(rawHtml);
+    const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"></head><body>${finalHtml}</body></html>`;
+    downloadFile(html, "mieterhoehung_vorlage.html", "text/html;charset=utf-8");
+  });
+
+  btnExportDoc.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+    const rawHtml = ed.getContent() || "";
+    const finalHtml = applyPlaceholders(rawHtml);
+    const docHtml = `<html><head><meta charset="UTF-8"></head><body>${finalHtml}</body></html>`;
+    downloadFile(docHtml, "mieterhoehung_vorlage.doc", "application/msword");
+  });
+
+  btnExportPdf.addEventListener("click", () => {
+    const ed = getEd(); if(!ed) return;
+
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("jsPDF fehlt (CDN).");
+      return;
+    }
+
+    const rawHtml = ed.getContent() || "";
+    const finalHtml = applyPlaceholders(rawHtml);
+    const finalText = htmlToText(finalHtml);
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+    const lines = doc.splitTextToSize(finalText, 500);
+    let y = 60;
+    lines.forEach(line => {
+      if (y > 780) { doc.addPage(); y = 60; }
+      doc.text(line, 50, y);
+      y += 16;
+    });
+
+    doc.save("mieterhoehung_vorlage.pdf");
+  });
+
+});
+</script>
+</body>
+</html>
