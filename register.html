@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Register - Landlord Lite</title>
+
+<style>
+body{
+  font-family: Arial;
+  background:#f4f4f4;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.box{
+  background:white;
+  padding:30px;
+  border-radius:10px;
+  width:320px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  background:#2e7d32;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#256628;
+}
+
+.msg{
+  margin-top:10px;
+  text-align:center;
+  color:red;
+}
+
+.link{
+  margin-top:15px;
+  text-align:center;
+}
+</style>
+
+</head>
+<body>
+
+<div class="box">
+
+<h2>Registrieren</h2>
+
+<form id="registerForm">
+
+<input type="email" id="email" placeholder="Email" required>
+
+<input type="password" id="password" placeholder="Passwort" required>
+
+<button type="submit">Account erstellen</button>
+
+</form>
+
+<div id="msg" class="msg"></div>
+
+<div class="link">
+<a href="login.html">Schon ein Account? Login</a>
+</div>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+const registerForm = document.getElementById("registerForm");
+const msg = document.getElementById("msg");
+
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  msg.textContent = "";
+  msg.style.color = "red";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  try {
+    const res = await fetch(window.AUTH_BASE + "/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      msg.textContent = data.error || "Registrierung fehlgeschlagen";
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+    window.location.replace("./index.html");
+  } catch (err) {
+    msg.textContent = "Server Fehler: " + err.message;
+  }
+});
+</script>
+</body>
+</html>

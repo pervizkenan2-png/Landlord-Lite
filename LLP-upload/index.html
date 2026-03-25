@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Landlord Lite – Mieterverwaltung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #205624;
+      --red: #c62828;
+      --bg: #f4f4f4;
+      --card-radius: 8px;
+      --shadow-soft: 0 2px 8px rgba(0,0,0,0.12);
+      --shadow-strong: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background-color: var(--bg);
+      color: #222;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, #2e7d32, #1b5e20);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px 18px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+    }
+    .sidebar h1 {
+      margin: 0 0 16px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar h1 span.logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.18);
+      font-size: 16px;
+    }
+    .sidebar small {
+      opacity: 0.8;
+      display: block;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+    }
+    .sidebar-nav {
+      margin-top: 20px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .nav-item span.icon { font-size: 1.1rem; }
+    .nav-item.active {
+      background: rgba(255,255,255,0.22);
+      box-shadow: var(--shadow-soft);
+    }
+    .nav-item:hover {
+      box-shadow: var(--shadow-strong);
+      transform: translateY(-1px);
+    }
+
+    /* Submenu unter Mieterverwaltung */
+    .submenu {
+      margin-left: 10px;
+      display: none; /* Start: zu */
+    }
+    .submenu a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 0.85rem;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .submenu a:hover {
+      background: rgba(255,255,255,0.18);
+      box-shadow: var(--shadow-soft);
+      transform: translateY(-0.5px);
+    }
+    .submenu .icon {
+      font-size: 1rem;
+    }
+
+    /* CONTENT */
+    .content {
+      flex: 1;
+      padding: 22px 26px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-row h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0f2f1;
+      color: #00695c;
+      font-size: 0.8rem;
+    }
+    .badge span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #26a69a;
+    }
+
+    /* CARDS / FORM */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-soft);
+      margin-top: 18px;
+    }
+    .card-title {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 420px;
+    }
+    .form-row-2 {
+      display: flex;
+      gap: 10px;
+    }
+    .form-row-2 > * { flex: 1; }
+
+    label {
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+      display: block;
+      color: #555;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px 9px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(46,125,50,0.15);
+    }
+
+    button.primary {
+      background-color: var(--green);
+      border: none;
+      color: #fff;
+      padding: 9px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-top: 4px;
+      transition: background 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
+    }
+    button.primary:hover {
+      background-color: var(--green-dark);
+      box-shadow: var(--shadow-soft);
+      transform: translateY(-0.5px);
+    }
+    button.primary:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .section-title {
+      margin-top: 22px;
+      margin-bottom: 10px;
+      font-size: 1.15rem;
+    }
+
+    /* FILTER / STATS */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 520px;
+      margin-bottom: 14px;
+    }
+    .filter-bar input,
+    .filter-bar select {
+      padding: 8px 9px;
+      border-radius: 7px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 150px;
+    }
+    .small-label {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .stat-pill {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #e8f5e9;
+      color: #1b5e20;
+      font-size: 0.8rem;
+    }
+    .stat-pill.red {
+      background: #ffebee;
+      color: #b71c1c;
+    }
+
+    /* TENANT LIST */
+    #tenantList { margin-top: 6px; }
+
+    .tenant-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      margin-bottom: 9px;
+      border-radius: 10px;
+      color: #fff;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .tenant-card.paid { background: var(--green); }
+    .tenant-card.unpaid { background: var(--red); }
+    .tenant-card:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-strong);
+    }
+    .tenant-main {
+      flex: 1;
+      padding-right: 10px;
+      font-size: 0.9rem;
+    }
+    .tenant-main strong { font-size: 1rem; }
+    .tenant-meta {
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+    .tenant-status {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      opacity: 0.95;
+    }
+    .tenant-status span.badge-inline {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      font-size: 0.75rem;
+    }
+
+    .tenant-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+      min-width: 130px;
+    }
+    .btn-small,
+    .btn-icon {
+      border: none;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-small:hover,
+    .btn-icon:hover {
+      background: rgba(255,255,255,0.35);
+    }
+    .btn-danger {
+      background: rgba(244,67,54,0.35);
+    }
+    .btn-danger:hover {
+      background: rgba(244,67,54,0.6);
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 18px;
+      width: 360px;
+      max-width: 92vw;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+      animation: popIn 0.18s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .modal header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #555;
+    }
+    .modal footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-secondary {
+      border-radius: 7px;
+      border: none;
+      padding: 7px 10px;
+      font-size: 0.85rem;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #d5d5d5; }
+    .btn-primary {
+      border-radius: 7px;
+      border: none;
+      padding: 7px 11px;
+      font-size: 0.85rem;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+
+    /* Messages */
+    #msg {
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+    #msg.error { color: #c62828; }
+    #msg.success { color: #2e7d32; }
+
+    @media (max-width: 800px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+        position: static;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        margin-bottom: 8px;
+      }
+      .content { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h1><span class="logo">🏡</span> Landlord Lite</h1>
+    <small>Mieterverwaltung</small>
+
+    <nav class="sidebar-nav">
+      <!-- Hauptpunkt Mieterverwaltung (zum Auf- und Zuklappen) -->
+      <div class="nav-item" onclick="toggleSidebarMenu()">
+        <span class="icon">📁</span>
+        <span>Mieterverwaltung</span>
+        <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
+      </div>
+
+      <!-- Unterpunkte -->
+      <div id="submenu" class="submenu">
+        <a href="index.html">
+          <span class="icon">👥</span>
+          <span>Übersicht</span>
+        </a>
+        <a href="mahnung.html">
+          <span class="icon">📧</span>
+          <span>Mahnungssystem</span>
+        </a>
+        <a href="reparatur.html">
+          <span class="icon">🛠️</span>
+          <span>Reparaturen</span>
+        </a>
+        <a href="mieterhoehung.html">
+          <span class="icon">📈</span>
+          <span>Mieterhöhung</span>
+        </a>
+     <a class="nav-item" href="import.html">
+  <span class="icon">📥</span>
+  <span>Massenimport</span>
+</a>
+     </div>
+<div id="submenu" class="submenu">
+  <a href="index.html">
+    <span class="icon">👥</span>
+    <span>Übersicht</span>
+  </a>
+
+  <a href="mahnung.html">
+    <span class="icon">💬</span>
+    <span>Mahnungssystem</span>
+  </a>
+
+  <a href="reparatur.html">
+    <span class="icon">🛠</span>
+    <span>Reparaturen</span>
+  </a>
+
+  <a href="mieterhoehung.html">
+    <span class="icon">📈</span>
+    <span>Mieterhöhung</span>
+  </a>
+
+  <a href="import.html">
+    <span class="icon">📥</span>
+    <span>Massenimport</span>
+  </a>
+</div>
+
+<!-- HIER kommt dein neuer Punkt, außerhalb vom Dropdown -->
+<a class="nav-item" href="dashboard.html">
+  <span class="icon">📊</span>
+  <span>Dashboard</span>
+</a>
+
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="header-row">
+      <h2>Mieterverwaltung</h2>
+      <div class="badge">
+        <span class="dot"></span>
+        Verbunden mit Backend (MongoDB)
+      </div>
+    </div>
+
+    <div id="msg"></div>
+
+    <!-- MIETER HINZUFÜGEN -->
+    <section class="card">
+      <h3 class="card-title">Mieter hinzufügen</h3>
+      <form id="tenantForm">
+        <div>
+          <label for="name">Name</label>
+          <input id="name" placeholder="z.B. Max Mustermann" required />
+        </div>
+
+        <div class="form-row-2">
+          <div>
+            <label for="unit">Wohnung</label>
+            <input id="unit" placeholder="z.B. Whg 3A" required />
+          </div>
+          <div>
+            <label for="rent">Miete (€)</label>
+            <input id="rent" type="number" min="0" step="1" placeholder="z.B. 750" required />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div>
+            <label for="dueDay">Fälligkeitstag (1–31)</label>
+            <input id="dueDay" type="number" min="1" max="31" placeholder="z.B. 1" required />
+          </div>
+          <div>
+            <label for="status">Status</label>
+            <select id="status">
+              <option value="unpaid">Nicht bezahlt</option>
+              <option value="paid">Bezahlt</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="iban">IBAN (optional)</label>
+          <input id="iban" placeholder="z.B. DE12 3456 7890 ..." />
+        </div>
+
+        <button type="submit" class="primary">Mieter speichern</button>
+      </form>
+    </section>
+
+    <!-- ÜBERSICHT -->
+    <h3 class="section-title">Übersicht</h3>
+
+    <div class="card">
+      <div class="small-label">Filter & Sortierung</div>
+      <div class="filter-bar">
+        <input id="searchInput" type="text" placeholder="🔍 Nach Name, Wohnung oder Betrag suchen..." />
+        <select id="sortSelect">
+          <option value="">Sortieren nach…</option>
+          <option value="name">Name</option>
+          <option value="unit">Wohnung</option>
+          <option value="rent">Miete</option>
+          <option value="dueDay">Fälligkeitstag</option>
+          <option value="status">Status</option>
+        </select>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-pill" id="statTotal">0 Mieter</div>
+        <div class="stat-pill red" id="statUnpaid">0 offen</div>
+        <div class="stat-pill" id="statPaid">0 bezahlt</div>
+      </div>
+
+      <div id="tenantList"></div>
+    </div>
+  </main>
+
+  <!-- EDIT-MODAL -->
+  <div class="modal-backdrop" id="editModalBackdrop">
+    <div class="modal">
+      <header>
+        <h3>Mieter bearbeiten</h3>
+        <button class="modal-close" id="editCloseBtn">✕</button>
+      </header>
+
+      <div>
+        <label for="editName">Name</label>
+        <input id="editName" />
+
+        <label for="editUnit">Wohnung</label>
+        <input id="editUnit" />
+
+        <label for="editRent">Miete (€)</label>
+        <input id="editRent" type="number" min="0" />
+
+        <label for="editDueDay">Fälligkeitstag (1–31)</label>
+        <input id="editDueDay" type="number" min="1" max="31" />
+
+        <label for="editIban">IBAN (optional)</label>
+        <input id="editIban" />
+
+        <label for="editStatus">Status</label>
+        <select id="editStatus">
+          <option value="unpaid">Nicht bezahlt</option>
+          <option value="paid">Bezahlt</option>
+        </select>
+      </div>
+
+      <footer>
+        <button class="btn-secondary" id="editCancelBtn">Abbrechen</button>
+        <button class="btn-primary" id="editSaveBtn">Speichern</button>
+      </footer>
+    </div>
+  </div>
+```html
+<script src="config.js"></script>
+<script>
+  // Sidebar Dropdown
+  function toggleSidebarMenu() {
+    const menu = document.getElementById('submenu');
+    const arrow = document.getElementById('menuArrow');
+    const isOpen = menu.style.display === 'block';
+    menu.style.display = isOpen ? 'none' : 'block';
+    if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+  }
+
+  const msgEl = document.getElementById('msg');
+  const tenantForm = document.getElementById('tenantForm');
+  const tenantListEl = document.getElementById('tenantList');
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const statTotal = document.getElementById('statTotal');
+  const statUnpaid = document.getElementById('statUnpaid');
+  const statPaid = document.getElementById('statPaid');
+
+  // Edit-Modal
+  const editModalBackdrop = document.getElementById('editModalBackdrop');
+  const editName = document.getElementById('editName');
+  const editUnit = document.getElementById('editUnit');
+  const editRent = document.getElementById('editRent');
+  const editDueDay = document.getElementById('editDueDay');
+  const editIban = document.getElementById('editIban');
+  const editStatus = document.getElementById('editStatus');
+  const editCloseBtn = document.getElementById('editCloseBtn');
+  const editCancelBtn = document.getElementById('editCancelBtn');
+  const editSaveBtn = document.getElementById('editSaveBtn');
+  let editId = null;
+
+  let tenantsCache = [];
+
+  function showMsg(text, type = 'error') {
+    if (!msgEl) return;
+    msgEl.textContent = text;
+    msgEl.className = '';
+    if (!text) return;
+    msgEl.classList.add(type === 'success' ? 'success' : 'error');
+    setTimeout(() => {
+      msgEl.textContent = '';
+      msgEl.className = '';
+    }, 4000);
+  }
+
+  // ✅ zentrale URL aus config.js
+  const TENANTS_URL = window.TENANTS_URL; // z.B. https://xxx.onrender.com/api/tenants
+  if (!TENANTS_URL) {
+    showMsg('config.js fehlt oder window.TENANTS_URL ist leer', 'error');
+  }
+
+  // ID Helper (Backend gibt meistens _id zurück)
+  function getTenantId(t) {
+    return t._id || t.id;
+  }
+
+  function getOverdueInfo(dueDay) {
+    const today = new Date();
+    const todayDay = today.getDate();
+    if (!dueDay || dueDay < 1 || dueDay > 31) return null;
+    if (todayDay <= dueDay) return null;
+    return todayDay - dueDay;
+  }
+
+  function renderTenants() {
+    const search = (searchInput?.value || '').toLowerCase();
+    let list = [...tenantsCache];
+
+    if (search) {
+      list = list.filter(t =>
+        (t.name || '').toLowerCase().includes(search) ||
+        (t.unit || '').toLowerCase().includes(search) ||
+        String(t.rent ?? '').includes(search)
+      );
+    }
+
+    const sortBy = sortSelect?.value;
+    if (sortBy) {
+      list.sort((a, b) => {
+        const va = a[sortBy];
+        const vb = b[sortBy];
+        if (va == null && vb == null) return 0;
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        if (typeof va === 'number' && typeof vb === 'number') return va - vb;
+        return String(va).localeCompare(String(vb), 'de');
+      });
+    }
+
+    const total = list.length;
+    const unpaid = list.filter(t => t.status === 'unpaid').length;
+    const paid = list.filter(t => t.status === 'paid').length;
+    if (statTotal) statTotal.textContent = `${total} Mieter`;
+    if (statUnpaid) statUnpaid.textContent = `${unpaid} offen`;
+    if (statPaid) statPaid.textContent = `${paid} bezahlt`;
+
+    if (!tenantListEl) return;
+    tenantListEl.innerHTML = '';
+    if (!list.length) {
+      tenantListEl.innerHTML = '<p style="font-size:0.9rem;color:#777;">Keine Mieter gefunden.</p>';
+      return;
+    }
+
+    list.forEach(t => {
+      const id = getTenantId(t);
+      const card = document.createElement('div');
+      card.className = `tenant-card ${t.status === 'paid' ? 'paid' : 'unpaid'}`;
+
+      const overdueDays = getOverdueInfo(t.dueDay);
+      const statusText = t.status === 'paid' ? 'Bezahlt' : 'Nicht bezahlt';
+      const overdueLabel = overdueDays
+        ? ` • Überfällig seit ${overdueDays} Tag${overdueDays === 1 ? '' : 'en'}`
+        : '';
+      const ibanText = t.iban ? ` | IBAN: ${t.iban}` : '';
+
+      card.innerHTML = `
+        <div class="tenant-main">
+          <strong>${t.name || '-'}</strong>
+          <div class="tenant-meta">
+            Wohnung: ${t.unit || '-'} | Miete: ${t.rent ?? 0} € | Fälligkeit: ${t.dueDay || '-'}${ibanText}
+          </div>
+          <div class="tenant-status">
+            <span class="badge-inline">${statusText}${overdueLabel}</span>
+          </div>
+        </div>
+
+        <div class="tenant-actions">
+          <button class="btn-small" data-action="toggle-status">
+            ${t.status === 'paid' ? 'Als offen markieren' : 'Als bezahlt markieren'}
+          </button>
+          <button class="btn-icon" data-action="edit">✏️</button>
+          <button class="btn-icon btn-danger" data-action="delete">🗑️</button>
+
+          <!-- Mahnung -->
+          <button class="btn-small green" data-action="mahnung">📄 Mahnung</button>
+        </div>
+      `;
+
+      const toggleBtn = card.querySelector('[data-action="toggle-status"]');
+      const editBtn = card.querySelector('[data-action="edit"]');
+      const deleteBtn = card.querySelector('[data-action="delete"]');
+      const mahnungBtn = card.querySelector('[data-action="mahnung"]');
+
+      toggleBtn?.addEventListener('click', () => toggleStatus(t));
+      editBtn?.addEventListener('click', () => openEditModal(t));
+      deleteBtn?.addEventListener('click', () => deleteTenant(t));
+      mahnungBtn?.addEventListener('click', () => selectTenantForMahnung(id));
+
+      tenantListEl.appendChild(card);
+    });
+  }
+
+  async function loadTenants() {
+    if (!TENANTS_URL) return;
+
+    try {
+      const res = await fetch(TENANTS_URL, { method: 'GET' });
+      if (!res.ok) {
+        const txt = await res.text();
+        showMsg('Fehler beim Laden der Mieter: ' + txt);
+        return;
+      }
+
+      tenantsCache = await res.json();
+
+      // für vorlage.html / mahnung / etc
+      localStorage.setItem('llp_tenants_v1', JSON.stringify(tenantsCache));
+
+      renderTenants();
+    } catch (err) {
+      showMsg('Netzwerkfehler beim Laden der Mieter: ' + err.message);
+    }
+  }
+
+  // CREATE
+  tenantForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!TENANTS_URL) return;
+
+    const payload = {
+      name: document.getElementById('name')?.value.trim(),
+      unit: document.getElementById('unit')?.value.trim(),
+      rent: Number(document.getElementById('rent')?.value),
+      dueDay: Number(document.getElementById('dueDay')?.value),
+      iban: document.getElementById('iban')?.value.trim() || '',
+      status: document.getElementById('status')?.value
+    };
+
+    try {
+      const res = await fetch(TENANTS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        showMsg('Fehler beim Speichern: ' + txt);
+        return;
+      }
+
+      showMsg('Mieter erfolgreich gespeichert.', 'success');
+      tenantForm.reset();
+      await loadTenants();
+    } catch (err) {
+      showMsg('Netzwerkfehler beim Speichern: ' + err.message);
+    }
+  });
+
+  // PATCH status
+  async function toggleStatus(tenant) {
+    if (!TENANTS_URL) return;
+
+    const id = getTenantId(tenant);
+    const newStatus = tenant.status === 'paid' ? 'unpaid' : 'paid';
+
+    try {
+      const res = await fetch(`${TENANTS_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        showMsg('Fehler beim Aktualisieren: ' + txt);
+        return;
+      }
+
+      showMsg('Status aktualisiert.', 'success');
+      await loadTenants();
+    } catch (err) {
+      showMsg('Netzwerkfehler beim Status-Update: ' + err.message);
+    }
+  }
+
+  // DELETE
+  async function deleteTenant(tenant) {
+    if (!TENANTS_URL) return;
+
+    const id = getTenantId(tenant);
+    if (!confirm(`Mieter "${tenant.name}" wirklich löschen?`)) return;
+
+    try {
+      const res = await fetch(`${TENANTS_URL}/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const txt = await res.text();
+        showMsg('Fehler beim Löschen: ' + txt);
+        return;
+      }
+      showMsg('Mieter gelöscht.', 'success');
+      await loadTenants();
+    } catch (err) {
+      showMsg('Netzwerkfehler beim Löschen: ' + err.message);
+    }
+  }
+
+  // EDIT MODAL
+  function openEditModal(tenant) {
+    editId = getTenantId(tenant);
+    if (editName) editName.value = tenant.name || '';
+    if (editUnit) editUnit.value = tenant.unit || '';
+    if (editRent) editRent.value = tenant.rent ?? '';
+    if (editDueDay) editDueDay.value = tenant.dueDay ?? '';
+    if (editIban) editIban.value = tenant.iban || '';
+    if (editStatus) editStatus.value = tenant.status || 'unpaid';
+    if (editModalBackdrop) editModalBackdrop.style.display = 'flex';
+  }
+
+  function closeEditModal() {
+    if (editModalBackdrop) editModalBackdrop.style.display = 'none';
+    editId = null;
+  }
+
+  editCloseBtn?.addEventListener('click', closeEditModal);
+  editCancelBtn?.addEventListener('click', closeEditModal);
+  editModalBackdrop?.addEventListener('click', (e) => {
+    if (e.target === editModalBackdrop) closeEditModal();
+  });
+
+  editSaveBtn?.addEventListener('click', async () => {
+    if (!TENANTS_URL) return;
+    if (!editId) return;
+
+    const payload = {
+      name: editName?.value.trim(),
+      unit: editUnit?.value.trim(),
+      rent: Number(editRent?.value),
+      dueDay: Number(editDueDay?.value),
+      iban: editIban?.value.trim(),
+      status: editStatus?.value
+    };
+
+    try {
+      const res = await fetch(`${TENANTS_URL}/${editId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        showMsg('Fehler beim Aktualisieren: ' + txt);
+        return;
+      }
+
+      showMsg('Mieter aktualisiert.', 'success');
+      closeEditModal();
+      await loadTenants();
+    } catch (err) {
+      showMsg('Netzwerkfehler beim Aktualisieren: ' + err.message);
+    }
+  });
+
+  // Search / Sort
+  searchInput?.addEventListener('input', renderTenants);
+  sortSelect?.addEventListener('change', renderTenants);
+
+  // Mahnung Auswahl (fix: _id / id)
+  function selectTenantForMahnung(id) {
+    const t = tenantsCache.find(x => String(getTenantId(x)) === String(id));
+    if (!t) {
+      alert('Mieter nicht gefunden');
+      return;
+    }
+    localStorage.setItem('llp_active_tenant_v1', JSON.stringify(t));
+    window.location.href = 'mahnung.html';
+  }
+
+  // INIT
+  loadTenants();
+</script>
+</body>
+</html>

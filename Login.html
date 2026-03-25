@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Landlord Lite</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #2e7d32, #66bb6a);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    .login-box p {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .login-box input:focus {
+      border-color: #2e7d32;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .login-box button:hover {
+      background: #256628;
+    }
+
+    .msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .error {
+      color: #c62828;
+    }
+
+    .success {
+      color: #2e7d32;
+    }
+
+    .register-link {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .register-link a {
+      color: #2e7d32;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<f>
+  <div class="login-box">
+    <h2>Landlord Lite Login</h2>
+    <p>Bitte melde dich an</p>
+
+<form id="loginForm">
+  <input type="email" id="email" placeholder="E-Mail" required>
+  <input type="password" id="password" placeholder="Passwort" required>
+  <button type="submit">Einloggen</button>
+</form>
+
+<div id="msg" class="msg"></div>
+    <div class="register-link">
+      Noch kein Konto? <a href="register.html">Registrieren</a>
+    </div>
+  </div>
+
+<script src="config.js"></script>
+<script>
+const loginForm = document.getElementById("loginForm");
+const msg = document.getElementById("msg");
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  msg.textContent = "";
+  msg.style.color = "red";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  try {
+    const res = await fetch(window.AUTH_BASE + "/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      msg.textContent = data.error || "Login fehlgeschlagen";
+      return;
+    }
+
+    localStorage.setItem("token", data.token);
+    window.location.replace("./index.html");
+  } catch (err) {
+    msg.textContent = "Server Fehler: " + err.message;
+  }
+});
+</script>
+</body>
+</html>  </body>
+</html>

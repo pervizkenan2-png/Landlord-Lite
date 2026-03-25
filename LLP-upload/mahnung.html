@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Landlord Lite – Mahnungssystem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- jsPDF für PDF-Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #1b5e20;
+      --bg: #f4f4f4;
+      --shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background: var(--bg);
+    }
+
+    /* SIDEBAR – wie index.html */
+    .sidebar {
+      width: 230px;
+      background: linear-gradient(180deg, #2e7d32, #1b5e20);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px 18px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+    .sidebar h1 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar h1 .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.2);
+    }
+    .sidebar small {
+      opacity: 0.8;
+      font-size: 0.8rem;
+    }
+    .sidebar-nav {
+      margin-top: 20px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      text-decoration: none;
+      color: #fff;
+      margin-bottom: 8px;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .nav-item span.icon {
+      font-size: 1.1rem;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.18);
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+    .nav-item.active {
+      background: rgba(255,255,255,0.25);
+      box-shadow: var(--shadow);
+    }
+
+    /* CONTENT */
+    .content {
+      flex: 1;
+      padding: 22px 26px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h2 { margin-top: 0; }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .card-title {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 9px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    textarea {
+      min-height: 260px;
+      resize: vertical;
+      white-space: pre-wrap;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(46,125,50,0.15);
+    }
+
+    .row-2 {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .row-2 > div { flex: 1; min-width: 180px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 11px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-secondary {
+      background: #eee;
+      color: #333;
+    }
+    .btn-secondary:hover { background: #ddd; }
+
+    #msg {
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    #msg.error { color: #c62828; }
+    #msg.success { color: #2e7d32; }
+
+    @media (max-width: 800px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+        position: static;
+      }
+      .content { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <h1>
+    <span class="logo">🏡</span> Landlord Lite
+  </h1>
+  <small>Mahnungssystem</small>
+
+  <nav class="sidebar-nav">
+
+    <!-- Mieterverwaltung -->
+    <a class="nav-item" href="index.html">
+      <span class="icon">📁</span>
+      <span>Mieterverwaltung</span>
+    </a>
+
+    <!-- Mahnungssystem -->
+    <a class="nav-item active" href="mahnung.html">
+      <span class="icon">📧</span>
+      <span>Mahnungssystem</span>
+    </a>
+
+    <!-- Eigene Vorlagen
+ (NEU) -->
+    <a class="nav-item" href="vorlage.html">
+      <span class="icon">📝</span>
+      <span>Eigene Vorlagen</span>
+    </a>
+
+  </nav>
+</aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h2>Mahnungssystem</h2>
+    <div id="msg"></div>
+
+    <!-- Vermieterdaten (werden gespeichert) -->
+    <section class="card">
+      <h3 class="card-title">Vermieterdaten (werden gespeichert)</h3>
+      <div class="row-2">
+        <div>
+          <label for="landlordName">Name des Vermieters / der Verwaltung</label>
+          <input id="landlordName" placeholder="z.B. Max Mustermann oder Muster Hausverwaltung" />
+        </div>
+        <div>
+          <label for="landlordCity">PLZ, Ort</label>
+          <input id="landlordCity" placeholder="z.B. 12345 Musterstadt" />
+        </div>
+      </div>
+      <label for="landlordAddress">Adresse</label>
+      <input id="landlordAddress" placeholder="z.B. Musterstraße 1" />
+
+      <label for="landlordContact">Kontoinformationen (für Zahlung)</label>
+      <input id="landlordContact" placeholder="z.B. IBAN, BIC oder Bankname" />
+
+      <button class="btn btn-primary" id="saveLandlordBtn">Vermieterdaten speichern</button>
+    </section>
+
+    <!-- Mieter-Auswahl -->
+    <section class="card">
+      <h3 class="card-title">Mieter auswählen & Mahnung generieren</h3>
+
+      <label for="tenantSelect">Mieter</label>
+      <select id="tenantSelect">
+        <option value="">— Mieter auswählen —</option>
+      </select>
+
+      <div style="margin-top:8px;">
+        <button class="btn btn-primary" id="btnSingle">Mahnung für ausgewählten Mieter generieren</button>
+        <button class="btn btn-secondary" id="btnAll">Mahnungen für alle offenen Mieter generieren</button>
+      </div>
+    </section>
+
+    <!-- Ergebnis -->
+    <section class="card">
+      <h3 class="card-title">Generierter Mahnungstext</h3>
+      <textarea id="output" placeholder="Hier erscheint der Mahnungstext..."></textarea>
+
+      <div style="margin-top:8px;">
+        <button class="btn btn-primary" id="btnPdf">Als PDF herunterladen</button>
+        <button class="btn btn-secondary" id="btnMail">In E-Mail öffnen</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API = 'http://localhost:3000/api/tenants';
+    let tenants = [];
+
+    const msgEl = document.getElementById('msg');
+    function showMsg(text, type = 'error') {
+      msgEl.textContent = text;
+      msgEl.className = '';
+      if (!text) return;
+      msgEl.classList.add(type === 'success' ? 'success' : 'error');
+      setTimeout(() => {
+        msgEl.textContent = '';
+        msgEl.className = '';
+      }, 4000);
+    }
+
+    // Vermieterdaten laden/speichern (LocalStorage)
+    const landlordNameEl = document.getElementById('landlordName');
+    const landlordAddressEl = document.getElementById('landlordAddress');
+    const landlordCityEl = document.getElementById('landlordCity');
+    const landlordContactEl = document.getElementById('landlordContact');
+    const saveLandlordBtn = document.getElementById('saveLandlordBtn');
+
+    function loadLandlordFromStorage() {
+      try {
+        const raw = localStorage.getItem('landlordProfile');
+        if (!raw) return;
+        const p = JSON.parse(raw);
+        landlordNameEl.value = p.name || '';
+        landlordAddressEl.value = p.address || '';
+        landlordCityEl.value = p.city || '';
+        landlordContactEl.value = p.contact || '';
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function saveLandlordToStorage() {
+      const profile = {
+        name: landlordNameEl.value.trim(),
+        address: landlordAddressEl.value.trim(),
+        city: landlordCityEl.value.trim(),
+        contact: landlordContactEl.value.trim()
+      };
+      localStorage.setItem('landlordProfile', JSON.stringify(profile));
+      showMsg('Vermieterdaten gespeichert.', 'success');
+    }
+
+    saveLandlordBtn.addEventListener('click', saveLandlordToStorage);
+    loadLandlordFromStorage();
+
+    // Mieter laden
+    const tenantSelect = document.getElementById('tenantSelect');
+    async function loadTenants() {
+      try {
+        const res = await fetch(API);
+        if (!res.ok) {
+          const txt = await res.text();
+          showMsg('Fehler beim Laden der Mieter: ' + txt);
+          return;
+        }
+        tenants = await res.json();
+        tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
+        tenants.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t._id;
+          opt.textContent = `${t.name} – Wohnung ${t.unit} (${t.rent} €)`;
+          tenantSelect.appendChild(opt);
+        });
+      } catch (err) {
+        showMsg('Netzwerkfehler beim Laden der Mieter: ' + err.message);
+      }
+    }
+    loadTenants();
+
+    function getOverdueDays(t) {
+      const today = new Date();
+      const day = today.getDate();
+      if (!t.dueDay || t.dueDay < 1 || t.dueDay > 31) return 0;
+      if (day <= t.dueDay) return 0;
+      return day - t.dueDay;
+    }
+
+    function getLandlordProfile() {
+      return {
+        name: landlordNameEl.value.trim() || '[Name des Vermieters/der Verwaltung]',
+        address: landlordAddressEl.value.trim() || '[Adresse des Vermieters]',
+        city: landlordCityEl.value.trim() || '[PLZ, Ort des Vermieters]',
+        contact: landlordContactEl.value.trim() || '[Kontoinformationen für die Mietzahlung]'
+      };
+    }
+
+    // JuraRat-ähnlicher Langtext – Platzhalter ersetzt
+    function buildLongLetter(tenant, overdueDays) {
+      const l = getLandlordProfile();
+      const today = new Date();
+      const datum = today.toLocaleDateString('de-DE');
+
+      const tenantName = tenant.name || '[Name des Mieters]';
+      const tenantAddress = tenant.unit ? `Wohnung ${tenant.unit}` : '[Adresse des Mieters]';
+      const tenantCity = '[PLZ, Ort]';
+      const mietObjekt = tenant.unit ? `Wohnung ${tenant.unit}` : '[Mietobjekt]';
+      const betrag = tenant.rent != null ? `${tenant.rent} €` : '[Höhe des ausstehenden Betrags]';
+      const faelligkeit = tenant.dueDay ? `${tenant.dueDay}. (aktueller Monat)` : '[Datum der Fälligkeit]';
+
+      return `
+${l.name}
+${l.address}
+${l.city}
+
+${tenantName}
+${tenantAddress}
+${tenantCity}
+
+[Ort], ${datum}
+
+1. Mahnung für die Miete des ${mietObjekt}
+
+Leider müssen wir feststellen, dass die vereinbarte Mietzahlung für die Immobilie ${tenantAddress} auch nach Ablauf der Zahlungsfrist nicht auf unserem Konto eingegangen ist.
+
+Gemäß der vertraglichen Vereinbarungen ist die Miete spätestens bis zum dritten Werktag eines jeden Monats fällig. Für den aktuellen Abrechnungszeitraum war die Miete spätestens am ${faelligkeit} zu zahlen. Bis heute ist jedoch kein Zahlungseingang feststellbar. Dieser Umstand stellt einen erheblichen Zahlungsrückstand dar, der umgehend beglichen werden muss.
+
+Der aktuelle Mietrückstand beläuft sich auf ${betrag}${overdueDays > 0 ? ` und ist seit ${overdueDays} Tag(en) überfällig` : ''}.
+
+In Anbetracht der bereits vergangenen Zeit und der ausstehenden Mietzahlung möchten wir Sie eindringlich daran erinnern, dass dieser Zahlungsrückstand unverzüglich ausgeglichen werden muss. Wir sind bestrebt, eine einvernehmliche Lösung zu finden, um weitere Schritte zur Klärung dieser Angelegenheit zu vermeiden.
+
+Wir fordern Sie daher auf, den offenen Betrag innerhalb der nächsten 7 Tage nach Erhalt dieses Schreibens auf folgendes Konto zu überweisen:
+
+${l.contact}
+
+Sollten Sie die Zahlung bereits veranlasst haben, betrachten Sie dieses Schreiben bitte als gegenstandslos. In diesem Fall bitten wir Sie jedoch, uns den Zahlungsbeleg oder das Datum der Überweisung kurz mitzuteilen.
+
+Sollte innerhalb der genannten Frist kein Zahlungseingang festzustellen sein, behalten wir uns vor, weitere rechtliche Schritte einzuleiten, was unter anderem zusätzliche Kosten und gegebenenfalls die Einleitung eines gerichtlichen Mahnverfahrens zur Folge haben kann.
+
+Mit freundlichen Grüßen
+
+${l.name}
+      `.trim();
+    }
+
+    const outputEl = document.getElementById('output');
+    const btnSingle = document.getElementById('btnSingle');
+    const btnAll = document.getElementById('btnAll');
+    const btnPdf = document.getElementById('btnPdf');
+    const btnMail = document.getElementById('btnMail');
+
+    btnSingle.addEventListener('click', () => {
+      const id = tenantSelect.value;
+      if (!id) {
+        showMsg('Bitte zuerst einen Mieter auswählen.');
+        return;
+      }
+      const t = tenants.find(x => x._id === id);
+      if (!t) {
+        showMsg('Mieter nicht gefunden.', 'error');
+        return;
+      }
+      const overdue = getOverdueDays(t);
+      const text = buildLongLetter(t, overdue);
+      outputEl.value = text;
+      showMsg('Mahnung für ausgewählten Mieter generiert.', 'success');
+    });
+
+    btnAll.addEventListener('click', () => {
+      const offene = tenants.filter(t => t.status === 'unpaid');
+      if (!offene.length) {
+        outputEl.value = 'Keine offenen Mieter gefunden.';
+        showMsg('Keine offenen Mieter gefunden.', 'error');
+        return;
+      }
+      let combined = '';
+      offene.forEach((t, idx) => {
+        const overdue = getOverdueDays(t);
+        const text = buildLongLetter(t, overdue);
+        combined += text + '\n\n----------------------------------------\n\n';
+      });
+      outputEl.value = combined.trim();
+      showMsg('Mahnungen für alle offenen Mieter generiert.', 'success');
+    });
+
+    // PDF Download
+    btnPdf.addEventListener('click', async () => {
+      const text = outputEl.value.trim();
+      if (!text) {
+        showMsg('Kein Text zum Exportieren vorhanden.', 'error');
+        return;
+      }
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const margin = 15;
+        const maxWidth = 180; // A4, links/rechts Margin
+
+        const lines = doc.splitTextToSize(text, maxWidth);
+        doc.text(lines, margin, margin);
+        doc.save('Mahnung.pdf');
+        showMsg('PDF heruntergeladen.', 'success');
+      } catch (err) {
+        console.error(err);
+        showMsg('Fehler beim PDF-Erstellen: ' + err.message, 'error');
+      }
+    });
+
+    // E-Mail öffnen
+    btnMail.addEventListener('click', () => {
+      const text = outputEl.value.trim();
+      if (!text) {
+        showMsg('Kein Text zum Versenden vorhanden.', 'error');
+        return;
+      }
+      const subject = encodeURIComponent('Mahnung Mietzahlung');
+      const body = encodeURIComponent(text);
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>
+

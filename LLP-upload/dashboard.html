@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard – Landlord Lite</title>
+
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; background:#f4f6f8; }
+    .main { padding:28px; }
+    h1 { margin:0 0 18px; font-size:28px; }
+
+    .top-row {
+      display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+      margin-bottom:18px;
+    }
+    .pill {
+      background:#fff; border:1px solid #e7e7e7; border-radius:999px;
+      padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.05);
+      font-size:13px; color:#222;
+    }
+    .pill select {
+      border:none; outline:none; font-size:13px; background:transparent; cursor:pointer;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap:16px;
+    }
+
+    .card {
+      background:#fff;
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.06);
+      border:1px solid #eee;
+    }
+
+    .card h3 { margin:0 0 12px; font-size:16px; color:#333; }
+
+    .donut-wrap { display:flex; gap:16px; align-items:center; }
+    .donut {
+      width:130px; height:130px; border-radius:50%;
+      background: conic-gradient(#3ccf91 0% 0%, #f7c948 0% 0%, #ff6b6b 0% 100%);
+      position:relative;
+    }
+    .donut::after {
+      content:"";
+      position:absolute;
+      inset:16px;
+      background:#fff;
+      border-radius:50%;
+      box-shadow: inset 0 0 0 1px #eee;
+    }
+    .donut-center {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      z-index:2;
+      font-weight:700;
+    }
+    .donut-center small { font-weight:400; color:#777; margin-top:4px; }
+
+    .legend { font-size:13px; color:#555; }
+    .legend div { margin-bottom:6px; }
+
+    .stats {
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin-top:10px;
+      margin-bottom:10px;
+    }
+    .stat {
+      background:#f7f9fb;
+      border-radius:12px;
+      padding:12px;
+      text-align:center;
+      border:1px solid #edf0f4;
+    }
+    .stat strong { font-size:18px; display:block; }
+    .stat span { font-size:12px; color:#777; }
+
+    .bars { display:flex; align-items:flex-end; gap:12px; height:170px; margin-top:8px; }
+    .bar-col { width:34px; text-align:center; font-size:11px; color:#777; }
+    .bar {
+      width:34px;
+      border-radius:8px 8px 0 0;
+      background: linear-gradient(180deg, #4f9cff, #2f6fd6);
+      height:20px;
+    }
+
+    .hint { margin-top:10px; font-size:12px; color:#777; }
+    .error { color:#c62828; font-size:13px; margin-top:10px; }
+
+    .landlord-box{
+      margin-bottom:16px;
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:14px 16px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.06);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .landlord-left{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:260px;
+    }
+    .landlord-title{ font-size:13px; color:#777; }
+    .landlord-value{ font-size:14px; font-weight:700; color:#111; }
+    .landlord-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{
+      border:none; border-radius:10px; padding:10px 12px;
+      cursor:pointer; font-size:13px;
+    }
+    .btn.green{ background:#2e7d32; color:#fff; }
+    .btn.grey{ background:#e9ecef; color:#222; }
+  </style>
+</head>
+
+<body>
+  <main class="main">
+    <h1>Dashboard</h1>
+
+    <!-- Vermieter aus localStorage (Landlord Lite / Mahnung Keys) -->
+    <div class="landlord-box">
+      <div class="landlord-left">
+        <div class="landlord-title">Vermieter (aus localStorage)</div>
+        <div class="landlord-value" id="llDisplay">—</div>
+      </div>
+      <div class="landlord-actions">
+        <button class="btn grey" id="btnReloadLL">Neu laden</button>
+        <button class="btn green" id="btnGoLandlord">Zu Vermieterdaten</button>
+      </div>
+    </div>
+
+    <div class="top-row">
+      <div class="pill">
+        Monat:
+        <select id="monthSelect"></select>
+      </div>
+      <div class="pill" id="tenantCountPill">Mieter: –</div>
+      <div class="pill" id="backendPill">Backend: –</div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h3>Einnahmen-Status (Mieten)</h3>
+
+        <div class="donut-wrap">
+          <div class="donut" id="donut">
+            <div class="donut-center">
+              <div id="donutAmount">€0</div>
+              <small id="donutSub">von €0</small>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div>🟢 Bezahlt: <strong id="paidText">€0</strong></div>
+            <div>🟡 Offen: <strong id="openText">€0</strong></div>
+            <div>🔴 Überfällig: <strong id="overdueText">€0</strong></div>
+          </div>
+        </div>
+
+        <div class="hint">
+          Logik: Überfällig = nicht bezahlt & nach Fälligkeit. Offen = nicht bezahlt & vor/gleich Fälligkeit.
+        </div>
+
+        <div id="err1" class="error" style="display:none;"></div>
+      </section>
+
+      <section class="card">
+        <h3>Cashflow</h3>
+
+        <div class="stats">
+          <div class="stat">
+            <strong id="incomeVal">€0</strong>
+            <span>Income</span>
+          </div>
+          <div class="stat">
+            <strong id="expensesVal">€0</strong>
+            <span>Expenses</span>
+          </div>
+          <div class="stat">
+            <strong id="netVal">€0</strong>
+            <span>Net</span>
+          </div>
+        </div>
+
+        <div class="bars" id="bars"></div>
+
+        <div class="hint">
+          Balken: Letzte 6 Monate (wenn keine Historie vorhanden ist → Projektion aus aktueller Miete).
+        </div>
+
+        <div id="err2" class="error" style="display:none;"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:3000";
+
+    const donut = document.getElementById("donut");
+    const donutAmount = document.getElementById("donutAmount");
+    const donutSub = document.getElementById("donutSub");
+
+    const paidText = document.getElementById("paidText");
+    const openText = document.getElementById("openText");
+    const overdueText = document.getElementById("overdueText");
+
+    const incomeVal = document.getElementById("incomeVal");
+    const expensesVal = document.getElementById("expensesVal");
+    const netVal = document.getElementById("netVal");
+
+    const barsEl = document.getElementById("bars");
+    const err1 = document.getElementById("err1");
+    const err2 = document.getElementById("err2");
+
+    const tenantCountPill = document.getElementById("tenantCountPill");
+    const backendPill = document.getElementById("backendPill");
+    const monthSelect = document.getElementById("monthSelect");
+
+    // Landlord UI
+    const llDisplay = document.getElementById("llDisplay");
+    const btnReloadLL = document.getElementById("btnReloadLL");
+    const btnGoLandlord = document.getElementById("btnGoLandlord");
+
+    function eur(n){
+      const v = Number(n || 0);
+      return "€" + v.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    function safe(v){ return (v ?? "").toString(); }
+    function num(v){
+      if (v === null || v === undefined) return 0;
+      const x = Number(String(v).replace(",", ".").replace(/[^\d.-]/g, ""));
+      return isNaN(x) ? 0 : x;
+    }
+
+    // ====== Landlord keys (kompatibel zu deinen Seiten) ======
+    const K1_NAME = "llp_landlord_name";
+    const K1_ADDR = "llp_landlord_address";
+    const K1_CITY = "llp_landlord_city";
+
+    const K2_NAME = "landlordName";
+    const K2_ADDR = "landlordAddress";
+    const K2_CITY = "landlordZipCity";
+
+    function readFirst(keys){
+      for(const k of keys){
+        const v = localStorage.getItem(k);
+        if(v && v.trim()) return v.trim();
+      }
+      return "";
+    }
+
+    function loadLandlordDisplay(){
+      const name = readFirst([K1_NAME, K2_NAME]);
+      const addr = readFirst([K1_ADDR, K2_ADDR]);
+      const city = readFirst([K1_CITY, K2_CITY]);
+
+      if(!name && !addr && !city){
+        llDisplay.textContent = "Keine Vermieterdaten gespeichert.";
+        return;
+      }
+      const parts = [name, addr, city].filter(Boolean);
+      llDisplay.textContent = parts.join(" • ");
+    }
+
+    btnReloadLL.addEventListener("click", loadLandlordDisplay);
+
+    // Zielseite: nimm die passende bei dir (Mahnung oder Mieterhöhung Auto)
+    btnGoLandlord.addEventListener("click", () => {
+      // Wenn du eine dedizierte Seite hast, ändere den Link:
+      window.location.href = "mahnung.html";
+    });
+
+    // ---- Month selector (current + last 11 months)
+    function buildMonths(){
+      const now = new Date();
+      monthSelect.innerHTML = "";
+      for(let i=0;i<12;i++){
+        const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+        const value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+        const label = d.toLocaleString("de-DE", { month:"long", year:"numeric" });
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = label;
+        monthSelect.appendChild(opt);
+      }
+    }
+
+    function parseDueDay(t){
+      const dd = num(t.dueDay || t.due_date || t.dueDate || "");
+      return dd > 0 && dd <= 31 ? dd : 3;
+    }
+
+    function isPaid(t){
+      const s = (t.paymentStatus ?? t.status ?? t.paid ?? "").toString().toLowerCase();
+      if (s === "paid" || s === "bezahlt" || s === "true" || s === "1") return true;
+      if (t.paymentStatus === true || t.paid === true) return true;
+      return false;
+    }
+
+    async function fetchTenants(){
+      const endpoints = [
+        `${API_BASE}/tenants`,
+        `${API_BASE}/api/tenants`,
+        `${API_BASE}/tenant`,
+        `${API_BASE}/api/tenant`,
+      ];
+
+      let lastErr = null;
+      for (const url of endpoints){
+        try{
+          const res = await fetch(url);
+          if(!res.ok){ lastErr = new Error(`HTTP ${res.status} @ ${url}`); continue; }
+          const data = await res.json();
+          if (Array.isArray(data)) return data;
+          if (data && Array.isArray(data.tenants)) return data.tenants;
+          lastErr = new Error(`Unerwartetes JSON @ ${url}`);
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      throw lastErr || new Error("Backend nicht erreichbar");
+    }
+
+    function getRepairsExpensesForMonth(yyyyMM){
+      try{
+        const raw = localStorage.getItem("llp_repairs");
+        if(!raw) return 0;
+        const arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) return 0;
+        return arr
+          .filter(x => safe(x.date).startsWith(yyyyMM))
+          .reduce((sum, x) => sum + num(x.cost), 0);
+      }catch(e){
+        return 0;
+      }
+    }
+
+    function setDonut(paid, open, overdue){
+      const total = paid + open + overdue;
+      const paidPct = total ? (paid/total)*100 : 0;
+      const openPct = total ? (open/total)*100 : 0;
+      const overduePct = Math.max(0, 100 - paidPct - openPct);
+
+      donut.style.background = `conic-gradient(
+        #3ccf91 0% ${paidPct}%,
+        #f7c948 ${paidPct}% ${paidPct+openPct}%,
+        #ff6b6b ${paidPct+openPct}% 100%
+      )`;
+
+      donutAmount.textContent = eur(paid);
+      donutSub.textContent = `von ${eur(total)}`;
+      paidText.textContent = eur(paid);
+      openText.textContent = eur(open);
+      overdueText.textContent = eur(overdue);
+    }
+
+    function renderBars(series){
+      barsEl.innerHTML = "";
+      const max = Math.max(...series.map(x => Math.abs(x.value)), 1);
+
+      series.forEach(x => {
+        const col = document.createElement("div");
+        col.className = "bar-col";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+
+        const h = Math.max(10, Math.round((Math.abs(x.value)/max)*100));
+        bar.style.height = h + "%";
+
+        if(x.value < 0){
+          bar.style.background = "linear-gradient(180deg, #ff7a7a, #d93b3b)";
+        }
+
+        col.appendChild(bar);
+
+        const label = document.createElement("div");
+        label.textContent = x.label;
+        col.appendChild(label);
+
+        barsEl.appendChild(col);
+      });
+    }
+
+    function last6MonthsLabels(yyyyMM){
+      const [y,m] = yyyyMM.split("-").map(Number);
+      const base = new Date(y, m-1, 1);
+      const out = [];
+      for(let i=5;i>=0;i--){
+        const d = new Date(base.getFullYear(), base.getMonth()-i, 1);
+        out.push({
+          key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`,
+          label: d.toLocaleString("de-DE", { month:"short" })
+        });
+      }
+      return out;
+    }
+
+    async function loadDashboard(){
+      err1.style.display = "none";
+      err2.style.display = "none";
+
+      const yyyyMM = monthSelect.value;
+      const now = new Date();
+
+      try{
+        const tenants = await fetchTenants();
+        backendPill.textContent = "Backend: OK";
+        tenantCountPill.textContent = "Mieter: " + tenants.length;
+
+        let paid = 0, open = 0, overdue = 0;
+
+        tenants.forEach(t => {
+          const rent = num(t.rent ?? t.miete ?? t.amount ?? t.mietbetrag);
+
+          const dd = parseDueDay(t);
+          const paidFlag = isPaid(t);
+
+          if (paidFlag){
+            paid += rent;
+          } else {
+            if (now.getDate() > dd) overdue += rent;
+            else open += rent;
+          }
+        });
+
+        setDonut(paid, open, overdue);
+
+        const income = paid;
+        const expenses = getRepairsExpensesForMonth(yyyyMM);
+        const net = income - expenses;
+
+        incomeVal.textContent = eur(income);
+        expensesVal.textContent = eur(expenses);
+        netVal.textContent = eur(net);
+
+        let cashflowHistory = null;
+        try{
+          const raw = localStorage.getItem("llp_cashflow");
+          if(raw) cashflowHistory = JSON.parse(raw);
+        }catch(e){ cashflowHistory = null; }
+
+        const months = last6MonthsLabels(yyyyMM);
+        const series = months.map(mm => {
+          if(cashflowHistory && cashflowHistory[mm.key]){
+            const inc = num(cashflowHistory[mm.key].income);
+            const exp = num(cashflowHistory[mm.key].expenses);
+            return { label: mm.label, value: inc - exp };
+          }
+          return { label: mm.label, value: net };
+        });
+
+        renderBars(series);
+
+      }catch(err){
+        backendPill.textContent = "Backend: FEHLT";
+        tenantCountPill.textContent = "Mieter: –";
+
+        err1.style.display = "block";
+        err1.textContent = "Fehler: " + err.message;
+
+        err2.style.display = "block";
+        err2.textContent = "Fehler: " + err.message;
+      }
+    }
+
+    // ====== INIT ======
+    buildMonths();
+    loadLandlordDisplay();
+    monthSelect.addEventListener("change", loadDashboard);
+
+    loadDashboard();
+  </script>
+</body>
+</html>
+

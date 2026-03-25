@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Landlord Lite – Reparaturen</title>
+
+  <style>
+    :root{
+      --green1:#0f5a2a;
+      --green2:#1f7a3a;
+      --green3:#2e9a4a;
+      --bg:#f4f6f8;
+      --card:#ffffff;
+      --text:#1f2a37;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --danger:#d13b3b;
+      --shadow:0 8px 24px rgba(0,0,0,.08);
+      --radius:14px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .app{
+      display:flex;
+      min-height:100vh;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:260px;
+      background:linear-gradient(180deg,var(--green2),var(--green1));
+      color:#fff;
+      padding:18px;
+      position:sticky;
+      top:0;
+      height:100vh;
+    }
+    .brand{
+      font-weight:800;
+      font-size:26px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+      letter-spacing:.2px;
+    }
+    .brand small{
+      display:block;
+      font-size:12px;
+      font-weight:600;
+      opacity:.85;
+      margin-top:2px;
+    }
+
+    .sidebar-nav{
+      margin-top:12px;
+    }
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      user-select:none;
+      background:rgba(255,255,255,.12);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+    }
+    .nav-item:hover{
+      background:rgba(255,255,255,.16);
+    }
+    .submenu{
+      margin-top:10px;
+      display:block;
+    }
+    .submenu a{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 12px;
+      margin:8px 0;
+      color:#fff;
+      text-decoration:none;
+      border-radius:12px;
+      background:rgba(255,255,255,.10);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+      transition:transform .06s ease, background .12s ease;
+    }
+    .submenu a:hover{
+      background:rgba(255,255,255,.16);
+      transform:translateY(-1px);
+    }
+    .submenu a.active{
+      background:rgba(255,255,255,.22);
+      box-shadow: 0 8px 20px rgba(0,0,0,.12), inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+    .icon{ width:18px; text-align:center; }
+
+    /* Content */
+    main.content{
+      flex:1;
+      padding:26px;
+    }
+    .header-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+    .header-row h2{
+      margin:0;
+      font-size:34px;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size:12px;
+      color:var(--muted);
+      background:#fff;
+      border:1px solid var(--border);
+      padding:8px 10px;
+      border-radius:999px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card h3{
+      margin:0 0 10px 0;
+      font-size:18px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:12px;
+      flex:1;
+      min-width:180px;
+    }
+    .field.full{ min-width:100%; }
+    .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .input, select.input, textarea.input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      background:#fff;
+      font-size:14px;
+    }
+    textarea.input{ min-height:86px; resize:vertical; }
+    .input:focus{
+      border-color:#9cc8a8;
+      box-shadow:0 0 0 3px rgba(46,154,74,.14);
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 10px 24px rgba(0,0,0,.12);
+    }
+    .btn.green{ background:linear-gradient(180deg,var(--green3),var(--green2)); color:#fff; }
+    .btn.grey{ background:#eef2f7; color:#111827; box-shadow:none; border:1px solid var(--border); }
+    .btn.red{ background:linear-gradient(180deg,#ea5656,var(--danger)); color:#fff; }
+    .btn:active{ transform:translateY(1px); }
+
+    .muted{ color:var(--muted); font-size:12px; margin-top:6px; }
+
+    /* Fälle-Liste */
+    .case-list{
+      margin-top:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-height:520px;
+      overflow:auto;
+      padding-right:4px;
+    }
+    .case-item{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+      cursor:pointer;
+      transition:transform .06s ease, box-shadow .12s ease;
+    }
+    .case-item:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 28px rgba(0,0,0,.10);
+    }
+    .case-item.active{
+      border-color:#9cc8a8;
+      box-shadow:0 12px 28px rgba(46,154,74,.14);
+    }
+    .case-title{
+      font-weight:900;
+      font-size:14px;
+      margin-bottom:4px;
+    }
+    .case-meta{
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns:1fr; }
+      .sidebar{ position:relative; height:auto; width:100%; }
+      .app{ flex-direction:column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">🏠 Landlord Lite</div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-item" onclick="toggleSubmenu()">
+          <span class="icon">📁</span>
+          <span>Mieterverwaltung</span>
+          <span id="menuArrow" style="margin-left:auto;">▲</span>
+        </div>
+
+        <div id="submenu" class="submenu">
+          <a href="index.html"><span class="icon">👥</span><span>Übersicht</span></a>
+          <a href="mahnung.html"><span class="icon">📄</span><span>Mahnungsystem</span></a>
+          <a href="reparatur.html" class="active"><span class="icon">🛠</span><span>Reparaturen</span></a>
+                  </div>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <div class="header-row">
+        <h2>Reparaturen</h2>
+        <div class="badge" id="modeBadge">● Lokal (Demo) – gespeichert im Browser</div>
+      </div>
+
+      <div class="grid">
+        <!-- LINKS: Fälle -->
+        <section class="card">
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Fälle</h3>
+            <button class="btn green" id="btnNewCase">＋ Neuer Fall</button>
+          </div>
+
+          <div class="field" style="margin-top:12px;">
+            <div class="label">Suchen (Mieter, Wohnung, Problem)…</div>
+            <input class="input" id="searchInput" placeholder="z.B. Rossetanni, Whg 45, Wasser…" />
+          </div>
+
+          <div class="field">
+            <div class="label">Status-Filter</div>
+            <select class="input" id="statusFilter">
+              <option value="alle">Alle</option>
+              <option value="offen">Offen</option>
+              <option value="inBearbeitung">In Bearbeitung</option>
+              <option value="abgeschlossen">Abgeschlossen</option>
+            </select>
+          </div>
+
+          <div class="muted" id="leftHint">Klicke links auf einen Fall.</div>
+          <div class="case-list" id="caseList"></div>
+        </section>
+
+        <!-- RECHTS: Details -->
+        <section class="card">
+          <h3>Fall-Details</h3>
+
+          <div class="row">
+            <div class="field">
+              <div class="label">Mieter</div>
+              <input class="input" id="tenant" placeholder="z.B. Max Mustermann" />
+            </div>
+
+            <div class="field">
+              <div class="label">Wohnung</div>
+              <input class="input" id="unit" placeholder="z.B. 45" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <div class="label">Status</div>
+              <select class="input" id="status">
+                <option value="offen">Offen</option>
+                <option value="inBearbeitung">In Bearbeitung</option>
+                <option value="abgeschlossen">Abgeschlossen</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <div class="label">Datum gemeldet</div>
+              <input class="input" id="date" type="date" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <div class="label">Handwerker</div>
+              <input class="input" id="contractor" placeholder="z.B. Müller GmbH" />
+            </div>
+
+            <div class="field">
+              <div class="label">Telefon</div>
+              <input class="input" id="phone" placeholder="z.B. 0176..." />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <div class="label">Kosten (€)</div>
+              <input class="input" id="cost" type="number" step="0.01" placeholder="0.00" />
+            </div>
+
+            <div class="field">
+              <div class="label">Bezahlt?</div>
+              <select class="input" id="paid">
+                <option value="nein">Nein</option>
+                <option value="ja">Ja</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field full">
+            <div class="label">Problem / Beschreibung</div>
+            <textarea class="input" id="problem" placeholder="Was ist kaputt? (kurz & klar)"></textarea>
+          </div>
+
+          <div class="field full">
+            <div class="label">Interne Notizen</div>
+            <textarea class="input" id="notes" placeholder="z.B. Termin, Material, Infos…"></textarea>
+          </div>
+
+          <div class="row" style="gap:12px; margin-top:8px;">
+            <button class="btn green" id="btnSaveCase">💾 Speichern</button>
+            <button class="btn grey" id="btnMarkDone">✅ Abschließen</button>
+            <button class="btn red" id="btnDeleteCase">🗑 Löschen</button>
+          </div>
+
+          <p class="muted" id="midMsg"></p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Sidebar Dropdown (optional)
+    function toggleSubmenu(){
+      const submenu = document.getElementById("submenu");
+      const arrow = document.getElementById("menuArrow");
+      const isHidden = submenu.style.display === "none";
+      submenu.style.display = isHidden ? "block" : "none";
+      arrow.textContent = isHidden ? "▲" : "▼";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const STORAGE_KEY = "llp_repairs_cases";
+
+      // DOM
+      const caseListEl   = document.getElementById("caseList");
+      const leftHint     = document.getElementById("leftHint");
+      const searchInput  = document.getElementById("searchInput");
+      const statusFilter = document.getElementById("statusFilter");
+
+      const btnNewCase   = document.getElementById("btnNewCase");
+      const btnSaveCase  = document.getElementById("btnSaveCase");
+      const btnMarkDone  = document.getElementById("btnMarkDone");
+      const btnDeleteCase= document.getElementById("btnDeleteCase");
+
+      const tenantEl     = document.getElementById("tenant");
+      const unitEl       = document.getElementById("unit");
+      const statusEl     = document.getElementById("status");
+      const dateEl       = document.getElementById("date");
+      const contractorEl = document.getElementById("contractor");
+      const phoneEl      = document.getElementById("phone");
+      const costEl       = document.getElementById("cost");
+      const paidEl       = document.getElementById("paid");
+      const problemEl    = document.getElementById("problem");
+      const notesEl      = document.getElementById("notes");
+      const midMsg       = document.getElementById("midMsg");
+
+      // State
+      let cases = [];
+      let activeId = null;
+
+      // Helpers
+      const uid = () => "case_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+      const safe = (v) => (v ?? "").toString().trim();
+
+      function msg(text, isErr=false){
+        midMsg.textContent = text;
+        midMsg.style.color = isErr ? "#b42318" : "";
+        setTimeout(()=>{ midMsg.textContent=""; }, 2200);
+      }
+
+      function load(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          cases = raw ? JSON.parse(raw) : [];
+          if(!Array.isArray(cases)) cases = [];
+        }catch(e){
+          cases = [];
+        }
+      }
+
+      function save(){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+      }
+
+      function normalizeStatus(v){
+        if(v === "offen" || v === "inBearbeitung" || v === "abgeschlossen") return v;
+        return "offen";
+      }
+
+      function statusLabel(v){
+        if(v === "inBearbeitung") return "In Bearbeitung";
+        if(v === "abgeschlossen") return "Abgeschlossen";
+        return "Offen";
+      }
+
+      function clearForm(){
+        tenantEl.value = "";
+        unitEl.value = "";
+        statusEl.value = "offen";
+        dateEl.value = "";
+        contractorEl.value = "";
+        phoneEl.value = "";
+        costEl.value = "";
+        paidEl.value = "nein";
+        problemEl.value = "";
+        notesEl.value = "";
+      }
+
+      function fillForm(c){
+        tenantEl.value = c.tenant || "";
+        unitEl.value = c.unit || "";
+        statusEl.value = normalizeStatus(c.status);
+        dateEl.value = c.date || "";
+        contractorEl.value = c.contractor || "";
+        phoneEl.value = c.phone || "";
+        costEl.value = (c.cost ?? "") === 0 ? "0.00" : (c.cost ?? "");
+        paidEl.value = (c.paid === "ja") ? "ja" : "nein";
+        problemEl.value = c.problem || "";
+        notesEl.value = c.notes || "";
+      }
+
+      function readForm(){
+        return {
+          tenant: safe(tenantEl.value),
+          unit: safe(unitEl.value),
+          status: normalizeStatus(statusEl.value),
+          date: safe(dateEl.value),
+          contractor: safe(contractorEl.value),
+          phone: safe(phoneEl.value),
+          cost: safe(costEl.value),
+          paid: paidEl.value === "ja" ? "ja" : "nein",
+          problem: safe(problemEl.value),
+          notes: safe(notesEl.value),
+        };
+      }
+
+      function matchesFilter(c){
+        const q = safe(searchInput.value).toLowerCase();
+        const f = statusFilter.value;
+
+        const hay = [
+          c.tenant, c.unit, c.problem, c.contractor, c.phone, c.notes
+        ].join(" ").toLowerCase();
+
+        const okQuery = !q || hay.includes(q);
+        const okStatus = (f === "alle") ? true : (c.status === f);
+
+        return okQuery && okStatus;
+      }
+
+      function render(){
+        caseListEl.innerHTML = "";
+
+        const filtered = cases.filter(matchesFilter);
+
+        if(filtered.length === 0){
+          leftHint.textContent = "Keine Fälle gefunden.";
+          leftHint.style.display = "block";
+          return;
+        }
+
+        leftHint.style.display = "none";
+
+        filtered
+          .sort((a,b)=> (b.updatedAt||0) - (a.updatedAt||0))
+          .forEach(c => {
+            const item = document.createElement("div");
+            item.className = "case-item" + (c.id === activeId ? " active" : "");
+
+            const title = document.createElement("div");
+            title.className = "case-title";
+            title.textContent = `${c.tenant || "Unbekannt"}${c.unit ? " (Whg " + c.unit + ")" : ""}`;
+
+            const meta = document.createElement("div");
+            meta.className = "case-meta";
+
+            const p1 = document.createElement("span");
+            p1.className = "pill";
+            p1.textContent = statusLabel(c.status);
+
+            const p2 = document.createElement("span");
+            p2.className = "pill";
+            p2.textContent = (c.paid === "ja") ? "Bezahlt" : "Nicht bezahlt";
+
+            const p3 = document.createElement("span");
+            p3.className = "pill";
+            p3.textContent = c.date ? ("📅 " + c.date) : "📅 kein Datum";
+
+            meta.appendChild(p1);
+            meta.appendChild(p2);
+            meta.appendChild(p3);
+
+            const preview = document.createElement("div");
+            preview.className = "muted";
+            preview.style.marginTop = "6px";
+            preview.textContent = c.problem ? (c.problem.length > 70 ? c.problem.slice(0,70) + "…" : c.problem) : "(kein Problemtext)";
+
+            item.appendChild(title);
+            item.appendChild(meta);
+            item.appendChild(preview);
+
+            item.addEventListener("click", () => {
+              activeId = c.id;
+              fillForm(c);
+              render();
+            });
+
+            caseListEl.appendChild(item);
+          });
+      }
+
+      function getActive(){
+        return cases.find(x => x.id === activeId) || null;
+      }
+
+      // Actions
+      btnNewCase.addEventListener("click", () => {
+        const id = uid();
+        const now = Date.now();
+        const c = {
+          id,
+          tenant:"",
+          unit:"",
+          status:"offen",
+          date:"",
+          contractor:"",
+          phone:"",
+          cost:"",
+          paid:"nein",
+          problem:"",
+          notes:"",
+          createdAt: now,
+          updatedAt: now
+        };
+        cases.push(c);
+        activeId = id;
+        save();
+        clearForm();
+        fillForm(c);
+        render();
+        msg("Neuer Fall angelegt.");
+      });
+
+      btnSaveCase.addEventListener("click", () => {
+        if(!activeId){
+          msg("Bitte erst einen Fall auswählen oder 'Neuer Fall'.", true);
+          return;
+        }
+
+        const c = getActive();
+        if(!c){
+          msg("Aktiver Fall nicht gefunden.", true);
+          return;
+        }
+
+        const data = readForm();
+
+        // Minimal-Validierung
+        if(!data.tenant){
+          msg("Bitte Mieter eintragen.", true);
+          tenantEl.focus();
+          return;
+        }
+
+        Object.assign(c, data, { updatedAt: Date.now() });
+        save();
+        render();
+        msg("Gespeichert ✅");
+      });
+
+      btnMarkDone.addEventListener("click", () => {
+        const c = getActive();
+        if(!c){
+          msg("Bitte erst einen Fall auswählen.", true);
+          return;
+        }
+        c.status = "abgeschlossen";
+        c.updatedAt = Date.now();
+        statusEl.value = "abgeschlossen";
+        save();
+        render();
+        msg("Fall abgeschlossen ✅");
+      });
+
+      btnDeleteCase.addEventListener("click", () => {
+        const c = getActive();
+        if(!c){
+          msg("Bitte erst einen Fall auswählen.", true);
+          return;
+        }
+        if(!confirm("Diesen Fall wirklich löschen?")) return;
+
+        cases = cases.filter(x => x.id !== activeId);
+        activeId = null;
+        save();
+        clearForm();
+        render();
+        msg("Fall gelöscht.");
+      });
+
+      // Live filter
+      searchInput.addEventListener("input", render);
+      statusFilter.addEventListener("change", render);
+
+      // Init
+      load();
+      render();
+
+      // Optional: set default date when empty and user starts typing
+      if(!dateEl.value){
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth()+1).padStart(2,"0");
+        const dd = String(today.getDate()).padStart(2,"0");
+        dateEl.value = `${yyyy}-${mm}-${dd}`;
+      }
+    });
+  </script>
+</body>
+</html>

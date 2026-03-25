@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mieterhöhung (Auto) – Landlord Lite</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --green:#2e7d32;
+      --bg:#f4f6f8;
+      --card:#fff;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow: 0 2px 12px rgba(0,0,0,.06);
+      --radius: 12px;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family: Arial, sans-serif; background:var(--bg); color:#111; }
+
+    .app{ display:flex; min-height:100vh; }
+    .sidebar{
+      width:240px; background:var(--green); color:#fff; padding:18px 14px;
+      display:flex; flex-direction:column; gap:14px;
+      box-shadow: 0 2px 14px rgba(0,0,0,.12);
+    }
+    .brand{ font-weight:800; font-size:16px; line-height:1.2; }
+    .nav{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+    .nav a{
+      text-decoration:none; color:#fff; padding:10px 12px; border-radius:10px;
+      background: rgba(255,255,255,.12);
+      display:block;
+    }
+    .nav a.active{ background: rgba(0,0,0,.18); }
+    .nav a:hover{ background: rgba(0,0,0,.22); }
+
+    .main{ flex:1; padding:18px; }
+    .pageTitle{ font-size:22px; font-weight:800; margin: 4px 0 16px; }
+
+    .card{
+      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:16px; margin-bottom:14px;
+    }
+    .card h2{ margin:0 0 12px; font-size:16px; }
+    .muted{ color:var(--muted); font-size:12px; margin-top:6px; }
+
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+    @media (max-width: 980px){
+      .sidebar{ display:none; }
+      .grid2,.grid3{ grid-template-columns: 1fr; }
+    }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .label{ font-size:12px; color:#444; }
+    .input{
+      height: 38px; border:1px solid var(--border); border-radius:10px;
+      padding: 8px 10px; outline:none; background:#fff;
+    }
+    .input:focus{ border-color: var(--green); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .btn{
+      border:none; border-radius:10px; padding:10px 12px; cursor:pointer; font-size:13px;
+    }
+    .btn.green{ background:var(--green); color:#fff; }
+    .btn.grey{ background:#e9ecef; color:#222; }
+    .btn.red{ background:#c62828; color:#fff; }
+    .btn:active{ transform: translateY(1px); }
+
+    textarea{
+      width:100%; min-height: 260px; resize:vertical;
+      border:1px solid var(--border); border-radius:12px; padding:12px;
+      font-size:13px; line-height:1.5; outline:none;
+    }
+    textarea:focus{ border-color: var(--green); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+
+    #msg{ margin-top:10px; font-size:13px; }ff
+    #msg.success{ color: var(--green); }
+    #msg.error{ color:#c62828; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">🏠Landlord Lite</div>
+      <div class="nav">
+        <a href="index.html">📁Mieterverwaltung</a>
+        <a class="active" href="mieterhoehung.autohtml">Mieterhöhung (Auto)</a>
+        <a href="mieterhoehung_vorlage.html">Mieterhöhung (Vorlage)</a>
+      </div>
+      <div style="margin-top:auto; font-size:12px; opacity:.9;">
+        LocalStorage wird genutzt<br/>wie bei Mahnung
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="pageTitle">Mieterhöhung (Automatisch)</div>
+
+      <!-- Vermieterdaten -->
+      <section class="card">
+        <h2>Vermieterdaten (werden gespeichert)</h2>
+
+        <div class="grid2">
+          <div class="field">
+            <div class="label">Name des Vermieters / der Verwaltung</div>
+            <input id="ll_name" class="input" placeholder="z.B. Max Mustermann" />
+          </div>
+
+          <div class="field">
+            <div class="label">PLZ, Ort</div>
+            <input id="ll_city" class="input" placeholder="z.B. 64295 Darmstadt" />
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="field">
+          <div class="label">Adresse</div>
+          <input id="ll_address" class="input" placeholder="z.B. Dieselstraße 7" />
+        </div>
+
+        <div class="actions">
+          <button id="btnSaveLandlord" class="btn green">Vermieterdaten speichern</button>
+          <button id="btnClearLandlord" class="btn grey">Vermieterdaten löschen</button>
+        </div>
+
+        <div id="msg"></div>
+        <div class="muted">Genau wie bei Mahnung: Daten werden im Browser gespeichert.</div>
+      </section>
+
+      <!-- Mieter + Werte -->
+      <section class="card">
+        <h2>Mieter auswählen & Mieterhöhung generieren</h2>
+
+        <div class="grid3">
+          <div class="field">
+            <div class="label">Mieter</div>
+            <select id="tenantSelect" class="input">
+              <option value="">— Mieter auswählen —</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <div class="label">Neue Miete (€)</div>
+            <input id="newRent" class="input" type="number" step="0.01" placeholder="z.B. 820" />
+          </div>
+
+          <div class="field">
+            <div class="label">Wirksam ab</div>
+            <input id="effectiveDate" class="input" type="date" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btnGenerate" class="btn green">Text generieren</button>
+          <button id="btnCopy" class="btn grey">Kopieren</button>
+        </div>
+
+        <div class="muted">
+          Tipp: Wenn du Mieter wechselst / neue Miete / Datum änderst, aktualisiert sich der Text automatisch.
+        </div>
+      </section>
+
+      <!-- Text -->
+      <section class="card">
+        <h2>Generierter Mieterhöhungstext</h2>
+        <textarea id="output" placeholder="Hier erscheint der Text..."></textarea>
+
+        <div class="actions">
+          <button id="btnExportTxt" class="btn grey">Als TXT speichern</button>
+          <button id="btnExportHtml" class="btn grey">Als HTML speichern</button>
+          <button id="btnExportDoc" class="btn grey">Als Word-Datei (.doc)</button>
+          <button id="btnExportPdf" class="btn grey">Als PDF exportieren</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ====== BACKEND ======
+    const API_BASE = "http://127.0.0.1:3000";
+
+    // ====== STORAGE KEYS (Kompatibel zu Mahnung + deinen bisherigen) ======
+    const K1_NAME = "llp_landlord_name";
+    const K1_ADDR = "llp_landlord_address";
+    const K1_CITY = "llp_landlord_city";
+
+    // häufige Keys aus anderen Seiten
+    const K2_NAME = "landlordName";
+    const K2_ADDR = "landlordAddress";
+    const K2_CITY = "landlordZipCity";
+
+    // ====== DOM ======
+    const elMsg = document.getElementById("msg");
+    const llName = document.getElementById("ll_name");
+    const llAddress = document.getElementById("ll_address");
+    const llCity = document.getElementById("ll_city");
+
+    const tenantSelect = document.getElementById("tenantSelect");
+    const newRentEl = document.getElementById("newRent");
+    const effectiveDateEl = document.getElementById("effectiveDate");
+    const outEl = document.getElementById("output");
+
+    const btnSaveLandlord = document.getElementById("btnSaveLandlord");
+    const btnClearLandlord = document.getElementById("btnClearLandlord");
+    const btnGenerate = document.getElementById("btnGenerate");
+    const btnCopy = document.getElementById("btnCopy");
+    const btnExportTxt = document.getElementById("btnExportTxt");
+    const btnExportHtml = document.getElementById("btnExportHtml");
+    const btnExportDoc = document.getElementById("btnExportDoc");
+    const btnExportPdf = document.getElementById("btnExportPdf");
+
+    let tenantsCache = [];
+    let selectedTenant = null;
+
+    function safe(v){ return (v ?? "").toString(); }
+
+    function showMsg(text, type="success"){
+      if(!elMsg) return;
+      elMsg.textContent = text;
+      elMsg.className = type;
+      setTimeout(() => { elMsg.textContent=""; elMsg.className=""; }, 2500);
+    }
+
+    // ====== Vermieter: lesen (probiert alle Keys) ======
+    function readFirst(keys){
+      for(const k of keys){
+        const v = localStorage.getItem(k);
+        if(v && v.trim()) return v;
+      }
+      return "";
+    }
+
+    function loadLandlord(){
+      llName.value = readFirst([K1_NAME, K2_NAME]);
+      llAddress.value = readFirst([K1_ADDR, K2_ADDR]);
+      llCity.value = readFirst([K1_CITY, K2_CITY]);
+    }
+
+    // ====== Vermieter: speichern (schreibt in ALLE Keys -> 100% kompatibel) ======
+    function saveLandlord(){
+      const name = llName.value.trim();
+      const addr = llAddress.value.trim();
+      const city = llCity.value.trim();
+
+      localStorage.setItem(K1_NAME, name);
+      localStorage.setItem(K1_ADDR, addr);
+      localStorage.setItem(K1_CITY, city);
+
+      localStorage.setItem(K2_NAME, name);
+      localStorage.setItem(K2_ADDR, addr);
+      localStorage.setItem(K2_CITY, city);
+
+      showMsg("Vermieterdaten gespeichert.", "success");
+      generateText();
+    }
+
+    function clearLandlord(){
+      [K1_NAME,K1_ADDR,K1_CITY,K2_NAME,K2_ADDR,K2_CITY].forEach(k => localStorage.removeItem(k));
+      loadLandlord();
+      showMsg("Vermieterdaten gelöscht.", "success");
+      generateText();
+    }
+
+    btnSaveLandlord.addEventListener("click", saveLandlord);
+    btnClearLandlord.addEventListener("click", clearLandlord);
+
+    // ====== Tenants ======
+    async function fetchTenants(){
+      const endpoints = [
+        `${API_BASE}/tenants`,
+        `${API_BASE}/api/tenants`,
+        `${API_BASE}/tenant`,
+        `${API_BASE}/api/tenant`,
+      ];
+
+      let lastErr = null;
+      for(const url of endpoints){
+        try{
+          const res = await fetch(url);
+          if(!res.ok){ lastErr = new Error(`HTTP ${res.status} @ ${url}`); continue; }
+          const data = await res.json();
+          if(Array.isArray(data)) return data;
+          if(data && Array.isArray(data.tenants)) return data.tenants;
+          lastErr = new Error(`Unerwartetes JSON @ ${url}`);
+        }catch(e){ lastErr = e; }
+      }
+      throw lastErr || new Error("Backend nicht erreichbar");
+    }
+
+    async function loadTenants(){
+      try{
+        const data = await fetchTenants();
+        tenantsCache = Array.isArray(data) ? data : [];
+
+        tenantSelect.innerHTML = `<option value="">— Mieter auswählen —</option>`;
+        tenantsCache.forEach(t => {
+          const id = String(t._id || t.id || "");
+          const unit = t.unit || t.apartment || t.wohnung || t.flat || "";
+          const opt = document.createElement("option");
+          opt.value = id;
+          opt.textContent = `${safe(t.name)} (${safe(unit)})`;
+          tenantSelect.appendChild(opt);
+        });
+      }catch(err){
+        console.error(err);
+        tenantSelect.innerHTML = `<option value="">(Backend nicht erreichbar)</option>`;
+        showMsg("Backend nicht erreichbar (Mieter nicht geladen).", "error");
+      }
+    }
+
+    tenantSelect.addEventListener("change", () => {
+      const id = String(tenantSelect.value || "");
+      selectedTenant = tenantsCache.find(t => String(t._id || t.id) === id) || null;
+      generateText();
+    });
+
+    newRentEl.addEventListener("input", generateText);
+    effectiveDateEl.addEventListener("change", generateText);
+
+    // ====== Text Generator ======
+    function getOldRent(){
+      return (
+        safe(selectedTenant?.rent) ||
+        safe(selectedTenant?.miete) ||
+        safe(selectedTenant?.amount) ||
+        safe(selectedTenant?.mietbetrag) ||
+        ""
+      );
+    }
+
+    function formatDateDE(iso){
+      if(!iso) return "";
+      const parts = iso.split("-");
+      if(parts.length !== 3) return iso;
+      return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    }
+
+    function generateText(){
+      const landlordName = readFirst([K1_NAME, K2_NAME]) || llName.value.trim();
+      const landlordAddress = readFirst([K1_ADDR, K2_ADDR]) || llAddress.value.trim();
+      const landlordCity = readFirst([K1_CITY, K2_CITY]) || llCity.value.trim();
+
+      const tenantName = safe(selectedTenant?.name);
+      const wohnung = safe(selectedTenant?.unit || selectedTenant?.apartment || selectedTenant?.wohnung || selectedTenant?.flat);
+
+      const alteMiete = getOldRent();
+      const neueMiete = safe(newRentEl.value);
+      const wirksam = formatDateDE(safe(effectiveDateEl.value));
+
+      const text =
+`${landlordName}
+${landlordAddress}
+${landlordCity}
+
+An: ${tenantName}
+Wohnung: ${wohnung}
+
+Betreff: Mieterhöhung
+
+Sehr geehrte/r ${tenantName},
+
+hiermit teile ich Ihnen mit, dass die monatliche Miete für die Wohnung (${wohnung})
+von ${alteMiete} € auf ${neueMiete} € erhöht wird.
+
+Die Erhöhung gilt ab dem ${wirksam}.
+
+Mit freundlichen Grüßen
+
+${landlordName}
+`.trim();
+
+      outEl.value = text;
+    }
+
+    btnGenerate.addEventListener("click", generateText);
+
+    // ====== Copy ======
+    btnCopy.addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(outEl.value || "");
+        showMsg("Text kopiert.", "success");
+      }catch(e){
+        outEl.select();
+        document.execCommand("copy");
+        showMsg("Text kopiert.", "success");
+      }
+    });
+
+    // ====== Export ======
+    function downloadFile(content, filename, mimeType){
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    btnExportTxt.addEventListener("click", () => {
+      downloadFile(outEl.value || "", "mieterhoehung.txt", "text/plain;charset=utf-8");
+    });
+
+    btnExportHtml.addEventListener("click", () => {
+      const escaped = (outEl.value || "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll("\n","<br>");
+      const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;line-height:1.5">${escaped}</body></html>`;
+      downloadFile(html, "mieterhoehung.html", "text/html;charset=utf-8");
+    });
+
+    btnExportDoc.addEventListener("click", () => {
+      const escaped = (outEl.value || "")
+        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+        .replaceAll("\n","<br>");
+      const docHtml = `<html><head><meta charset="UTF-8"></head><body style="font-family:Arial,sans-serif;line-height:1.5">${escaped}</body></html>`;
+      downloadFile(docHtml, "mieterhoehung.doc", "application/msword");
+    });
+
+    btnExportPdf.addEventListener("click", () => {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("jsPDF fehlt. Prüfe ob du das jsPDF Script eingebunden hast.");
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:"pt", format:"a4" });
+
+      const text = outEl.value || "";
+      const marginLeft = 50;
+      const marginTop = 60;
+      const maxWidth = 500;
+      const lines = doc.splitTextToSize(text, maxWidth);
+
+      doc.setFont("Times", "Normal");
+      doc.setFontSize(12);
+
+      let y = marginTop;
+      for(const line of lines){
+        if(y > 780){ doc.addPage(); y = marginTop; }
+        doc.text(line, marginLeft, y);
+        y += 16;
+      }
+      doc.save("Mieterhoehung.pdf");
+    });
+
+    // ====== INIT ======
+    loadLandlord();
+    loadTenants();
+    generateText();
+  </script>
+</body>
+</html>
