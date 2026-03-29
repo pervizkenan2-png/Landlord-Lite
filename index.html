@@ -4,7 +4,7 @@
 <script>
   const token = localStorage.getItem("token");
   if (!token) {
-    window.location.replace = "./Login.html";
+    window.location.replace("./Login.html");
   }
 </script>
   <meta charset="UTF-8" />
@@ -790,6 +790,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const res = await fetch(TENANTS_URL, { method: 'GET' });
+
+if (res.status === 401) {
+  localStorage.removeItem("token");
+  window.location.replace("./Login.html");
+  return;
+}
+
 
       if (!res.ok) {
         const txt = await res.text();
