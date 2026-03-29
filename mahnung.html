@@ -2,478 +2,716 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Landlord Lite – Mahnungssystem</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- jsPDF für PDF-Download -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <title>Landlord Lite - Mahnungen</title>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.replace("./Login.html");
+    }
+  </script>
+
+  <script src="config.js"></script>
+
   <style>
     :root {
       --green: #2e7d32;
-      --green-dark: #1b5e20;
+      --green-dark: #205624;
+      --green-soft: #e8f5e9;
+      --red: #c62828;
       --bg: #f4f4f4;
-      --shadow: 0 2px 8px rgba(0,0,0,0.15);
+      --card-radius: 10px;
+      --shadow-soft: 0 2px 8px rgba(0,0,0,0.12);
+      --shadow-strong: 0 6px 18px rgba(0,0,0,0.18);
+      --border: #d9d9d9;
+      --text: #222;
+      --muted: #666;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      display: flex;
-      background: var(--bg);
+      background-color: var(--bg);
+      color: var(--text);
     }
 
-    /* SIDEBAR – wie index.html */
-    .sidebar {
-      width: 230px;
-      background: linear-gradient(180deg, #2e7d32, #1b5e20);
-      color: #fff;
+    .layout {
+      display: flex;
       min-height: 100vh;
-      padding: 20px 18px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-    }
-    .sidebar h1 {
-      margin: 0 0 10px;
-      font-size: 1.4rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .sidebar h1 .logo {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.2);
-    }
-    .sidebar small {
-      opacity: 0.8;
-      font-size: 0.8rem;
-    }
-    .sidebar-nav {
-      margin-top: 20px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 10px;
-      border-radius: 9px;
-      text-decoration: none;
-      color: #fff;
-      margin-bottom: 8px;
-      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-    }
-    .nav-item span.icon {
-      font-size: 1.1rem;
-    }
-    .nav-item:hover {
-      background: rgba(255,255,255,0.18);
-      box-shadow: var(--shadow);
-      transform: translateY(-1px);
-    }
-    .nav-item.active {
-      background: rgba(255,255,255,0.25);
-      box-shadow: var(--shadow);
     }
 
-    /* CONTENT */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, var(--green), var(--green-dark));
+      color: white;
+      padding: 26px 18px;
+      box-shadow: var(--shadow-strong);
+    }
+
+    .brand {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .brand-sub {
+      opacity: 0.9;
+      margin-bottom: 28px;
+      font-size: 1rem;
+    }
+
+    .nav-item,
+    .submenu a {
+      display: block;
+      text-decoration: none;
+      color: white;
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .submenu a:hover,
+    .nav-item.active {
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+
+    .nav-parent {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .submenu {
+      display: none;
+      margin: 4px 0 12px 0;
+      padding-left: 10px;
+    }
+
+    .submenu a {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      background: rgba(255,255,255,0.06);
+    }
+
     .content {
       flex: 1;
-      padding: 22px 26px;
-      max-width: 1100px;
-      margin: 0 auto;
+      padding: 32px;
     }
-    h2 { margin-top: 0; }
+
+    .page-title {
+      font-size: 2.4rem;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+    }
+
+    .msg {
+      min-height: 24px;
+      margin-bottom: 18px;
+      font-size: 1rem;
+    }
+
+    .msg.error {
+      color: var(--red);
+    }
+
+    .msg.success {
+      color: var(--green);
+    }
 
     .card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px 18px;
-      box-shadow: var(--shadow);
-      margin-bottom: 18px;
-    }
-    .card-title {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 1.1rem;
+      background: white;
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-soft);
+      padding: 22px;
+      margin-bottom: 22px;
     }
 
-    label {
-      display: block;
-      font-size: 0.85rem;
-      margin-bottom: 4px;
-      color: #555;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px 9px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-family: inherit;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
-    textarea {
-      min-height: 260px;
-      resize: vertical;
-      white-space: pre-wrap;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--green);
-      box-shadow: 0 0 0 2px rgba(46,125,50,0.15);
+    .card h2 {
+      margin: 0 0 16px 0;
+      font-size: 1.9rem;
     }
 
-    .row-2 {
+    .card h3 {
+      margin: 0 0 14px 0;
+      font-size: 1.2rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
     }
-    .row-2 > div { flex: 1; min-width: 180px; }
+
+    .field label {
+      font-size: 0.98rem;
+      color: #444;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+    }
+
+    textarea {
+      min-height: 320px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 8px 11px;
-      border-radius: 7px;
       border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: bold;
       cursor: pointer;
-      font-size: 0.9rem;
+      transition: 0.2s ease;
     }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
     .btn-primary {
       background: var(--green);
-      color: #fff;
+      color: white;
     }
-    .btn-primary:hover { background: var(--green-dark); }
+
     .btn-secondary {
-      background: #eee;
-      color: #333;
+      background: #f1f1f1;
+      color: #222;
+      border: 1px solid #ddd;
     }
-    .btn-secondary:hover { background: #ddd; }
 
-    #msg {
-      font-size: 0.85rem;
-      margin-bottom: 8px;
+    .tenant-info {
+      background: var(--green-soft);
+      border-left: 5px solid var(--green);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      color: #1f3b22;
     }
-    #msg.error { color: #c62828; }
-    #msg.success { color: #2e7d32; }
 
-    @media (max-width: 800px) {
-      body { flex-direction: column; }
+    .tenant-info strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .small {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
-        min-height: auto;
-        position: static;
       }
-      .content { padding: 14px; }
+
+      .content {
+        padding: 18px;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">🏡 Landlord Lite</div>
+      <div class="brand-sub">Mieterverwaltung</div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <h1>
-    <span class="logo">🏡</span> Landlord Lite
-  </h1>
-  <small>Mahnungssystem</small>
+      <div class="nav-item nav-parent" onclick="toggleSidebarMenu()">
+        <span>📁 Mieterverwaltung</span>
+        <span id="menuArrow">▼</span>
+      </div>
 
-  <nav class="sidebar-nav">
+      <div class="submenu" id="submenu">
+        <a href="./index.html">Mieterübersicht</a>
+        <a href="./mahnung.html">Mahnungen</a>
+        <a href="./reparatur.html">Reparaturen</a>
+        <a href="./vorlage.html">Vorlagen</a>
+      </div>
 
-    <!-- Mieterverwaltung -->
-    <a class="nav-item" href="index.html">
-      <span class="icon">📁</span>
-      <span>Mieterverwaltung</span>
-    </a>
+      <a class="nav-item" href="./dashboard.html">📊 Dashboard</a>
+    </aside>
 
-    <!-- Mahnungssystem -->
-    <a class="nav-item active" href="mahnung.html">
-      <span class="icon">📧</span>
-      <span>Mahnungssystem</span>
-    </a>
+    <main class="content">
+      <h1 class="page-title">Mahnungen</h1>
+      <div id="msg" class="msg"></div>
 
-    <!-- Eigene Vorlagen
- (NEU) -->
-    <a class="nav-item" href="vorlage.html">
-      <span class="icon">📝</span>
-      <span>Eigene Vorlagen</span>
-    </a>
+      <section class="card">
+        <h3>Vermieterdaten</h3>
 
-  </nav>
-</aside>
-
-  <!-- CONTENT -->
-  <main class="content">
-    <h2>Mahnungssystem</h2>
-    <div id="msg"></div>
-
-    <!-- Vermieterdaten (werden gespeichert) -->
-    <section class="card">
-      <h3 class="card-title">Vermieterdaten (werden gespeichert)</h3>
-      <div class="row-2">
-        <div>
+        <div class="field">
           <label for="landlordName">Name des Vermieters / der Verwaltung</label>
-          <input id="landlordName" placeholder="z.B. Max Mustermann oder Muster Hausverwaltung" />
+          <input id="landlordName" type="text" placeholder="z.B. Max Mustermann oder Muster Hausverwaltung" />
         </div>
-        <div>
-          <label for="landlordCity">PLZ, Ort</label>
-          <input id="landlordCity" placeholder="z.B. 12345 Musterstadt" />
+
+        <div class="field">
+          <label for="landlordAddress">Adresse</label>
+          <input id="landlordAddress" type="text" placeholder="z.B. Musterstraße 1, 12345 Musterstadt" />
         </div>
-      </div>
-      <label for="landlordAddress">Adresse</label>
-      <input id="landlordAddress" placeholder="z.B. Musterstraße 1" />
 
-      <label for="landlordContact">Kontoinformationen (für Zahlung)</label>
-      <input id="landlordContact" placeholder="z.B. IBAN, BIC oder Bankname" />
+        <div class="field">
+          <label for="landlordPayment">Kontoinformationen für Zahlung</label>
+          <input id="landlordPayment" type="text" placeholder="z.B. IBAN, Bankname oder Zahlungsanweisung" />
+        </div>
 
-      <button class="btn btn-primary" id="saveLandlordBtn">Vermieterdaten speichern</button>
-    </section>
+        <button id="saveLandlordBtn" class="btn btn-primary">Vermieterdaten speichern</button>
+      </section>
 
-    <!-- Mieter-Auswahl -->
-    <section class="card">
-      <h3 class="card-title">Mieter auswählen & Mahnung generieren</h3>
+      <section class="card">
+        <h3>Mieter auswählen & Mahnung generieren</h3>
 
-      <label for="tenantSelect">Mieter</label>
-      <select id="tenantSelect">
-        <option value="">— Mieter auswählen —</option>
-      </select>
+        <div class="grid-2">
+          <div class="field">
+            <label for="tenantSelect">Mieter</label>
+            <select id="tenantSelect">
+              <option value="">— Mieter auswählen —</option>
+            </select>
+          </div>
 
-      <div style="margin-top:8px;">
-        <button class="btn btn-primary" id="btnSingle">Mahnung für ausgewählten Mieter generieren</button>
-        <button class="btn btn-secondary" id="btnAll">Mahnungen für alle offenen Mieter generieren</button>
-      </div>
-    </section>
+          <div class="field">
+            <label for="mahnungLevel">Mahnungsstufe</label>
+            <select id="mahnungLevel">
+              <option value="1">1. Mahnung</option>
+              <option value="2">2. Mahnung</option>
+              <option value="3">Letzte Mahnung</option>
+            </select>
+          </div>
+        </div>
 
-    <!-- Ergebnis -->
-    <section class="card">
-      <h3 class="card-title">Generierter Mahnungstext</h3>
-      <textarea id="output" placeholder="Hier erscheint der Mahnungstext..."></textarea>
+        <div id="tenantInfo" class="tenant-info" style="display:none;"></div>
 
-      <div style="margin-top:8px;">
-        <button class="btn btn-primary" id="btnPdf">Als PDF herunterladen</button>
-        <button class="btn btn-secondary" id="btnMail">In E-Mail öffnen</button>
-      </div>
-    </section>
-  </main>
+        <div class="btn-row">
+          <button id="generateSelectedBtn" class="btn btn-primary">Mahnung für ausgewählten Mieter generieren</button>
+          <button id="generateAllBtn" class="btn btn-secondary">Mahnungen für alle offenen Mieter generieren</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Generierter Mahnungstext</h3>
+
+        <div class="field">
+          <textarea id="previewText" placeholder="Hier erscheint der Mahnungstext..."></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button id="copyBtn" class="btn btn-primary">Text kopieren</button>
+          <button id="downloadBtn" class="btn btn-secondary">Als TXT speichern</button>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
-    const API = 'http://localhost:3000/api/tenants';
-    let tenants = [];
+    window.toggleSidebarMenu = function () {
+      const menu = document.getElementById("submenu");
+      const arrow = document.getElementById("menuArrow");
+      if (!menu) return;
 
-    const msgEl = document.getElementById('msg');
-    function showMsg(text, type = 'error') {
-      msgEl.textContent = text;
-      msgEl.className = '';
-      if (!text) return;
-      msgEl.classList.add(type === 'success' ? 'success' : 'error');
-      setTimeout(() => {
-        msgEl.textContent = '';
-        msgEl.className = '';
-      }, 4000);
-    }
+      const isOpen = menu.style.display === "block";
+      menu.style.display = isOpen ? "none" : "block";
+      if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
+    };
 
-    // Vermieterdaten laden/speichern (LocalStorage)
-    const landlordNameEl = document.getElementById('landlordName');
-    const landlordAddressEl = document.getElementById('landlordAddress');
-    const landlordCityEl = document.getElementById('landlordCity');
-    const landlordContactEl = document.getElementById('landlordContact');
-    const saveLandlordBtn = document.getElementById('saveLandlordBtn');
-
-    function loadLandlordFromStorage() {
-      try {
-        const raw = localStorage.getItem('landlordProfile');
-        if (!raw) return;
-        const p = JSON.parse(raw);
-        landlordNameEl.value = p.name || '';
-        landlordAddressEl.value = p.address || '';
-        landlordCityEl.value = p.city || '';
-        landlordContactEl.value = p.contact || '';
-      } catch(e) {
-        console.error(e);
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.replace("./Login.html");
+        return;
       }
-    }
 
-    function saveLandlordToStorage() {
-      const profile = {
-        name: landlordNameEl.value.trim(),
-        address: landlordAddressEl.value.trim(),
-        city: landlordCityEl.value.trim(),
-        contact: landlordContactEl.value.trim()
+      const _fetch = window.fetch.bind(window);
+      window.fetch = function (url, options = {}) {
+        const currentToken = localStorage.getItem("token");
+        options.headers = {
+          ...(options.headers || {}),
+          ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
+        };
+        return _fetch(url, options);
       };
-      localStorage.setItem('landlordProfile', JSON.stringify(profile));
-      showMsg('Vermieterdaten gespeichert.', 'success');
-    }
 
-    saveLandlordBtn.addEventListener('click', saveLandlordToStorage);
-    loadLandlordFromStorage();
+      const TENANTS_URL = window.TENANTS_URL;
+      const ACTIVE_TENANT_KEY = "llp_active_tenant_v1";
+      const LANDLORD_KEY = "llp_landlord_data_v1";
 
-    // Mieter laden
-    const tenantSelect = document.getElementById('tenantSelect');
-    async function loadTenants() {
-      try {
-        const res = await fetch(API);
-        if (!res.ok) {
-          const txt = await res.text();
-          showMsg('Fehler beim Laden der Mieter: ' + txt);
+      const msgEl = document.getElementById("msg");
+      const landlordName = document.getElementById("landlordName");
+      const landlordAddress = document.getElementById("landlordAddress");
+      const landlordPayment = document.getElementById("landlordPayment");
+      const saveLandlordBtn = document.getElementById("saveLandlordBtn");
+
+      const tenantSelect = document.getElementById("tenantSelect");
+      const mahnungLevel = document.getElementById("mahnungLevel");
+      const tenantInfo = document.getElementById("tenantInfo");
+      const generateSelectedBtn = document.getElementById("generateSelectedBtn");
+      const generateAllBtn = document.getElementById("generateAllBtn");
+      const previewText = document.getElementById("previewText");
+      const copyBtn = document.getElementById("copyBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
+
+      let tenantsCache = [];
+
+      function showMsg(text, type = "error") {
+        msgEl.textContent = text;
+        msgEl.className = "msg " + (type === "success" ? "success" : "error");
+      }
+
+      function clearMsg() {
+        msgEl.textContent = "";
+        msgEl.className = "msg";
+      }
+
+      function getTenantId(t) {
+        return t?._id || t?.id || "";
+      }
+
+      function formatDate(date) {
+        return new Intl.DateTimeFormat("de-DE").format(date);
+      }
+
+      function getLatestDueDate(dueDay) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        let lastDayCurrentMonth = new Date(year, month + 1, 0).getDate();
+        let clampedCurrent = Math.min(Number(dueDay || 1), lastDayCurrentMonth);
+        let dueDate = new Date(year, month, clampedCurrent);
+
+        if (today.getDate() < Number(dueDay || 1)) {
+          const prevLastDay = new Date(year, month, 0).getDate();
+          const clampedPrev = Math.min(Number(dueDay || 1), prevLastDay);
+          dueDate = new Date(year, month - 1, clampedPrev);
+        }
+
+        return dueDate;
+      }
+
+      function getOverdueDays(tenant) {
+        if (!tenant || tenant.status === "paid") return 0;
+
+        const dueDay = Number(tenant.dueDay || 0);
+        if (!dueDay) return 0;
+
+        const dueDate = getLatestDueDate(dueDay);
+        const today = new Date();
+
+        const a = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const b = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+
+        const diff = Math.floor((a - b) / 86400000);
+        return diff > 0 ? diff : 0;
+      }
+
+      function loadLandlordData() {
+        const raw = localStorage.getItem(LANDLORD_KEY);
+        if (!raw) return;
+
+        try {
+          const data = JSON.parse(raw);
+          landlordName.value = data.name || "";
+          landlordAddress.value = data.address || "";
+          landlordPayment.value = data.payment || "";
+        } catch (_) {}
+      }
+
+      function getLandlordData() {
+        return {
+          name: landlordName.value.trim(),
+          address: landlordAddress.value.trim(),
+          payment: landlordPayment.value.trim()
+        };
+      }
+
+      function saveLandlordData() {
+        const data = getLandlordData();
+        localStorage.setItem(LANDLORD_KEY, JSON.stringify(data));
+        showMsg("Vermieterdaten gespeichert.", "success");
+      }
+
+      function populateTenantSelect() {
+        const previousValue = tenantSelect.value;
+        const rawActive = localStorage.getItem(ACTIVE_TENANT_KEY);
+        let activeId = "";
+
+        if (rawActive) {
+          try {
+            const activeTenant = JSON.parse(rawActive);
+            activeId = String(getTenantId(activeTenant));
+          } catch (_) {}
+        }
+
+        const openTenants = tenantsCache.filter(t => t.status !== "paid");
+
+        tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
+
+        openTenants.forEach(t => {
+          const option = document.createElement("option");
+          option.value = String(getTenantId(t));
+          option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
+          tenantSelect.appendChild(option);
+        });
+
+        if (activeId && openTenants.some(t => String(getTenantId(t)) === activeId)) {
+          tenantSelect.value = activeId;
+        } else if (previousValue && openTenants.some(t => String(getTenantId(t)) === previousValue)) {
+          tenantSelect.value = previousValue;
+        }
+
+        renderTenantInfo();
+      }
+
+      function getSelectedTenant() {
+        const id = tenantSelect.value;
+        return tenantsCache.find(t => String(getTenantId(t)) === String(id)) || null;
+      }
+
+      function renderTenantInfo() {
+        const tenant = getSelectedTenant();
+
+        if (!tenant) {
+          tenantInfo.style.display = "none";
+          tenantInfo.innerHTML = "";
           return;
         }
-        tenants = await res.json();
-        tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
-        tenants.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t._id;
-          opt.textContent = `${t.name} – Wohnung ${t.unit} (${t.rent} €)`;
-          tenantSelect.appendChild(opt);
-        });
-      } catch (err) {
-        showMsg('Netzwerkfehler beim Laden der Mieter: ' + err.message);
+
+        const overdueDays = getOverdueDays(tenant);
+        const dueDate = getLatestDueDate(tenant.dueDay);
+
+        tenantInfo.style.display = "block";
+        tenantInfo.innerHTML = `
+          <strong>${tenant.name || "-"}</strong>
+          Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} € | Fälligkeit: ${formatDate(dueDate)}
+          <br>
+          Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}${overdueDays ? ` | Überfällig seit ${overdueDays} Tagen` : ""}
+        `;
       }
-    }
-    loadTenants();
 
-    function getOverdueDays(t) {
-      const today = new Date();
-      const day = today.getDate();
-      if (!t.dueDay || t.dueDay < 1 || t.dueDay > 31) return 0;
-      if (day <= t.dueDay) return 0;
-      return day - t.dueDay;
-    }
+      function getLevelLabel(level) {
+        if (level === "2") return "2. Mahnung";
+        if (level === "3") return "Letzte Mahnung";
+        return "1. Mahnung";
+      }
 
-    function getLandlordProfile() {
-      return {
-        name: landlordNameEl.value.trim() || '[Name des Vermieters/der Verwaltung]',
-        address: landlordAddressEl.value.trim() || '[Adresse des Vermieters]',
-        city: landlordCityEl.value.trim() || '[PLZ, Ort des Vermieters]',
-        contact: landlordContactEl.value.trim() || '[Kontoinformationen für die Mietzahlung]'
-      };
-    }
+      function buildMahnungText(tenant, level) {
+        const landlord = getLandlordData();
+        const overdueDays = getOverdueDays(tenant);
+        const dueDate = getLatestDueDate(tenant.dueDay);
+        const label = getLevelLabel(level);
 
-    // JuraRat-ähnlicher Langtext – Platzhalter ersetzt
-    function buildLongLetter(tenant, overdueDays) {
-      const l = getLandlordProfile();
-      const today = new Date();
-      const datum = today.toLocaleDateString('de-DE');
+        let intro = "";
+        let deadline = "";
 
-      const tenantName = tenant.name || '[Name des Mieters]';
-      const tenantAddress = tenant.unit ? `Wohnung ${tenant.unit}` : '[Adresse des Mieters]';
-      const tenantCity = '[PLZ, Ort]';
-      const mietObjekt = tenant.unit ? `Wohnung ${tenant.unit}` : '[Mietobjekt]';
-      const betrag = tenant.rent != null ? `${tenant.rent} €` : '[Höhe des ausstehenden Betrags]';
-      const faelligkeit = tenant.dueDay ? `${tenant.dueDay}. (aktueller Monat)` : '[Datum der Fälligkeit]';
+        if (level === "2") {
+          intro = `trotz meiner bereits erfolgten 1. Mahnung ist die Miete für die unten genannte Wohnung weiterhin offen.`;
+          deadline = "Ich fordere Sie daher erneut auf, den offenen Betrag innerhalb von 7 Tagen zu begleichen.";
+        } else if (level === "3") {
+          intro = `trotz meiner bisherigen Aufforderungen ist die Miete weiterhin nicht bei mir eingegangen.`;
+          deadline = "Hiermit erhalten Sie die letzte Mahnung. Ich fordere Sie auf, den offenen Betrag spätestens innerhalb von 5 Tagen vollständig zu begleichen.";
+        } else {
+          intro = `die Miete für die unten genannte Wohnung ist trotz Fälligkeit bisher nicht eingegangen.`;
+          deadline = "Bitte überweisen Sie den offenen Betrag innerhalb von 7 Tagen.";
+        }
 
-      return `
-${l.name}
-${l.address}
-${l.city}
+        const paymentBlock = landlord.payment
+          ? `\nZahlungsinformationen:\n${landlord.payment}\n`
+          : "";
 
-${tenantName}
-${tenantAddress}
-${tenantCity}
+        return `${landlord.name || "Vermieter / Verwaltung"}
+${landlord.address || ""}
 
-[Ort], ${datum}
+${formatDate(new Date())}
 
-1. Mahnung für die Miete des ${mietObjekt}
+An:
+${tenant.name || "-"}
+Wohnung: ${tenant.unit || "-"}
 
-Leider müssen wir feststellen, dass die vereinbarte Mietzahlung für die Immobilie ${tenantAddress} auch nach Ablauf der Zahlungsfrist nicht auf unserem Konto eingegangen ist.
+Betreff: ${label} wegen offener Miete
 
-Gemäß der vertraglichen Vereinbarungen ist die Miete spätestens bis zum dritten Werktag eines jeden Monats fällig. Für den aktuellen Abrechnungszeitraum war die Miete spätestens am ${faelligkeit} zu zahlen. Bis heute ist jedoch kein Zahlungseingang feststellbar. Dieser Umstand stellt einen erheblichen Zahlungsrückstand dar, der umgehend beglichen werden muss.
+Sehr geehrte Damen und Herren,
 
-Der aktuelle Mietrückstand beläuft sich auf ${betrag}${overdueDays > 0 ? ` und ist seit ${overdueDays} Tag(en) überfällig` : ''}.
+${intro}
 
-In Anbetracht der bereits vergangenen Zeit und der ausstehenden Mietzahlung möchten wir Sie eindringlich daran erinnern, dass dieser Zahlungsrückstand unverzüglich ausgeglichen werden muss. Wir sind bestrebt, eine einvernehmliche Lösung zu finden, um weitere Schritte zur Klärung dieser Angelegenheit zu vermeiden.
+Offener Betrag: ${tenant.rent ?? 0} €
+Fälligkeit: ${formatDate(dueDate)}${overdueDays ? `
+Überfällig seit: ${overdueDays} Tagen` : ""}
 
-Wir fordern Sie daher auf, den offenen Betrag innerhalb der nächsten 7 Tage nach Erhalt dieses Schreibens auf folgendes Konto zu überweisen:
-
-${l.contact}
-
-Sollten Sie die Zahlung bereits veranlasst haben, betrachten Sie dieses Schreiben bitte als gegenstandslos. In diesem Fall bitten wir Sie jedoch, uns den Zahlungsbeleg oder das Datum der Überweisung kurz mitzuteilen.
-
-Sollte innerhalb der genannten Frist kein Zahlungseingang festzustellen sein, behalten wir uns vor, weitere rechtliche Schritte einzuleiten, was unter anderem zusätzliche Kosten und gegebenenfalls die Einleitung eines gerichtlichen Mahnverfahrens zur Folge haben kann.
+${deadline}${paymentBlock}
+Sollte die Zahlung bereits erfolgt sein, betrachten Sie dieses Schreiben bitte als gegenstandslos.
 
 Mit freundlichen Grüßen
 
-${l.name}
-      `.trim();
-    }
-
-    const outputEl = document.getElementById('output');
-    const btnSingle = document.getElementById('btnSingle');
-    const btnAll = document.getElementById('btnAll');
-    const btnPdf = document.getElementById('btnPdf');
-    const btnMail = document.getElementById('btnMail');
-
-    btnSingle.addEventListener('click', () => {
-      const id = tenantSelect.value;
-      if (!id) {
-        showMsg('Bitte zuerst einen Mieter auswählen.');
-        return;
+${landlord.name || "Vermieter / Verwaltung"}`.trim();
       }
-      const t = tenants.find(x => x._id === id);
-      if (!t) {
-        showMsg('Mieter nicht gefunden.', 'error');
-        return;
-      }
-      const overdue = getOverdueDays(t);
-      const text = buildLongLetter(t, overdue);
-      outputEl.value = text;
-      showMsg('Mahnung für ausgewählten Mieter generiert.', 'success');
-    });
 
-    btnAll.addEventListener('click', () => {
-      const offene = tenants.filter(t => t.status === 'unpaid');
-      if (!offene.length) {
-        outputEl.value = 'Keine offenen Mieter gefunden.';
-        showMsg('Keine offenen Mieter gefunden.', 'error');
-        return;
-      }
-      let combined = '';
-      offene.forEach((t, idx) => {
-        const overdue = getOverdueDays(t);
-        const text = buildLongLetter(t, overdue);
-        combined += text + '\n\n----------------------------------------\n\n';
-      });
-      outputEl.value = combined.trim();
-      showMsg('Mahnungen für alle offenen Mieter generiert.', 'success');
-    });
+      function generateForSelected() {
+        clearMsg();
 
-    // PDF Download
-    btnPdf.addEventListener('click', async () => {
-      const text = outputEl.value.trim();
-      if (!text) {
-        showMsg('Kein Text zum Exportieren vorhanden.', 'error');
-        return;
-      }
-      try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-        const margin = 15;
-        const maxWidth = 180; // A4, links/rechts Margin
+        const tenant = getSelectedTenant();
+        if (!tenant) {
+          showMsg("Bitte zuerst einen Mieter auswählen.");
+          return;
+        }
 
-        const lines = doc.splitTextToSize(text, maxWidth);
-        doc.text(lines, margin, margin);
-        doc.save('Mahnung.pdf');
-        showMsg('PDF heruntergeladen.', 'success');
-      } catch (err) {
-        console.error(err);
-        showMsg('Fehler beim PDF-Erstellen: ' + err.message, 'error');
+        const text = buildMahnungText(tenant, mahnungLevel.value);
+        previewText.value = text;
+        localStorage.setItem(ACTIVE_TENANT_KEY, JSON.stringify(tenant));
+        showMsg(`${getLevelLabel(mahnungLevel.value)} wurde generiert.`, "success");
       }
-    });
 
-    // E-Mail öffnen
-    btnMail.addEventListener('click', () => {
-      const text = outputEl.value.trim();
-      if (!text) {
-        showMsg('Kein Text zum Versenden vorhanden.', 'error');
-        return;
+      function generateForAllOpen() {
+        clearMsg();
+
+        const openTenants = tenantsCache.filter(t => t.status !== "paid");
+        if (!openTenants.length) {
+          showMsg("Keine offenen Mieter gefunden.");
+          return;
+        }
+
+        const texts = openTenants.map(t => buildMahnungText(t, mahnungLevel.value));
+        previewText.value = texts.join("\n\n----------------------------------------\n\n");
+        showMsg(`${texts.length} Mahnungen wurden generiert.`, "success");
       }
-      const subject = encodeURIComponent('Mahnung Mietzahlung');
-      const body = encodeURIComponent(text);
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+
+      async function copyText() {
+        const text = previewText.value.trim();
+        if (!text) {
+          showMsg("Es gibt noch keinen generierten Text.");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(text);
+          showMsg("Text wurde kopiert.", "success");
+        } catch (_) {
+          showMsg("Kopieren nicht möglich.");
+        }
+      }
+
+      function downloadText() {
+        const text = previewText.value.trim();
+        if (!text) {
+          showMsg("Es gibt noch keinen generierten Text.");
+          return;
+        }
+
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "mahnung.txt";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function loadTenants() {
+        if (!TENANTS_URL) {
+          showMsg("config.js fehlt oder TENANTS_URL ist leer.");
+          return;
+        }
+
+        try {
+          const res = await fetch(TENANTS_URL, { method: "GET" });
+
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.replace("./Login.html");
+            return;
+          }
+
+          if (!res.ok) {
+            const txt = await res.text();
+            showMsg("Fehler beim Laden der Mieter: " + txt);
+            return;
+          }
+
+          tenantsCache = await res.json();
+          populateTenantSelect();
+          clearMsg();
+        } catch (err) {
+          console.error("MAHNUNG LOAD TENANTS ERROR:", err);
+          showMsg("Netzwerkfehler beim Laden der Mieter: " + err.message);
+        }
+      }
+
+      saveLandlordBtn.addEventListener("click", saveLandlordData);
+      tenantSelect.addEventListener("change", renderTenantInfo);
+      generateSelectedBtn.addEventListener("click", generateForSelected);
+      generateAllBtn.addEventListener("click", generateForAllOpen);
+      copyBtn.addEventListener("click", copyText);
+      downloadBtn.addEventListener("click", downloadText);
+
+      loadLandlordData();
+      loadTenants();
     });
   </script>
 </body>
 </html>
-
