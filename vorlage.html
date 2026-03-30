@@ -564,29 +564,38 @@ font-size:1rem;
       }
 
       function renderTemplateList() {
-        templateListEl.innerHTML = "";
+  templateListEl.innerHTML = "";
 
-        if (!templates.length) {
-          templateListEl.innerHTML = '<div class="empty-state">Noch keine Vorlagen vorhanden.</div>';
-          return;
-        }
+  if (!Array.isArray(templates) || templates.length === 0) {
+    templateListEl.innerHTML = '<div class="empty-state">Noch keine Vorlagen vorhanden.</div>';
+    return;
+  }
 
-        templates
-          .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
-          .forEach(template => {
-            const item = document.createElement("div");
-            item.className = "template-item" + (String(template.id) === String(activeTemplateId) ? " active" : "");
-            item.innerHTML = `
-              <div class="template-title">${template.title || "Ohne Titel"}</div>
-              <div class="template-meta">Zuletzt geändert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}</div>
-            `;
-            item.addEventListener("click", () => openTemplate(template.id));
-            templateListEl.appendChild(item);
-          });
-      }
+  const sortedTemplates = [...templates].sort((a, b) => {
+    return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+  });
 
-      function newTemplate() {
+  sortedTemplates.forEach((template) => {
+    const item = document.createElement("div");
+    item.className = "template-item" + (String(template.id) === String(activeTemplateId) ? " active" : "");
+
+    item.innerHTML = `
+      <div class="template-title">${template.title || "Ohne Titel"}</div>
+      <div class="template-meta">
+        Zuletzt geändert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}
+      </div>
+    `;
+
+    item.addEventListener("click", () => openTemplate(template.id));
+    templateListEl.appendChild(item);
+  });
+}
+    function newTemplate() {
   clearMsg();
+
+  if (!Array.isArray(templates)) {
+    templates = [];
+  }
 
   const now = new Date().toISOString();
   const draft = {
@@ -596,6 +605,24 @@ font-size:1rem;
     createdAt: now,
     updatedAt: now
   };
+
+  templates.unshift(draft);
+  activeTemplateId = draft.id;
+
+  saveTemplatesToStorage();
+  renderTemplateList();
+
+  templateTitleEl.value = draft.title;
+  templateContentEl.value = "";
+  previewTextEl.value = "";
+
+  renderPreview();
+
+  templateTitleEl.focus();
+  templateTitleEl.select();
+
+  showMsg("Neue Vorlage erstellt.", "success");
+}
 
   templates.unshift(draft);
   activeTemplateId = draft.id;
