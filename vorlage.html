@@ -586,14 +586,34 @@ font-size:1rem;
       }
 
       function newTemplate() {
-        activeTemplateId = null;
-        templateTitleEl.value = "";
-        templateContentEl.value = "";
-        previewTextEl.value = "";
-        renderTemplateList();
-        renderPreview();
-        clearMsg();
-      }
+  clearMsg();
+
+  const now = new Date().toISOString();
+  const draft = {
+    id: "tpl_" + Date.now(),
+    title: "Neue Vorlage",
+    content: "",
+    createdAt: now,
+    updatedAt: now
+  };
+
+  templates.unshift(draft);
+  activeTemplateId = draft.id;
+
+  saveTemplatesToStorage();
+  renderTemplateList();
+
+  templateTitleEl.value = draft.title;
+  templateContentEl.value = draft.content;
+  previewTextEl.value = "";
+
+  renderPreview();
+
+  templateTitleEl.focus();
+  templateTitleEl.select();
+
+  showMsg("Neue Vorlage erstellt.", "success");
+}
 
       function openTemplate(id) {
         const template = templates.find(t => String(t.id) === String(id));
