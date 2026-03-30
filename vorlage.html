@@ -1,855 +1,874 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Landlord Lite – Eigene Vorlagen</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landlord Lite - Eigene Vorlagen</title>
 
-  <!-- TinyMCE (Rich-Text-Editor wie Word) -->
-  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-  <!-- jsPDF für PDF-Export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.replace("./Login.html");
+    }
+  </script>
 
- <style>
-  /* TinyMCE wirklich auf volle Breite im Panel zwingen */
-  .tox.tox-tinymce,
-  .tox-tinymce {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
+  <script src="config.js"></script>
 
-  /* Falls dein Editor ein <textarea id="editor"> ist */
-  #editor {
-    width: 100%;
-  }
+  <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #205624;
+      --green-soft: #e8f5e9;
+      --red: #c62828;
+      --bg: #f4f4f4;
+      --card-radius: 10px;
+      --shadow-soft: 0 2px 8px rgba(0,0,0,0.12);
+      --shadow-strong: 0 6px 18px rgba(0,0,0,0.18);
+      --border: #d9d9d9;
+      --text: #222;
+      --muted: #666;
+    }
 
-  :root {
-    --green: #2e7d32;
-    --green-dark: #205624;
-    --bg: #f4f4f4;
-    --shadow-soft: 0 2px 8px rgba(0,0,0,0.12);
-    --shadow-strong: 0 6px 18px rgba(0,0,0,0.25);
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
 
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: var(--bg);
-    display: flex;
-  }
-
-  /* Sidebar */
-  .sidebar {
-    width: 230px;
-    background: linear-gradient(180deg, #2e7d32, #1b5e20);
-    color: white;
-    min-height: 100vh;
-    padding: 20px 18px;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-    position: sticky;
-    top: 0;
-  }
-  .sidebar h1 {
-    margin: 0 0 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.3rem;
-  }
-  .logo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.2);
-    font-size: 16px;
-  }
-  .sidebar small {
-    opacity: 0.85;
-    display: block;
-    margin-bottom: 16px;
-    font-size: 0.8rem;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 10px;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
-    cursor: pointer;
-  }
-  .nav-item:hover {
-    background: rgba(255,255,255,0.18);
-    box-shadow: var(--shadow-soft);
-    transform: translateY(-1px);
-  }
-  .nav-item.active {
-    background: rgba(255,255,255,0.28);
-    box-shadow: var(--shadow-soft);
-  }
-
-  /* Content */
-  .content {
-    flex: 1;
-    padding: 20px;
-    max-width: 1400px;   /* vorher 1200 -> mehr Platz */
-    margin: 0 auto;
-  }
-
-  h2 { margin-top: 0; }
-
-  .top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: #e0f2f1;
-    color: #00695c;
-    font-size: 0.8rem;
-  }
-  .badge span.dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #26a69a;
-  }
-
-  /* ✅ HIER ist der wichtigste Fix:
-     Editor bekommt 2x so viel Platz wie Vorschau */
-  .layout {
-    display: grid;
-    grid-template-columns: 260px 2fr 1fr; /* vorher: 260px 1fr 1fr */
-    gap: 16px;
-    margin-top: 18px;
-  }
-
-  /* Template Liste */
-  .template-panel {
-    background: #fff;
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: var(--shadow-soft);
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  .template-panel h3 {
-    margin-top: 0;
-    font-size: 1rem;
-  }
-  .template-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .template-card {
-    padding: 10px;
-    border-radius: 9px;
-    background: #f7f7f7;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: 0.15s;
-    font-size: 0.9rem;
-  }
-  .template-card:hover {
-    box-shadow: var(--shadow-soft);
-    transform: translateY(-1px);
-  }
-  .template-card.active {
-    background: #e8f5e9;
-    border: 1px solid #2e7d32;
-  }
-  .template-card-title {
-    font-weight: bold;
-    margin-bottom: 3px;
-  }
-  .template-card-meta {
-    font-size: 0.75rem;
-    color: #666;
-  }
-
-  .add-card {
-    text-align: center;
-    padding: 16px 10px;
-    border: 2px dashed #cfd8dc;
-    border-radius: 10px;
-    color: #607d8b;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-  .add-card:hover {
-    border-color: #2e7d32;
-    color: #2e7d32;
-  }
-
-  /* Editor & Preview */
-  .editor-panel, .preview-panel {
-    background: #fff;
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    flex-direction: column;
-    min-height: 60vh;
-    min-width: 0; /* wichtig bei Grid, damit nix gequetscht wird */
-  }
-  .editor-panel h3,
-  .preview-panel h3 {
-    margin-top: 0;
-    font-size: 1rem;
-  }
-
-  .field-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .field-row label {
-    font-size: 0.8rem;
-    color: #555;
-  }
-  .field-row input {
-    padding: 6px 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 0.85rem;
-  }
-
-  .btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .btn.green { background: #2e7d32; color: #fff; }
-  .btn.green:hover { background: var(--green-dark); }
-  .btn.red { background: #c62828; color: #fff; }
-  .btn.red:hover { background: #b71c1c; }
-  .btn.grey { background: #eceff1; }
-  .btn.grey:hover { background: #e0e0e0; }
-
-  .btn.sm { font-size: 0.78rem; padding: 4px 8px; }
-
-  .toolbar-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 8px 0;
-  }
-
-  .placeholder-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 6px 0 10px;
-  }
-  .placeholder-pill {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: #e3f2fd;
-    color: #1565c0;
-    cursor: pointer;
-    border: 1px solid #bbdefb;
-  }
-  .placeholder-pill:hover {
-    background: #bbdefb;
-  }
-
-  .preview-box {
-    flex: 1;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    padding: 12px;
-    overflow-y: auto;
-    font-size: 0.9rem;
-    background: #fafafa;
-  }
-
-  .versions-row {
-    margin-top: 6px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    font-size: 0.8rem;
-  }
-  .versions-row select {
-    padding: 4px 6px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 0.78rem;
-  }
-
-  #msg {
-    margin-top: 8px;
-    font-size: 0.85rem;
-  }
-  #msg.success { color: #2e7d32; }
-  #msg.error { color: #c62828; }
-
-  @media (max-width: 1100px) {
     .layout {
-      grid-template-columns: 1fr;
+      display: flex;
+      min-height: 100vh;
     }
-    .preview-panel {
-      min-height: 40vh;
+
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, var(--green), var(--green-dark));
+      color: white;
+      padding: 26px 18px;
+      box-shadow: var(--shadow-strong);
     }
-  }
-</style>
+
+    .brand {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .brand-sub {
+      opacity: 0.9;
+      margin-bottom: 28px;
+      font-size: 1rem;
+    }
+
+    .nav-item,
+    .submenu a {
+      display: block;
+      text-decoration: none;
+      color: white;
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .submenu a:hover,
+    .nav-item.active {
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+
+    .nav-parent {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .submenu {
+      display: none;
+      margin: 4px 0 12px 0;
+      padding-left: 10px;
+    }
+
+    .submenu a {
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .content {
+      flex: 1;
+      padding: 32px;
+    }
+
+    .page-title {
+      font-size: 2.4rem;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+    }
+
+    .msg {
+      min-height: 24px;
+      margin-bottom: 18px;
+      font-size: 1rem;
+    }
+
+    .msg.error {
+      color: var(--red);
+    }
+
+    .msg.success {
+      color: var(--green);
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-soft);
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 14px 0;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      font-size: 0.98rem;
+      color: #444;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+    }
+
+    textarea {
+      min-height: 280px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #f1f1f1;
+      color: #222;
+      border: 1px solid #ddd;
+    }
+
+    .btn-danger {
+      background: #d32f2f;
+      color: white;
+    }
+
+    .placeholder-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0 16px 0;
+    }
+
+    .placeholder-chip {
+      border: none;
+      background: #eef4ff;
+      color: #365ea9;
+      padding: 8px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+
+    .template-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 680px;
+      overflow-y: auto;
+    }
+
+    .template-item {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      background: #fff;
+      transition: 0.2s ease;
+    }
+
+    .template-item:hover,
+    .template-item.active {
+      border-color: var(--green);
+      background: var(--green-soft);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .template-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .template-meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 0.95rem;
+      border: 2px dashed #ddd;
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .preview-box textarea {
+      min-height: 430px;
+    }
+
+    .small {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .tenant-info {
+      background: var(--green-soft);
+      border-left: 5px solid var(--green);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      color: #1f3b22;
+    }
+
+    @media (max-width: 1100px) {
+      .top-grid,
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .content {
+        padding: 18px;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h1><span class="logo">📝</span> Eigene Vorlagen</h1>
-    <small>Vorlagen & Serienbriefe</small>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">🏡 Landlord Lite</div>
+      <div class="brand-sub">Mieterverwaltung</div>
 
-    <a class="nav-item" href="index.html">📁 Mieterverwaltung</a>
-    <a class="nav-item" href="mahnung.html">📧 Mahnungssystem</a>
-    <a class="nav-item active" href="vorlage.html">📝 Eigene Vorlagen</a>
-  </aside>
-
-  <!-- CONTENT -->
-  <main class="content">
-    <div class="top-row">
-      <h2>Eigene Vorlagen erstellen</h2>
-      <div class="badge">
-        <span class="dot"></span>
-        Lokale Speicherung (nur auf diesem Gerät)
-      </div>
-    </div>
-
-    <div id="msg"></div>
-
-    <section class="layout">
-      <!-- LINKS: Vorlagenliste -->
-      <div class="template-panel">
-        <h3>Vorlagen</h3>
-        <div class="add-card" id="btnNewTemplate">+ Neue Vorlage</div>
-        <div class="template-list" id="templateList"></div>
+      <div class="nav-item nav-parent" onclick="toggleSidebarMenu()">
+        <span>📁 Mieterverwaltung</span>
+        <span id="menuArrow">▼</span>
       </div>
 
-      <!-- MITTE: Editor -->
-      <div class="editor-panel">
-        <h3>Vorlage bearbeiten</h3>
-
-        <div class="field-row">
-          <label for="tplTitle">Titel:</label>
-          <input id="tplTitle" placeholder="z.B. 1. Mahnung freundlich" style="flex:1; max-width:260px;">
-          <button class="btn grey sm" id="btnSaveTitle">Titel speichern</button>
-        </div>
-
-        <div class="toolbar-row">
-          <button class="btn green sm" id="btnSaveTemplate">💾 Vorlage speichern</button>
-          <button class="btn grey sm" id="btnSaveVersion">📑 Version speichern</button>
-          <button class="btn red sm" id="btnDeleteTemplate">🗑 Vorlage löschen</button>
-        </div>
-
-        <div class="placeholder-row">
-          <span>Platzhalter einfügen:</span>
-          <button class="placeholder-pill" data-placeholder="{MieterName}">{MieterName}</button>
-          <button class="placeholder-pill" data-placeholder="{Wohnung}">{Wohnung}</button>
-          <button class="placeholder-pill" data-placeholder="{Mietbetrag}">{Mietbetrag}</button>
-          <button class="placeholder-pill" data-placeholder="{Fälligkeit}">{Fälligkeit}</button>
-          <button class="placeholder-pill" data-placeholder="{VermieterName}">{VermieterName}</button>
-          <button class="placeholder-pill" data-placeholder="{AdresseVermieter}">{AdresseVermieter}</button>
-        </div>
-
-<div style="margin:10px 0;">
-  <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">
-    Mieter auswählen
-  </label>
-  <select id="tenantSelect" class="input" style="width:260px;">
-    <option value="">-- Bitte wählen --</option>
-  </select>
-</div>
-
-        <!-- TinyMCE Editor -->
-        <textarea id="editor"></textarea>
-
-        <div class="toolbar-row" style="margin-top:10px;">
-          <button class="btn grey sm" id="btnExportTxt">📄 Als TXT speichern</button>
-          <button class="btn grey sm" id="btnExportHtml">🌐 Als HTML speichern</button>
-          <button class="btn grey sm" id="btnExportDoc">📃 Als Word-Datei (.doc)</button>
-          <button class="btn green sm" id="btnExportPdf">📑 Als PDF exportieren</button>
-        </div>
-
-        <div class="versions-row">
-          <span>Versionen:</span>
-          <select id="versionSelect">
-            <option value="">Keine Version ausgewählt</option>
-          </select>
-          <button class="btn grey sm" id="btnLoadVersion">Version laden</button>
-        </div>
+      <div class="submenu" id="submenu">
+        <a href="./index.html">Mieterübersicht</a>
+        <a href="./reparatur.html">Reparaturen</a>
+        <a href="./vorlage.html" class="active">Eigene Vorlagen</a>
       </div>
 
-      <!-- RECHTS: Vorschau -->
-      <div class="preview-panel">
-        <h3>Live-Vorschau</h3>
-        <div class="preview-box" id="previewBox">
-          <p style="color:#777;font-size:0.9rem;">
-            Wähle eine Vorlage aus oder erstelle eine neue, um die Vorschau zu sehen.
-          </p>
-        </div>
+      <a class="nav-item" href="./dashboard.html">📊 Dashboard</a>
+    </aside>
+
+    <main class="content">
+      <h1 class="page-title">Eigene Vorlagen</h1>
+      <div id="msg" class="msg"></div>
+
+      <div class="top-grid">
+        <section class="card">
+          <h3>Vorlagen</h3>
+
+          <div class="btn-row">
+            <button id="newTemplateBtn" class="btn btn-primary">+ Neue Vorlage</button>
+          </div>
+
+          <div id="templateList" class="template-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="editor-grid">
+            <div>
+              <h3>Vorlage bearbeiten</h3>
+
+              <div class="field">
+                <label for="templateTitle">Titel</label>
+                <input id="templateTitle" type="text" placeholder="z.B. 1. Mahnung Standard" />
+              </div>
+
+              <div class="field">
+                <label for="tenantSelect">Mieter für Live-Vorschau</label>
+                <select id="tenantSelect">
+                  <option value="">— Mieter auswählen —</option>
+                </select>
+              </div>
+
+              <div id="tenantInfo" class="tenant-info" style="display:none;"></div>
+
+              <div class="small">Platzhalter einfügen:</div>
+              <div class="placeholder-row">
+                <button class="placeholder-chip" type="button" data-placeholder="{MieterName}">{MieterName}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{Wohnung}">{Wohnung}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{Mietbetrag}">{Mietbetrag}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{Faelligkeit}">{Faelligkeit}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{IBAN}">{IBAN}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{Status}">{Status}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{UeberfaelligTage}">{UeberfaelligTage}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{VermieterName}">{VermieterName}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{AdresseVermieter}">{AdresseVermieter}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{Kontoinformationen}">{Kontoinformationen}</button>
+                <button class="placeholder-chip" type="button" data-placeholder="{Heute}">{Heute}</button>
+              </div>
+
+              <div class="field">
+                <label for="templateContent">Vorlageninhalt</label>
+                <textarea id="templateContent" placeholder="Schreibe hier deine Vorlage..."></textarea>
+              </div>
+
+              <div class="btn-row">
+                <button id="saveTemplateBtn" class="btn btn-primary">Vorlage speichern</button>
+                <button id="deleteTemplateBtn" class="btn btn-danger">Vorlage löschen</button>
+              </div>
+            </div>
+
+            <div class="preview-box">
+              <h3>Live-Vorschau</h3>
+
+              <div class="field">
+                <label for="previewText">Generierter Text</label>
+                <textarea id="previewText" readonly placeholder="Hier erscheint deine fertige Vorschau..."></textarea>
+              </div>
+
+              <div class="btn-row">
+                <button id="copyPreviewBtn" class="btn btn-primary">Vorschau kopieren</button>
+                <button id="downloadPreviewBtn" class="btn btn-secondary">Als TXT speichern</button>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </section>
-  </main>
+    </main>
+  </div>
 
-<script src="/node_modules/tinymce/tinymce.min.js"></script>
-<script>
-  // =========================
-  // TinyMCE initialisieren
-  // =========================
-  tinymce.init({
-    selector: '#editor',
-    height: 600,
-    menubar: true,
-    license_key: 'gpl',
-    plugins: 'lists table link image code',
-    toolbar: 'undo redo | styleselect | bold italic underline | ' +
-             'alignleft aligncenter alignright alignjustify | ' +
-             'bullist numlist outdent indent | forecolor backcolor | ' +
-             'table image | removeformat | code',
-    language: 'de',
-    setup: function (editor) {
-      editor.on('keyup change', updatePreview);
-      editor.on('init', updatePreview);
-    }
-  });
+  <script>
+    window.toggleSidebarMenu = function () {
+      const menu = document.getElementById("submenu");
+      const arrow = document.getElementById("menuArrow");
+      if (!menu) return;
 
-  // =========================
-  // Speicherstruktur
-  // templates = [{ id, title, html, versions:[{savedAt, html}] }]
-  // =========================
-  let templates = [];
-  let activeIndex = null;
+      const isOpen = menu.style.display === "block";
+      menu.style.display = isOpen ? "none" : "block";
+      if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
+    };
 
-  const STORAGE_KEY = 'llp_custom_templates_rich';
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.replace("./Login.html");
+        return;
+      }
 
-  // =========================
-  // NEU: Mieter Auswahl + Platzhalter Daten
-  // =========================
-  const API_BASE = "http://localhost:3000"; // Backend
-  const tenantSelect = document.getElementById("tenantSelect");
-  let tenantsCache = [];
-  let selectedTenant = null;
+      const _fetch = window.fetch.bind(window);
+      window.fetch = function (url, options = {}) {
+        const currentToken = localStorage.getItem("token");
+        options.headers = {
+          ...(options.headers || {}),
+          ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
+        };
+        return _fetch(url, options);
+      };
 
-  function safe(v){ return (v ?? "").toString(); }
+      const TENANTS_URL = window.TENANTS_URL;
+      const TEMPLATES_KEY = "llp_custom_templates_v2";
+      const LANDLORD_KEY = "llp_landlord_data_v1";
+      const ACTIVE_TENANT_KEY = "llp_active_tenant_v1";
 
-  async function loadTenants(){
-    if(!tenantSelect) return; // falls Dropdown nicht existiert
+      const msgEl = document.getElementById("msg");
+      const templateListEl = document.getElementById("templateList");
+      const templateTitleEl = document.getElementById("templateTitle");
+      const templateContentEl = document.getElementById("templateContent");
+      const previewTextEl = document.getElementById("previewText");
+      const tenantSelectEl = document.getElementById("tenantSelect");
+      const tenantInfoEl = document.getElementById("tenantInfo");
 
-    try{
-const res = await fetch(`${API_BASE}/api/tenants`);
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      tenantsCache = Array.isArray(data) ? data : [];
+      const newTemplateBtn = document.getElementById("newTemplateBtn");
+      const saveTemplateBtn = document.getElementById("saveTemplateBtn");
+      const deleteTemplateBtn = document.getElementById("deleteTemplateBtn");
+      const copyPreviewBtn = document.getElementById("copyPreviewBtn");
+      const downloadPreviewBtn = document.getElementById("downloadPreviewBtn");
 
-      tenantSelect.innerHTML = `<option value="">-- Bitte wählen --</option>`;
-      tenantsCache.forEach(t => {
-        const id = t._id || t.id;
-        const opt = document.createElement("option");
-        opt.value = id;
-        opt.textContent = `${safe(t.name)} (${safe(t.unit || t.apartment)})`;
-        tenantSelect.appendChild(opt);
+      let templates = [];
+      let tenantsCache = [];
+      let activeTemplateId = null;
+
+      function showMsg(text, type = "error") {
+        msgEl.textContent = text;
+        msgEl.className = "msg " + (type === "success" ? "success" : "error");
+      }
+
+      function clearMsg() {
+        msgEl.textContent = "";
+        msgEl.className = "msg";
+      }
+
+      function getTenantId(t) {
+        return t?._id || t?.id || "";
+      }
+
+      function formatDate(date) {
+        return new Intl.DateTimeFormat("de-DE").format(date);
+      }
+
+      function getLatestDueDate(dueDay) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        let lastDayCurrentMonth = new Date(year, month + 1, 0).getDate();
+        let clampedCurrent = Math.min(Number(dueDay || 1), lastDayCurrentMonth);
+        let dueDate = new Date(year, month, clampedCurrent);
+
+        if (today.getDate() < Number(dueDay || 1)) {
+          const prevLastDay = new Date(year, month, 0).getDate();
+          const clampedPrev = Math.min(Number(dueDay || 1), prevLastDay);
+          dueDate = new Date(year, month - 1, clampedPrev);
+        }
+
+        return dueDate;
+      }
+
+      function getOverdueDays(tenant) {
+        if (!tenant || tenant.status === "paid") return 0;
+
+        const dueDay = Number(tenant.dueDay || 0);
+        if (!dueDay) return 0;
+
+        const dueDate = getLatestDueDate(dueDay);
+        const today = new Date();
+
+        const a = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const b = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+
+        const diff = Math.floor((a - b) / 86400000);
+        return diff > 0 ? diff : 0;
+      }
+
+      function loadTemplates() {
+        const raw = localStorage.getItem(TEMPLATES_KEY);
+        if (!raw) {
+          templates = [];
+          return;
+        }
+
+        try {
+          const parsed = JSON.parse(raw);
+          templates = Array.isArray(parsed) ? parsed : [];
+        } catch (_) {
+          templates = [];
+        }
+      }
+
+      function saveTemplatesToStorage() {
+        localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+      }
+
+      function renderTemplateList() {
+        templateListEl.innerHTML = "";
+
+        if (!templates.length) {
+          templateListEl.innerHTML = '<div class="empty-state">Noch keine Vorlagen vorhanden.</div>';
+          return;
+        }
+
+        templates
+          .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
+          .forEach(template => {
+            const item = document.createElement("div");
+            item.className = "template-item" + (String(template.id) === String(activeTemplateId) ? " active" : "");
+            item.innerHTML = `
+              <div class="template-title">${template.title || "Ohne Titel"}</div>
+              <div class="template-meta">Zuletzt geändert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}</div>
+            `;
+            item.addEventListener("click", () => openTemplate(template.id));
+            templateListEl.appendChild(item);
+          });
+      }
+
+      function newTemplate() {
+        activeTemplateId = null;
+        templateTitleEl.value = "";
+        templateContentEl.value = "";
+        previewTextEl.value = "";
+        renderTemplateList();
+        renderPreview();
+        clearMsg();
+      }
+
+      function openTemplate(id) {
+        const template = templates.find(t => String(t.id) === String(id));
+        if (!template) return;
+
+        activeTemplateId = template.id;
+        templateTitleEl.value = template.title || "";
+        templateContentEl.value = template.content || "";
+        renderTemplateList();
+        renderPreview();
+        clearMsg();
+      }
+
+      function saveTemplate() {
+        const title = templateTitleEl.value.trim();
+        const content = templateContentEl.value;
+
+        if (!title) {
+          showMsg("Bitte einen Titel eingeben.");
+          return;
+        }
+
+        if (!content.trim()) {
+          showMsg("Bitte einen Vorlageninhalt eingeben.");
+          return;
+        }
+
+        const now = new Date().toISOString();
+
+        if (activeTemplateId) {
+          const existing = templates.find(t => String(t.id) === String(activeTemplateId));
+          if (existing) {
+            existing.title = title;
+            existing.content = content;
+            existing.updatedAt = now;
+          }
+        } else {
+          const newItem = {
+            id: "tpl_" + Date.now(),
+            title,
+            content,
+            createdAt: now,
+            updatedAt: now
+          };
+          templates.push(newItem);
+          activeTemplateId = newItem.id;
+        }
+
+        saveTemplatesToStorage();
+        renderTemplateList();
+        renderPreview();
+        showMsg("Vorlage gespeichert.", "success");
+      }
+
+      function deleteTemplate() {
+        if (!activeTemplateId) {
+          showMsg("Bitte zuerst eine Vorlage auswählen.");
+          return;
+        }
+
+        const template = templates.find(t => String(t.id) === String(activeTemplateId));
+        const title = template?.title || "diese Vorlage";
+
+        if (!confirm(`Vorlage "${title}" wirklich löschen?`)) return;
+
+        templates = templates.filter(t => String(t.id) !== String(activeTemplateId));
+        saveTemplatesToStorage();
+        activeTemplateId = null;
+        templateTitleEl.value = "";
+        templateContentEl.value = "";
+        previewTextEl.value = "";
+        renderTemplateList();
+        showMsg("Vorlage gelöscht.", "success");
+      }
+
+      function getSelectedTenant() {
+        const id = tenantSelectEl.value;
+        return tenantsCache.find(t => String(getTenantId(t)) === String(id)) || null;
+      }
+
+      function renderTenantInfo() {
+        const tenant = getSelectedTenant();
+
+        if (!tenant) {
+          tenantInfoEl.style.display = "none";
+          tenantInfoEl.innerHTML = "";
+          return;
+        }
+
+        tenantInfoEl.style.display = "block";
+        tenantInfoEl.innerHTML = `
+          <strong>${tenant.name || "-"}</strong>
+          Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} € | Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}
+        `;
+      }
+
+      function populateTenantSelect() {
+        const previousValue = tenantSelectEl.value;
+        const rawActive = localStorage.getItem(ACTIVE_TENANT_KEY);
+        let activeId = "";
+
+        if (rawActive) {
+          try {
+            const activeTenant = JSON.parse(rawActive);
+            activeId = String(getTenantId(activeTenant));
+          } catch (_) {}
+        }
+
+        tenantSelectEl.innerHTML = '<option value="">— Mieter auswählen —</option>';
+
+        tenantsCache.forEach(t => {
+          const option = document.createElement("option");
+          option.value = String(getTenantId(t));
+          option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
+          tenantSelectEl.appendChild(option);
+        });
+
+        if (activeId && tenantsCache.some(t => String(getTenantId(t)) === activeId)) {
+          tenantSelectEl.value = activeId;
+        } else if (previousValue && tenantsCache.some(t => String(getTenantId(t)) === previousValue)) {
+          tenantSelectEl.value = previousValue;
+        }
+
+        renderTenantInfo();
+        renderPreview();
+      }
+
+      function getLandlordData() {
+        try {
+          return JSON.parse(localStorage.getItem(LANDLORD_KEY) || "{}");
+        } catch (_) {
+          return {};
+        }
+      }
+
+      function getPlaceholderMap() {
+        const tenant = getSelectedTenant();
+        const landlord = getLandlordData();
+
+        return {
+          "{MieterName}": tenant?.name || "",
+          "{Wohnung}": tenant?.unit || "",
+          "{Mietbetrag}": tenant ? `${tenant.rent ?? 0} €` : "",
+          "{Faelligkeit}": tenant ? formatDate(getLatestDueDate(tenant.dueDay)) : "",
+          "{IBAN}": tenant?.iban || "",
+          "{Status}": tenant ? (tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt") : "",
+          "{UeberfaelligTage}": tenant ? String(getOverdueDays(tenant)) : "",
+          "{VermieterName}": landlord.name || "",
+          "{AdresseVermieter}": landlord.address || "",
+          "{Kontoinformationen}": landlord.payment || "",
+          "{Heute}": formatDate(new Date())
+        };
+      }
+
+      function renderPreview() {
+        let text = templateContentEl.value || "";
+        const placeholderMap = getPlaceholderMap();
+
+        Object.entries(placeholderMap).forEach(([key, value]) => {
+          text = text.split(key).join(value);
+        });
+
+        previewTextEl.value = text;
+      }
+
+      function insertAtCursor(text) {
+        const start = templateContentEl.selectionStart || 0;
+        const end = templateContentEl.selectionEnd || 0;
+        const current = templateContentEl.value;
+
+        templateContentEl.value =
+          current.substring(0, start) +
+          text +
+          current.substring(end);
+
+        templateContentEl.focus();
+        const pos = start + text.length;
+        templateContentEl.setSelectionRange(pos, pos);
+        renderPreview();
+      }
+
+      async function copyPreview() {
+        const text = previewTextEl.value.trim();
+        if (!text) {
+          showMsg("Es gibt noch keine Vorschau.");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(text);
+          showMsg("Vorschau kopiert.", "success");
+        } catch (_) {
+          showMsg("Kopieren nicht möglich.");
+        }
+      }
+
+      function downloadPreview() {
+        const text = previewTextEl.value.trim();
+        if (!text) {
+          showMsg("Es gibt noch keine Vorschau.");
+          return;
+        }
+
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "vorlage.txt";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function loadTenants() {
+        if (!TENANTS_URL) {
+          showMsg("config.js fehlt oder TENANTS_URL ist leer.");
+          tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
+          return;
+        }
+
+        try {
+          const res = await fetch(TENANTS_URL, { method: "GET" });
+
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.replace("./Login.html");
+            return;
+          }
+
+          if (!res.ok) {
+            const txt = await res.text();
+            showMsg("Fehler beim Laden der Mieter: " + txt);
+            tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
+            return;
+          }
+
+          tenantsCache = await res.json();
+          populateTenantSelect();
+          clearMsg();
+        } catch (err) {
+          console.error("VORLAGE LOAD TENANTS ERROR:", err);
+          showMsg("Netzwerkfehler beim Laden der Mieter: " + err.message);
+          tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
+        }
+      }
+
+      document.querySelectorAll("[data-placeholder]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          insertAtCursor(btn.dataset.placeholder);
+        });
       });
-    }catch(err){
-      console.error(err);
-      tenantSelect.innerHTML = `<option value="">(Backend nicht erreichbar)</option>`;
-    }
-  }
 
-  if(tenantSelect){
-    tenantSelect.addEventListener("change", () => {
-      const id = tenantSelect.value;
-      selectedTenant = tenantsCache.find(t => (t._id || t.id) === id) || null;
-      updatePreview(); // Vorschau neu mit Daten
-    });
-  }
+      newTemplateBtn.addEventListener("click", newTemplate);
+      saveTemplateBtn.addEventListener("click", saveTemplate);
+      deleteTemplateBtn.addEventListener("click", deleteTemplate);
+      copyPreviewBtn.addEventListener("click", copyPreview);
+      downloadPreviewBtn.addEventListener("click", downloadPreview);
 
-  // Platzhalter ersetzen für Vorschau/Export/Druck
-  function applyPlaceholders(html){
-    if(!selectedTenant) return html || "";
+      templateTitleEl.addEventListener("input", renderPreview);
+      templateContentEl.addEventListener("input", renderPreview);
+      tenantSelectEl.addEventListener("change", () => {
+        renderTenantInfo();
+        renderPreview();
+      });
 
-    // Vermieter-Daten später aus Settings
-    const landlordName = "VermieterName";
-    const landlordAddress = "AdresseVermieter";
+      loadTemplates();
+      renderTemplateList();
+      loadTenants();
 
-    const map = {
-      "{MieterName}": safe(selectedTenant.name),
-      "{Wohnung}": safe(selectedTenant.unit || selectedTenant.apartment),
-      "{Mietbetrag}": safe(selectedTenant.rent),
-      "{Fälligkeit}": safe(selectedTenant.dueDay),   // ✅ FIX: mit ä
-      "{IBAN}": safe(selectedTenant.iban),
-
-      "{VermieterName}": landlordName,
-      "{AdresseVermieter}": landlordAddress
-    };
-
-    let out = html || "";
-    Object.keys(map).forEach(k => {
-      out = out.split(k).join(map[k]);
-    });
-    return out;
-  }
-
-  // =========================
-  // Deine bisherigen DOM Refs
-  // =========================
-  const msgEl = document.getElementById('msg');
-  const templateListEl = document.getElementById('templateList');
-  const btnNewTemplate = document.getElementById('btnNewTemplate');
-  const tplTitleInput = document.getElementById('tplTitle');
-  const btnSaveTitle = document.getElementById('btnSaveTitle');
-  const btnSaveTemplate = document.getElementById('btnSaveTemplate');
-  const btnSaveVersion = document.getElementById('btnSaveVersion');
-  const btnDeleteTemplate = document.getElementById('btnDeleteTemplate');
-  const previewBox = document.getElementById('previewBox');
-  const versionSelect = document.getElementById('versionSelect');
-  const btnLoadVersion = document.getElementById('btnLoadVersion');
-  const btnExportTxt = document.getElementById('btnExportTxt');
-  const btnExportHtml = document.getElementById('btnExportHtml');
-  const btnExportDoc = document.getElementById('btnExportDoc');
-  const btnExportPdf = document.getElementById('btnExportPdf');
-
-  function showMsg(text, type = 'success') {
-    msgEl.textContent = text;
-    msgEl.className = '';
-    msgEl.classList.add(type === 'success' ? 'success' : 'error');
-    setTimeout(() => {
-      msgEl.textContent = '';
-      msgEl.className = '';
-    }, 3000);
-  }
-
-  // Laden / Speichern im localStorage
-  function loadTemplates() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      templates = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      templates = [];
-    }
-  }
-
-  function saveTemplates() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
-  }
-
-  // Liste rendern
-  function renderTemplateList() {
-    templateListEl.innerHTML = '';
-    templates.forEach((tpl, i) => {
-      const card = document.createElement('div');
-      card.className = 'template-card' + (i === activeIndex ? ' active' : '');
-      card.onclick = () => openTemplate(i);
-      const title = tpl.title || 'Unbenannt';
-      const lastVersion = tpl.versions && tpl.versions.length
-        ? tpl.versions[tpl.versions.length - 1].savedAt
-        : null;
-
-      card.innerHTML = `
-        <div class="template-card-title">${title}</div>
-        <div class="template-card-meta">
-          ${lastVersion ? 'Letzte Version: ' + formatDateTime(lastVersion) : 'Noch keine Version gespeichert'}
-        </div>
-      `;
-      templateListEl.appendChild(card);
-    });
-  }
-
-  function formatDateTime(iso) {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
-    return d.toLocaleString('de-DE');
-  }
-
-  function newTemplate() {
-    const tpl = {
-      id: 'tpl_' + Date.now(),
-      title: 'Neue Vorlage',
-      html: '',
-      versions: []
-    };
-    templates.push(tpl);
-    activeIndex = templates.length - 1;
-    saveTemplates();
-    renderTemplateList();
-    loadActiveIntoEditor();
-    showMsg('Neue Vorlage erstellt.', 'success');
-  }
-
-  function openTemplate(i) {
-    activeIndex = i;
-    renderTemplateList();
-    loadActiveIntoEditor();
-  }
-
-  function loadActiveIntoEditor() {
-    if (activeIndex === null || templates[activeIndex] == null) {
-      tplTitleInput.value = '';
-      const edEmpty = tinymce.get('editor');
-      if (edEmpty) edEmpty.setContent('');
-      previewBox.innerHTML = '<p style="color:#777;">Keine Vorlage ausgewählt.</p>';
-      fillVersionSelect();
-      return;
-    }
-
-    const tpl = templates[activeIndex];
-    tplTitleInput.value = tpl.title || '';
-
-    setTimeout(() => {
-      const ed = tinymce.get('editor');
-      if (ed) {
-        ed.setContent(tpl.html || '');
-        updatePreview();
-      }
-    }, 50);
-
-    fillVersionSelect();
-  }
-
-  function fillVersionSelect() {
-    versionSelect.innerHTML = '<option value="">Keine Version ausgewählt</option>';
-    if (activeIndex === null) return;
-    const tpl = templates[activeIndex];
-    if (!tpl.versions || !tpl.versions.length) return;
-    tpl.versions.forEach((v, idx) => {
-      const opt = document.createElement('option');
-      opt.value = idx;
-      opt.textContent = formatDateTime(v.savedAt);
-      versionSelect.appendChild(opt);
-    });
-  }
-
-  // =========================
-  // Preview aktualisieren (mit Platzhalter-Ersatz wenn Mieter gewählt)
-  // =========================
-  function updatePreview() {
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-    const htmlRaw = ed.getContent();
-
-    const htmlFinal = applyPlaceholders(htmlRaw);
-
-    if(tenantSelect && !selectedTenant){
-      previewBox.innerHTML = htmlRaw || '<p style="color:#777;">(Noch kein Inhalt)</p>';
-    } else {
-      previewBox.innerHTML = htmlFinal || '<p style="color:#777;">(Noch kein Inhalt)</p>';
-    }
-  }
-
-  // Platzhalter einfügen (bleibt)
-  document.querySelectorAll('.placeholder-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const ph = btn.getAttribute('data-placeholder'); // z.B. "{MieterName}"
-      const ed = tinymce.get('editor');
-      if (ed) {
-        ed.insertContent(ph);
-        updatePreview();
+      if (templates.length) {
+        openTemplate(templates[0].id);
+      } else {
+        newTemplate();
       }
     });
-  });
-
-  // Titel speichern
-  btnSaveTitle.addEventListener('click', () => {
-    if (activeIndex === null) {
-      showMsg('Bitte zuerst eine Vorlage anlegen.', 'error');
-      return;
-    }
-    templates[activeIndex].title = tplTitleInput.value.trim() || 'Unbenannt';
-    saveTemplates();
-    renderTemplateList();
-    showMsg('Titel gespeichert.', 'success');
-  });
-
-  // Vorlage speichern
-  btnSaveTemplate.addEventListener('click', () => {
-    if (activeIndex === null) {
-      showMsg('Bitte zuerst eine Vorlage anlegen.', 'error');
-      return;
-    }
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-    templates[activeIndex].html = ed.getContent();
-    saveTemplates();
-    renderTemplateList();
-    showMsg('Vorlage gespeichert.', 'success');
-  });
-
-  // Version speichern
-  btnSaveVersion.addEventListener('click', () => {
-    if (activeIndex === null) {
-      showMsg('Bitte zuerst eine Vorlage anlegen.', 'error');
-      return;
-    }
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-    const html = ed.getContent();
-    const tpl = templates[activeIndex];
-    if (!tpl.versions) tpl.versions = [];
-    tpl.versions.push({
-      savedAt: new Date().toISOString(),
-      html
-    });
-    saveTemplates();
-    fillVersionSelect();
-    renderTemplateList();
-    showMsg('Version gespeichert.', 'success');
-  });
-
-  // Version laden
-  btnLoadVersion.addEventListener('click', () => {
-    if (activeIndex === null) {
-      showMsg('Keine Vorlage ausgewählt.', 'error');
-      return;
-    }
-    const idxStr = versionSelect.value;
-    if (!idxStr) {
-      showMsg('Keine Version ausgewählt.', 'error');
-      return;
-    }
-    const idx = Number(idxStr);
-    const tpl = templates[activeIndex];
-    if (!tpl.versions || !tpl.versions[idx]) {
-      showMsg('Version nicht gefunden.', 'error');
-      return;
-    }
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-    ed.setContent(tpl.versions[idx].html || '');
-    updatePreview();
-    showMsg('Version geladen.', 'success');
-  });
-
-  // Vorlage löschen
-  btnDeleteTemplate.addEventListener('click', () => {
-    if (activeIndex === null) {
-      showMsg('Keine Vorlage ausgewählt.', 'error');
-      return;
-    }
-    if (!confirm('Diese Vorlage wirklich löschen?')) return;
-    templates.splice(activeIndex, 1);
-    activeIndex = null;
-    saveTemplates();
-    renderTemplateList();
-    loadActiveIntoEditor();
-    showMsg('Vorlage gelöscht.', 'success');
-  });
-
-  // TXT Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
-  btnExportTxt.addEventListener('click', () => {
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-    const textRaw = ed.getContent({ format: 'text' });
-    const textFinal = selectedTenant ? applyPlaceholders(textRaw) : textRaw;
-    downloadFile(textFinal, 'vorlage.txt', 'text/plain;charset=utf-8');
-  });
-
-  // HTML Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
-  btnExportHtml.addEventListener('click', () => {
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-    const htmlRaw = ed.getContent();
-    const htmlFinal = selectedTenant ? applyPlaceholders(htmlRaw) : htmlRaw;
-    downloadFile(htmlFinal, 'vorlage.html', 'text/html;charset=utf-8');
-  });
-
-  // Word Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
-  btnExportDoc.addEventListener('click', () => {
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-
-    const htmlRaw = ed.getContent();
-    const htmlFinal = selectedTenant ? applyPlaceholders(htmlRaw) : htmlRaw;
-
-    const docHtml = `
-      <html>
-        <head><meta charset="UTF-8"></head>
-        <body>${htmlFinal}</body>
-      </html>`;
-    downloadFile(docHtml, 'vorlage.doc', 'application/msword');
-  });
-
-  // PDF Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
-  btnExportPdf.addEventListener('click', () => {
-    const ed = tinymce.get('editor');
-    if (!ed) return;
-
-    const textRaw = ed.getContent({ format: 'text' }) || '';
-    const textFinal = selectedTenant ? applyPlaceholders(textRaw) : textRaw;
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-
-    const marginLeft = 50;
-    const marginTop = 60;
-    const maxWidth = 500;
-    const lines = doc.splitTextToSize(textFinal, maxWidth);
-
-    doc.setFont('Times', 'Normal');
-    doc.setFontSize(12);
-
-    let cursorY = marginTop;
-    lines.forEach(line => {
-      if (cursorY > 780) {
-        doc.addPage();
-        cursorY = marginTop;
-      }
-      doc.text(line, marginLeft, cursorY);
-      cursorY += 16;
-    });
-
-    doc.save('Vorlage.pdf');
-  });
-
-  function downloadFile(content, filename, mimeType) {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  // Neue Vorlage Button
-  btnNewTemplate.addEventListener('click', newTemplate);
-
-  // Init
-  loadTemplates();
-  renderTemplateList();
-  loadActiveIntoEditor();
-  loadTenants(); // ✅ nur eine Quelle (Backend)
-</script>
-
+  </script>
 </body>
 </html>
