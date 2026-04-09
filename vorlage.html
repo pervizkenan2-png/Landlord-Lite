@@ -440,483 +440,468 @@ font-size:1rem;
       </div>
     </main>
   </div>
+<script>
+  window.toggleSidebarMenu = function () {
+    const menu = document.getElementById("submenu");
+    const arrow = document.getElementById("menuArrow");
+    if (!menu) return;
 
-  <script>
-    window.toggleSidebarMenu = function () {
-      const menu = document.getElementById("submenu");
-      const arrow = document.getElementById("menuArrow");
-      if (!menu) return;
+    const isOpen = menu.style.display === "block";
+    menu.style.display = isOpen ? "none" : "block";
+    if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
+  };
 
-      const isOpen = menu.style.display === "block";
-      menu.style.display = isOpen ? "none" : "block";
-      if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.replace("./Login.html");
+      return;
+    }
+
+    const _fetch = window.fetch.bind(window);
+    window.fetch = function (url, options = {}) {
+      const currentToken = localStorage.getItem("token");
+      options.headers = {
+        ...(options.headers || {}),
+        ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
+      };
+      return _fetch(url, options);
     };
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.replace("./Login.html");
+    const TENANTS_URL = window.TENANTS_URL;
+    const TEMPLATES_KEY = "llp_custom_templates_v2";
+    const LANDLORD_KEY = "llp_landlord_data_v1";
+    const ACTIVE_TENANT_KEY = "llp_active_tenant_v1";
+
+    const msgEl = document.getElementById("msg");
+    const templateListEl = document.getElementById("templateList");
+    const templateTitleEl = document.getElementById("templateTitle");
+    const templateContentEl = document.getElementById("templateContent");
+    const previewTextEl = document.getElementById("previewText");
+    const tenantSelectEl = document.getElementById("tenantSelect");
+    const tenantInfoEl = document.getElementById("tenantInfo");
+
+    const newTemplateBtn = document.getElementById("newTemplateBtn");
+    const saveTemplateBtn = document.getElementById("saveTemplateBtn");
+    const deleteTemplateBtn = document.getElementById("deleteTemplateBtn");
+    const copyPreviewBtn = document.getElementById("copyPreviewBtn");
+    const downloadPreviewBtn = document.getElementById("downloadPreviewBtn");
+
+    let templates = [];
+    let tenantsCache = [];
+    let activeTemplateId = null;
+
+    function showMsg(text, type = "error") {
+      msgEl.textContent = text;
+      msgEl.className = "msg " + (type === "success" ? "success" : "error");
+    }
+
+    function clearMsg() {
+      msgEl.textContent = "";
+      msgEl.className = "msg";
+    }
+
+    function getTenantId(t) {
+      return t?._id || t?.id || "";
+    }
+
+    function formatDate(date) {
+      return new Intl.DateTimeFormat("de-DE").format(date);
+    }
+
+    function getLatestDueDate(dueDay) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+
+      let lastDayCurrentMonth = new Date(year, month + 1, 0).getDate();
+      let clampedCurrent = Math.min(Number(dueDay || 1), lastDayCurrentMonth);
+      let dueDate = new Date(year, month, clampedCurrent);
+
+      if (today.getDate() < Number(dueDay || 1)) {
+        const prevLastDay = new Date(year, month, 0).getDate();
+        const clampedPrev = Math.min(Number(dueDay || 1), prevLastDay);
+        dueDate = new Date(year, month - 1, clampedPrev);
+      }
+
+      return dueDate;
+    }
+
+    function getOverdueDays(tenant) {
+      if (!tenant || tenant.status === "paid") return 0;
+
+      const dueDay = Number(tenant.dueDay || 0);
+      if (!dueDay) return 0;
+
+      const dueDate = getLatestDueDate(dueDay);
+      const today = new Date();
+
+      const a = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const b = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+
+      const diff = Math.floor((a - b) / 86400000);
+      return diff > 0 ? diff : 0;
+    }
+
+    function loadTemplates() {
+      const raw = localStorage.getItem(TEMPLATES_KEY);
+      if (!raw) {
+        templates = [];
         return;
       }
 
-      const _fetch = window.fetch.bind(window);
-      window.fetch = function (url, options = {}) {
-        const currentToken = localStorage.getItem("token");
-        options.headers = {
-          ...(options.headers || {}),
-          ...(currentToken ? { Authorization: "Bearer " + currentToken } : {})
-        };
-        return _fetch(url, options);
+      try {
+        const parsed = JSON.parse(raw);
+        templates = Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        templates = [];
+      }
+    }
+
+    function saveTemplatesToStorage() {
+      localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+    }
+
+    function renderTemplateList() {
+      templateListEl.innerHTML = "";
+
+      if (!Array.isArray(templates) || templates.length === 0) {
+        templateListEl.innerHTML = '<div class="empty-state">Noch keine Vorlagen vorhanden.</div>';
+        return;
+      }
+
+      const sortedTemplates = [...templates].sort((a, b) => {
+        return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+      });
+
+      sortedTemplates.forEach((template) => {
+        const item = document.createElement("div");
+        item.className =
+          "template-item" +
+          (String(template.id) === String(activeTemplateId) ? " active" : "");
+
+        item.innerHTML = `
+          <div class="template-title">${template.title || "Ohne Titel"}</div>
+          <div class="template-meta">
+            Zuletzt geändert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}
+          </div>
+        `;
+
+        item.addEventListener("click", () => openTemplate(template.id));
+        templateListEl.appendChild(item);
+      });
+    }
+
+    function newTemplate() {
+      clearMsg();
+
+      if (!Array.isArray(templates)) {
+        templates = [];
+      }
+
+      const now = new Date().toISOString();
+      const draft = {
+        id: "tpl_" + Date.now(),
+        title: "Neue Vorlage",
+        content: "",
+        createdAt: now,
+        updatedAt: now
       };
 
-      const TENANTS_URL = window.TENANTS_URL;
-      const TEMPLATES_KEY = "llp_custom_templates_v2";
-      const LANDLORD_KEY = "llp_landlord_data_v1";
-      const ACTIVE_TENANT_KEY = "llp_active_tenant_v1";
+      templates.unshift(draft);
+      activeTemplateId = draft.id;
 
-      const msgEl = document.getElementById("msg");
-      const templateListEl = document.getElementById("templateList");
-      const templateTitleEl = document.getElementById("templateTitle");
-      const templateContentEl = document.getElementById("templateContent");
-      const previewTextEl = document.getElementById("previewText");
-      const tenantSelectEl = document.getElementById("tenantSelect");
-      const tenantInfoEl = document.getElementById("tenantInfo");
-
-      const newTemplateBtn = document.getElementById("newTemplateBtn");
-      const saveTemplateBtn = document.getElementById("saveTemplateBtn");
-      const deleteTemplateBtn = document.getElementById("deleteTemplateBtn");
-      const copyPreviewBtn = document.getElementById("copyPreviewBtn");
-      const downloadPreviewBtn = document.getElementById("downloadPreviewBtn");
-
-      let templates = [];
-      let tenantsCache = [];
-      let activeTemplateId = null;
-
-      function showMsg(text, type = "error") {
-        msgEl.textContent = text;
-        msgEl.className = "msg " + (type === "success" ? "success" : "error");
-      }
-
-      function clearMsg() {
-        msgEl.textContent = "";
-        msgEl.className = "msg";
-      }
-
-      function getTenantId(t) {
-        return t?._id || t?.id || "";
-      }
-
-      function formatDate(date) {
-        return new Intl.DateTimeFormat("de-DE").format(date);
-      }
-
-      function getLatestDueDate(dueDay) {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
-
-        let lastDayCurrentMonth = new Date(year, month + 1, 0).getDate();
-        let clampedCurrent = Math.min(Number(dueDay || 1), lastDayCurrentMonth);
-        let dueDate = new Date(year, month, clampedCurrent);
-
-        if (today.getDate() < Number(dueDay || 1)) {
-          const prevLastDay = new Date(year, month, 0).getDate();
-          const clampedPrev = Math.min(Number(dueDay || 1), prevLastDay);
-          dueDate = new Date(year, month - 1, clampedPrev);
-        }
-
-        return dueDate;
-      }
-
-      function getOverdueDays(tenant) {
-        if (!tenant || tenant.status === "paid") return 0;
-
-        const dueDay = Number(tenant.dueDay || 0);
-        if (!dueDay) return 0;
-
-        const dueDate = getLatestDueDate(dueDay);
-        const today = new Date();
-
-        const a = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const b = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
-
-        const diff = Math.floor((a - b) / 86400000);
-        return diff > 0 ? diff : 0;
-      }
-
-      function loadTemplates() {
-        const raw = localStorage.getItem(TEMPLATES_KEY);
-        if (!raw) {
-          templates = [];
-          return;
-        }
-
-        try {
-          const parsed = JSON.parse(raw);
-          templates = Array.isArray(parsed) ? parsed : [];
-        } catch (_) {
-          templates = [];
-        }
-      }
-
-      function saveTemplatesToStorage() {
-        localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
-      }
-
-      function renderTemplateList() {
-  templateListEl.innerHTML = "";
-
-  if (!Array.isArray(templates) || templates.length === 0) {
-    templateListEl.innerHTML = '<div class="empty-state">Noch keine Vorlagen vorhanden.</div>';
-    return;
-  }
-
-  const sortedTemplates = [...templates].sort((a, b) => {
-    return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
-  });
-
-  sortedTemplates.forEach((template) => {
-    const item = document.createElement("div");
-    item.className = "template-item" + (String(template.id) === String(activeTemplateId) ? " active" : "");
-
-    item.innerHTML = `
-      <div class="template-title">${template.title || "Ohne Titel"}</div>
-      <div class="template-meta">
-        Zuletzt geändert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}
-      </div>
-    `;
-
-    item.addEventListener("click", () => openTemplate(template.id));
-    templateListEl.appendChild(item);
-  });
-}
-    function newTemplate() {
-  clearMsg();
-
-  if (!Array.isArray(templates)) {
-    templates = [];
-  }
-
-  const now = new Date().toISOString();
-  const draft = {
-    id: "tpl_" + Date.now(),
-    title: "Neue Vorlage",
-    content: "",
-    createdAt: now,
-    updatedAt: now
-  };
-
-  templates.unshift(draft);
-  activeTemplateId = draft.id;
-
-  saveTemplatesToStorage();
-  renderTemplateList();
-
-  templateTitleEl.value = draft.title;
-  templateContentEl.value = "";
-  previewTextEl.value = "";
-
-  renderPreview();
-
-  templateTitleEl.focus();
-  templateTitleEl.select();
-
-  showMsg("Neue Vorlage erstellt.", "success");
-}
-
-  templates.unshift(draft);
-  activeTemplateId = draft.id;
-
-  saveTemplatesToStorage();
-  renderTemplateList();
-
-  templateTitleEl.value = draft.title;
-  templateContentEl.value = draft.content;
-  previewTextEl.value = "";
-
-  renderPreview();
-
-  templateTitleEl.focus();
-  templateTitleEl.select();
-
-  showMsg("Neue Vorlage erstellt.", "success");
-}
-
-      function openTemplate(id) {
-        const template = templates.find(t => String(t.id) === String(id));
-        if (!template) return;
-
-        activeTemplateId = template.id;
-        templateTitleEl.value = template.title || "";
-        templateContentEl.value = template.content || "";
-        renderTemplateList();
-        renderPreview();
-        clearMsg();
-      }
-
-      function saveTemplate() {
-        const title = templateTitleEl.value.trim();
-        const content = templateContentEl.value;
-
-        if (!title) {
-          showMsg("Bitte einen Titel eingeben.");
-          return;
-        }
-
-        if (!content.trim()) {
-          showMsg("Bitte einen Vorlageninhalt eingeben.");
-          return;
-        }
-
-        const now = new Date().toISOString();
-
-        if (activeTemplateId) {
-          const existing = templates.find(t => String(t.id) === String(activeTemplateId));
-          if (existing) {
-            existing.title = title;
-            existing.content = content;
-            existing.updatedAt = now;
-          }
-        } else {
-          const newItem = {
-            id: "tpl_" + Date.now(),
-            title,
-            content,
-            createdAt: now,
-            updatedAt: now
-          };
-          templates.push(newItem);
-          activeTemplateId = newItem.id;
-        }
-
-        saveTemplatesToStorage();
-        renderTemplateList();
-        renderPreview();
-        showMsg("Vorlage gespeichert.", "success");
-      }
-
-      function deleteTemplate() {
-        if (!activeTemplateId) {
-          showMsg("Bitte zuerst eine Vorlage auswählen.");
-          return;
-        }
-
-        const template = templates.find(t => String(t.id) === String(activeTemplateId));
-        const title = template?.title || "diese Vorlage";
-
-        if (!confirm(`Vorlage "${title}" wirklich löschen?`)) return;
-
-        templates = templates.filter(t => String(t.id) !== String(activeTemplateId));
-        saveTemplatesToStorage();
-        activeTemplateId = null;
-        templateTitleEl.value = "";
-        templateContentEl.value = "";
-        previewTextEl.value = "";
-        renderTemplateList();
-        showMsg("Vorlage gelöscht.", "success");
-      }
-
-      function getSelectedTenant() {
-        const id = tenantSelectEl.value;
-        return tenantsCache.find(t => String(getTenantId(t)) === String(id)) || null;
-      }
-
-      function renderTenantInfo() {
-        const tenant = getSelectedTenant();
-
-        if (!tenant) {
-          tenantInfoEl.style.display = "none";
-          tenantInfoEl.innerHTML = "";
-          return;
-        }
-
-        tenantInfoEl.style.display = "block";
-        tenantInfoEl.innerHTML = `
-          <strong>${tenant.name || "-"}</strong>
-          Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} € | Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}
-        `;
-      }
-
-      function populateTenantSelect() {
-        const previousValue = tenantSelectEl.value;
-        const rawActive = localStorage.getItem(ACTIVE_TENANT_KEY);
-        let activeId = "";
-
-        if (rawActive) {
-          try {
-            const activeTenant = JSON.parse(rawActive);
-            activeId = String(getTenantId(activeTenant));
-          } catch (_) {}
-        }
-
-        tenantSelectEl.innerHTML = '<option value="">— Mieter auswählen —</option>';
-
-        tenantsCache.forEach(t => {
-          const option = document.createElement("option");
-          option.value = String(getTenantId(t));
-          option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
-          tenantSelectEl.appendChild(option);
-        });
-
-        if (activeId && tenantsCache.some(t => String(getTenantId(t)) === activeId)) {
-          tenantSelectEl.value = activeId;
-        } else if (previousValue && tenantsCache.some(t => String(getTenantId(t)) === previousValue)) {
-          tenantSelectEl.value = previousValue;
-        }
-
-        renderTenantInfo();
-        renderPreview();
-      }
-
-      function getLandlordData() {
-        try {
-          return JSON.parse(localStorage.getItem(LANDLORD_KEY) || "{}");
-        } catch (_) {
-          return {};
-        }
-      }
-
-      function getPlaceholderMap() {
-        const tenant = getSelectedTenant();
-        const landlord = getLandlordData();
-
-        return {
-          "{MieterName}": tenant?.name || "",
-          "{Wohnung}": tenant?.unit || "",
-          "{Mietbetrag}": tenant ? `${tenant.rent ?? 0} €` : "",
-          "{Faelligkeit}": tenant ? formatDate(getLatestDueDate(tenant.dueDay)) : "",
-          "{IBAN}": tenant?.iban || "",
-          "{Status}": tenant ? (tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt") : "",
-          "{UeberfaelligTage}": tenant ? String(getOverdueDays(tenant)) : "",
-          "{VermieterName}": landlord.name || "",
-          "{AdresseVermieter}": landlord.address || "",
-          "{Kontoinformationen}": landlord.payment || "",
-          "{Heute}": formatDate(new Date())
-        };
-      }
-
-      function renderPreview() {
-        let text = templateContentEl.value || "";
-        const placeholderMap = getPlaceholderMap();
-
-        Object.entries(placeholderMap).forEach(([key, value]) => {
-          text = text.split(key).join(value);
-        });
-
-        previewTextEl.value = text;
-      }
-
-      function insertAtCursor(text) {
-        const start = templateContentEl.selectionStart || 0;
-        const end = templateContentEl.selectionEnd || 0;
-        const current = templateContentEl.value;
-
-        templateContentEl.value =
-          current.substring(0, start) +
-          text +
-          current.substring(end);
-
-        templateContentEl.focus();
-        const pos = start + text.length;
-        templateContentEl.setSelectionRange(pos, pos);
-        renderPreview();
-      }
-
-      async function copyPreview() {
-        const text = previewTextEl.value.trim();
-        if (!text) {
-          showMsg("Es gibt noch keine Vorschau.");
-          return;
-        }
-
-        try {
-          await navigator.clipboard.writeText(text);
-          showMsg("Vorschau kopiert.", "success");
-        } catch (_) {
-          showMsg("Kopieren nicht möglich.");
-        }
-      }
-
-      function downloadPreview() {
-        const text = previewTextEl.value.trim();
-        if (!text) {
-          showMsg("Es gibt noch keine Vorschau.");
-          return;
-        }
-
-        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "vorlage.txt";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      }
-
-      async function loadTenants() {
-        if (!TENANTS_URL) {
-          showMsg("config.js fehlt oder TENANTS_URL ist leer.");
-          tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
-          return;
-        }
-
-        try {
-          const res = await fetch(TENANTS_URL, { method: "GET" });
-
-          if (res.status === 401) {
-            localStorage.removeItem("token");
-            window.location.replace("./Login.html");
-            return;
-          }
-
-          if (!res.ok) {
-            const txt = await res.text();
-            showMsg("Fehler beim Laden der Mieter: " + txt);
-            tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
-            return;
-          }
-
-          tenantsCache = await res.json();
-          populateTenantSelect();
-          clearMsg();
-        } catch (err) {
-          console.error("VORLAGE LOAD TENANTS ERROR:", err);
-          showMsg("Netzwerkfehler beim Laden der Mieter: " + err.message);
-          tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
-        }
-      }
-
-      document.querySelectorAll("[data-placeholder]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          insertAtCursor(btn.dataset.placeholder);
-        });
-      });
-
-      newTemplateBtn.addEventListener("click", newTemplate);
-      saveTemplateBtn.addEventListener("click", saveTemplate);
-      deleteTemplateBtn.addEventListener("click", deleteTemplate);
-      copyPreviewBtn.addEventListener("click", copyPreview);
-      downloadPreviewBtn.addEventListener("click", downloadPreview);
-
-      templateTitleEl.addEventListener("input", renderPreview);
-      templateContentEl.addEventListener("input", renderPreview);
-      tenantSelectEl.addEventListener("change", () => {
-        renderTenantInfo();
-        renderPreview();
-      });
-
-      loadTemplates();
+      saveTemplatesToStorage();
       renderTemplateList();
-      loadTenants();
 
-      if (templates.length) {
-        openTemplate(templates[0].id);
-      } else {
-        newTemplate();
+      templateTitleEl.value = draft.title;
+      templateContentEl.value = "";
+      previewTextEl.value = "";
+
+      renderPreview();
+
+      templateTitleEl.focus();
+      templateTitleEl.select();
+
+      showMsg("Neue Vorlage erstellt.", "success");
+    }
+
+    function openTemplate(id) {
+      const template = templates.find(t => String(t.id) === String(id));
+      if (!template) return;
+
+      activeTemplateId = template.id;
+      templateTitleEl.value = template.title || "";
+      templateContentEl.value = template.content || "";
+      renderTemplateList();
+      renderPreview();
+      clearMsg();
+    }
+
+    function saveTemplate() {
+      const title = templateTitleEl.value.trim();
+      const content = templateContentEl.value;
+
+      if (!title) {
+        showMsg("Bitte einen Titel eingeben.");
+        return;
       }
+
+      if (!content.trim()) {
+        showMsg("Bitte einen Vorlageninhalt eingeben.");
+        return;
+      }
+
+      const now = new Date().toISOString();
+
+      if (activeTemplateId) {
+        const existing = templates.find(t => String(t.id) === String(activeTemplateId));
+        if (existing) {
+          existing.title = title;
+          existing.content = content;
+          existing.updatedAt = now;
+        }
+      } else {
+        const newItem = {
+          id: "tpl_" + Date.now(),
+          title,
+          content,
+          createdAt: now,
+          updatedAt: now
+        };
+        templates.unshift(newItem);
+        activeTemplateId = newItem.id;
+      }
+
+      saveTemplatesToStorage();
+      renderTemplateList();
+      renderPreview();
+      showMsg("Vorlage gespeichert.", "success");
+    }
+
+    function deleteTemplate() {
+      if (!activeTemplateId) {
+        showMsg("Bitte zuerst eine Vorlage auswählen.");
+        return;
+      }
+
+      const template = templates.find(t => String(t.id) === String(activeTemplateId));
+      const title = template?.title || "diese Vorlage";
+
+      if (!confirm(`Vorlage "${title}" wirklich löschen?`)) return;
+
+      templates = templates.filter(t => String(t.id) !== String(activeTemplateId));
+      saveTemplatesToStorage();
+      activeTemplateId = null;
+
+      templateTitleEl.value = "";
+      templateContentEl.value = "";
+      previewTextEl.value = "";
+
+      renderTemplateList();
+      renderPreview();
+      showMsg("Vorlage gelöscht.", "success");
+    }
+
+    function getSelectedTenant() {
+      const id = tenantSelectEl.value;
+      return tenantsCache.find(t => String(getTenantId(t)) === String(id)) || null;
+    }
+
+    function renderTenantInfo() {
+      const tenant = getSelectedTenant();
+
+      if (!tenant) {
+        tenantInfoEl.style.display = "none";
+        tenantInfoEl.innerHTML = "";
+        return;
+      }
+
+      tenantInfoEl.style.display = "block";
+      tenantInfoEl.innerHTML = `
+        <strong>${tenant.name || "-"}</strong>
+        Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} € | Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}
+      `;
+    }
+
+    function populateTenantSelect() {
+      const previousValue = tenantSelectEl.value;
+      const rawActive = localStorage.getItem(ACTIVE_TENANT_KEY);
+      let activeId = "";
+
+      if (rawActive) {
+        try {
+          const activeTenant = JSON.parse(rawActive);
+          activeId = String(getTenantId(activeTenant));
+        } catch (_) {}
+      }
+
+      tenantSelectEl.innerHTML = '<option value="">— Mieter auswählen —</option>';
+
+      tenantsCache.forEach(t => {
+        const option = document.createElement("option");
+        option.value = String(getTenantId(t));
+        option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
+        tenantSelectEl.appendChild(option);
+      });
+
+      if (activeId && tenantsCache.some(t => String(getTenantId(t)) === activeId)) {
+        tenantSelectEl.value = activeId;
+      } else if (previousValue && tenantsCache.some(t => String(getTenantId(t)) === previousValue)) {
+        tenantSelectEl.value = previousValue;
+      }
+
+      renderTenantInfo();
+      renderPreview();
+    }
+
+    function getLandlordData() {
+      try {
+        return JSON.parse(localStorage.getItem(LANDLORD_KEY) || "{}");
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function getPlaceholderMap() {
+      const tenant = getSelectedTenant();
+      const landlord = getLandlordData();
+
+      return {
+        "{MieterName}": tenant?.name || "",
+        "{Wohnung}": tenant?.unit || "",
+        "{Mietbetrag}": tenant ? `${tenant.rent ?? 0} €` : "",
+        "{Faelligkeit}": tenant ? formatDate(getLatestDueDate(tenant.dueDay)) : "",
+        "{IBAN}": tenant?.iban || "",
+        "{Status}": tenant ? (tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt") : "",
+        "{UeberfaelligTage}": tenant ? String(getOverdueDays(tenant)) : "",
+        "{VermieterName}": landlord.name || "",
+        "{AdresseVermieter}": landlord.address || "",
+        "{Kontoinformationen}": landlord.payment || "",
+        "{Heute}": formatDate(new Date())
+      };
+    }
+
+    function renderPreview() {
+      let text = templateContentEl.value || "";
+      const placeholderMap = getPlaceholderMap();
+
+      Object.entries(placeholderMap).forEach(([key, value]) => {
+        text = text.split(key).join(value);
+      });
+
+      previewTextEl.value = text;
+    }
+
+    function insertAtCursor(text) {
+      const start = templateContentEl.selectionStart || 0;
+      const end = templateContentEl.selectionEnd || 0;
+      const current = templateContentEl.value;
+
+      templateContentEl.value =
+        current.substring(0, start) +
+        text +
+        current.substring(end);
+
+      templateContentEl.focus();
+      const pos = start + text.length;
+      templateContentEl.setSelectionRange(pos, pos);
+      renderPreview();
+    }
+
+    async function copyPreview() {
+      const text = previewTextEl.value.trim();
+      if (!text) {
+        showMsg("Es gibt noch keine Vorschau.");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showMsg("Vorschau kopiert.", "success");
+      } catch (_) {
+        showMsg("Kopieren nicht möglich.");
+      }
+    }
+
+    function downloadPreview() {
+      const text = previewTextEl.value.trim();
+      if (!text) {
+        showMsg("Es gibt noch keine Vorschau.");
+        return;
+      }
+
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "vorlage.txt";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function loadTenants() {
+      if (!TENANTS_URL) {
+        showMsg("config.js fehlt oder TENANTS_URL ist leer.");
+        tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
+        return;
+      }
+
+      try {
+        const res = await fetch(TENANTS_URL, { method: "GET" });
+
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          window.location.replace("./Login.html");
+          return;
+        }
+
+        if (!res.ok) {
+          const txt = await res.text();
+          showMsg("Fehler beim Laden der Mieter: " + txt);
+          tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
+          return;
+        }
+
+        tenantsCache = await res.json();
+        populateTenantSelect();
+        clearMsg();
+      } catch (err) {
+        console.error("VORLAGE LOAD TENANTS ERROR:", err);
+        showMsg("Netzwerkfehler beim Laden der Mieter: " + err.message);
+        tenantSelectEl.innerHTML = '<option value="">Backend nicht erreichbar</option>';
+      }
+    }
+
+    document.querySelectorAll("[data-placeholder]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        insertAtCursor(btn.dataset.placeholder);
+      });
     });
-  </script>
-</body>
+
+    newTemplateBtn.addEventListener("click", newTemplate);
+    saveTemplateBtn.addEventListener("click", saveTemplate);
+    deleteTemplateBtn.addEventListener("click", deleteTemplate);
+    copyPreviewBtn.addEventListener("click", copyPreview);
+    downloadPreviewBtn.addEventListener("click", downloadPreview);
+
+    templateTitleEl.addEventListener("input", renderPreview);
+    templateContentEl.addEventListener("input", renderPreview);
+    tenantSelectEl.addEventListener("change", () => {
+      renderTenantInfo();
+      renderPreview();
+    });
+
+    loadTemplates();
+    renderTemplateList();
+    loadTenants();
+
+    if (templates.length) {
+      openTemplate(templates[0].id);
+    }
+  });
+</script>
+  </body>
 </html>
