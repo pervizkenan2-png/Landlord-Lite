@@ -17,13 +17,22 @@
     }
     * { box-sizing: border-box; }
 
+    
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      background-color: var(--bg);
-      color: #222;
-    }
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg);
+  color: #222;
+}
+
+.app {
+  display: flex;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+}
 
     /* SIDEBAR */
     .sidebar {
@@ -421,6 +430,7 @@
 
 <body>
   <div class="app">
+style="display:flex;">
     <!-- SIDEBAR -->
 <aside class="sidebar">
   <h1><span class="logo">🏡</span> Landlord Lite</h1>
