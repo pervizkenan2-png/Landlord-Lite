@@ -424,75 +424,56 @@
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h1><span class="logo">🏡</span> Landlord Lite</h1>
-    <small>Mieterverwaltung</small>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <h1><span class="logo">🏡</span> Landlord Lite</h1>
+  <small>Mieterverwaltung</small>
 
-    <nav class="sidebar-nav">
-      <!-- Hauptpunkt Mieterverwaltung (zum Auf- und Zuklappen) -->
-      <div class="nav-item" onclick="toggleSidebarMenu()">
-        <span class="icon">📁</span>
-        <span>Mieterverwaltung</span>
-        <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
-      </div>
+  <nav class="sidebar-nav">
 
-      <!-- Unterpunkte -->
-      <div id="submenu" class="submenu">
-        <a href="index.html">
-          <span class="icon">👥</span>
-          <span>Übersicht</span>
-        </a>
-        <a href="mahnung.html">
-          <span class="icon">📧</span>
-          <span>Mahnungssystem</span>
-        </a>
-        <a href="reparatur.html">
-          <span class="icon">🛠️</span>
-          <span>Reparaturen</span>
-        </a>
-        <a href="mieterhoehung.html">
-          <span class="icon">📈</span>
-          <span>Mieterhöhung</span>
-        </a>
-     <a class="nav-item" href="import.html">
-  <span class="icon">📥</span>
-  <span>Massenimport</span>
-</a>
-     </div>
-<div id="submenu" class="submenu">
-  <a href="index.html">
-    <span class="icon">👥</span>
-    <span>Übersicht</span>
-  </a>
+    <!-- Dropdown Hauptpunkt -->
+    <div class="nav-item" onclick="toggleSidebarMenu()">
+      <span class="icon">📁</span>
+      <span>Mieterverwaltung</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
+    </div>
 
-  <a href="mahnung.html">
-    <span class="icon">💬</span>
-    <span>Mahnungssystem</span>
-  </a>
+    <!-- Untermenü -->
+    <div id="submenu" class="submenu">
+      <a href="index.html">
+        <span class="icon">👥</span>
+        Übersicht
+      </a>
 
-<a href="mieterhoehung.html">
-    <span class="icon">📈</span>
-    <span>Mieterhöhung</span>
-  </a>
+      <a href="mahnung.html">
+        <span class="icon">📧</span>
+        Mahnungssystem
+      </a>
 
+      <a href="mieterhoehung.html">
+        <span class="icon">📈</span>
+        Mieterhöhung
+      </a>
 
-<a href="reparatur.html">
-    <span class="icon">🛠</span>
-    <span>Reparaturen</span>
-  </a>
+      <a href="reparatur.html">
+        <span class="icon">🛠️</span>
+        Reparaturen
+      </a>
 
- </div>
+      <a href="import.html">
+        <span class="icon">📥</span>
+        Massenimport
+      </a>
+    </div>
 
-<!-- HIER kommt dein neuer Punkt, außerhalb vom Dropdown -->
-<a class="nav-item" href="dashboard.html">
-  <span class="icon">📊</span>
-  <span>Dashboard</span>
-</a>
+    <!-- Fester Punkt -->
+    <a class="nav-item" href="dashboard.html">
+      <span class="icon">📊</span>
+      Dashboard
+    </a>
 
-    </nav>
-  </aside>
-
+  </nav>
+</aside>
   <!-- CONTENT -->
   <main class="content">
     <div class="header-row">

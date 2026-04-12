@@ -258,24 +258,56 @@
 
 <body>
   <div class="app">
-    <aside class="sidebar">
-      <div class="brand">🏠 Landlord Lite</div>
+    <!-- SIDEBAR -->
+<aside class="sidebar">
+  <h1><span class="logo">🏡</span> Landlord Lite</h1>
+  <small>Mieterverwaltung</small>
 
-      <nav class="sidebar-nav">
-        <div class="nav-item" onclick="toggleSubmenu()">
-          <span class="icon">📁</span>
-          <span>Mieterverwaltung</span>
-          <span id="menuArrow" style="margin-left:auto;">▲</span>
-        </div>
+  <nav class="sidebar-nav">
 
-        <div id="submenu" class="submenu">
-          <a href="index.html"><span class="icon">👥</span><span>Übersicht</span></a>
-          <a href="mahnung.html"><span class="icon">📄</span><span>Mahnungsystem</span></a>
-          <a href="reparatur.html" class="active"><span class="icon">🛠</span><span>Reparaturen</span></a>
-                  </div>
-      </nav>
-    </aside>
+    <!-- Dropdown Hauptpunkt -->
+    <div class="nav-item" onclick="toggleSidebarMenu()">
+      <span class="icon">📁</span>
+      <span>Mieterverwaltung</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
+    </div>
 
+    <!-- Untermenü -->
+    <div id="submenu" class="submenu">
+      <a href="index.html">
+        <span class="icon">👥</span>
+        Übersicht
+      </a>
+
+      <a href="mahnung.html">
+        <span class="icon">📧</span>
+        Mahnungssystem
+      </a>
+
+      <a href="mieterhoehung.html">
+        <span class="icon">📈</span>
+        Mieterhöhung
+      </a>
+
+      <a href="reparatur.html">
+        <span class="icon">🛠️</span>
+        Reparaturen
+      </a>
+
+      <a href="import.html">
+        <span class="icon">📥</span>
+        Massenimport
+      </a>
+    </div>
+
+    <!-- Fester Punkt -->
+    <a class="nav-item" href="dashboard.html">
+      <span class="icon">📊</span>
+      Dashboard
+    </a>
+
+  </nav>
+</aside>
     <main class="content">
       <div class="header-row">
         <h2>Reparaturen</h2>

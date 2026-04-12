@@ -255,6 +255,8 @@
     }
 
     @media (max-width: 980px) {
+
+
       .layout {
         flex-direction: column;
       }
@@ -280,24 +282,56 @@
 </head>
 <body>
   <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">🏡 Landlord Lite</div>
-      <div class="brand-sub">Mieterverwaltung</div>
+   <!-- SIDEBAR -->
+<aside class="sidebar">
+  <h1><span class="logo">🏡</span> Landlord Lite</h1>
+  <small>Mieterverwaltung</small>
 
-      <div class="nav-item nav-parent" onclick="toggleSidebarMenu()">
-        <span>📁 Mieterverwaltung</span>
-        <span id="menuArrow">▼</span>
-      </div>
+  <nav class="sidebar-nav">
 
-      <div class="submenu" id="submenu">
-        <a href="./index.html">Mieterübersicht</a>
-        <a href="./mahnung.html">Mahnungen</a>
-        <a href="./reparatur.html">Reparaturen</a>
-        <a href="./vorlage.html">Vorlagen</a>
-      </div>
+    <!-- Dropdown Hauptpunkt -->
+    <div class="nav-item" onclick="toggleSidebarMenu()">
+      <span class="icon">📁</span>
+      <span>Mieterverwaltung</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
+    </div>
 
-      <a class="nav-item" href="./dashboard.html">📊 Dashboard</a>
-    </aside>
+    <!-- Untermenü -->
+    <div id="submenu" class="submenu">
+      <a href="index.html">
+        <span class="icon">👥</span>
+        Übersicht
+      </a>
+
+      <a href="mahnung.html">
+        <span class="icon">📧</span>
+        Mahnungssystem
+      </a>
+
+      <a href="mieterhoehung.html">
+        <span class="icon">📈</span>
+        Mieterhöhung
+      </a>
+
+      <a href="reparatur.html">
+        <span class="icon">🛠️</span>
+        Reparaturen
+      </a>
+
+      <a href="import.html">
+        <span class="icon">📥</span>
+        Massenimport
+      </a>
+    </div>
+
+    <!-- Fester Punkt -->
+    <a class="nav-item" href="dashboard.html">
+      <span class="icon">📊</span>
+      Dashboard
+    </a>
+
+  </nav>
+</aside>
 
     <main class="content">
       <h1 class="page-title">Mahnungen</h1>
