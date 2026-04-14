@@ -892,5 +892,30 @@
       }
     });
   </script>
+<script>
+function toggleSidebarMenu() {
+  const menu = document.getElementById("submenu");
+  const arrow = document.getElementById("menuArrow");
+  if (!menu) return;
+
+  const isOpen = menu.style.display === "block";
+  menu.style.display = isOpen ? "none" : "block";
+
+  if (arrow) {
+    arrow.textContent = isOpen ? "▼" : "▲";
+  }
+}
+
+window.addEventListener("DOMContentLoaded", function () {
+  const menu = document.getElementById("submenu");
+  const arrow = document.getElementById("menuArrow");
+  if (menu && !menu.style.display) {
+    menu.style.display = "none";
+  }
+  if (arrow && menu && menu.style.display !== "block") {
+    arrow.textContent = "▼";
+  }
+});
+</script>
 </body>
 </html>
