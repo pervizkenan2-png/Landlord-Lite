@@ -532,7 +532,44 @@ button.green:hover {
     padding: 14px;
   }
 }
-  </style>
+  /* FINAL FIX: Reparatur Inhalt sofort sichtbar */
+body {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+.layout,
+.app {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+.main,
+.content {
+  padding-top: 20px !important;
+  margin-top: 0 !important;
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
+}
+
+.card,
+.grid,
+.header-row,
+form {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
+}
+
+.card:first-child {
+  margin-top: 0 !important;
+}
+</style>
 
 </head>
 
