@@ -424,12 +424,25 @@
       }
       .content { padding: 14px; }
     }
+html, body {
+  margin: 0;
+}
+
+.layout {
+  display: flex;
+  align-items: flex-start; /* WICHTIG */
+}
+
+.sidebar {
+  flex: 0 0 230px;
+}
+
 .main,
 .content {
   flex: 1;
+  margin: 0 !important;
   padding: 20px;
-  min-width: 0;
-max-width: 900px;
+  align-self: flex-start;
 }
 
 .grid {
