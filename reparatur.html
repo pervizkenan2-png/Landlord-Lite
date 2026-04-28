@@ -628,8 +628,7 @@ form {
     <main class="content">
       <div class="header-row">
         <h2>Reparaturen</h2>
-        <div class="badge" id="modeBadge">● Lokal (Demo) – gespeichert im Browser</div>
-      </div>
+             </div>
 
       <div class="grid">
         <!-- LINKS: Fälle -->
@@ -738,329 +737,368 @@ form {
       </div>
     </main>
   </div>
+```html
+<script src="config.js"></script>
 
-  <script>
-    // Sidebar Dropdown (optional)
-    function toggleSubmenu(){
-      const submenu = document.getElementById("submenu");
-      const arrow = document.getElementById("menuArrow");
-      const isHidden = submenu.style.display === "none";
-      submenu.style.display = isHidden ? "block" : "none";
-      arrow.textContent = isHidden ? "▲" : "▼";
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const STORAGE_KEY = "llp_repairs_cases";
-
-      // DOM
-      const caseListEl   = document.getElementById("caseList");
-      const leftHint     = document.getElementById("leftHint");
-      const searchInput  = document.getElementById("searchInput");
-      const statusFilter = document.getElementById("statusFilter");
-
-      const btnNewCase   = document.getElementById("btnNewCase");
-      const btnSaveCase  = document.getElementById("btnSaveCase");
-      const btnMarkDone  = document.getElementById("btnMarkDone");
-      const btnDeleteCase= document.getElementById("btnDeleteCase");
-
-      const tenantEl     = document.getElementById("tenant");
-      const unitEl       = document.getElementById("unit");
-      const statusEl     = document.getElementById("status");
-      const dateEl       = document.getElementById("date");
-      const contractorEl = document.getElementById("contractor");
-      const phoneEl      = document.getElementById("phone");
-      const costEl       = document.getElementById("cost");
-      const paidEl       = document.getElementById("paid");
-      const problemEl    = document.getElementById("problem");
-      const notesEl      = document.getElementById("notes");
-      const midMsg       = document.getElementById("midMsg");
-
-      // State
-      let cases = [];
-      let activeId = null;
-
-      // Helpers
-      const uid = () => "case_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-      const safe = (v) => (v ?? "").toString().trim();
-
-      function msg(text, isErr=false){
-        midMsg.textContent = text;
-        midMsg.style.color = isErr ? "#b42318" : "";
-        setTimeout(()=>{ midMsg.textContent=""; }, 2200);
-      }
-
-      function load(){
-        try{
-          const raw = localStorage.getItem(STORAGE_KEY);
-          cases = raw ? JSON.parse(raw) : [];
-          if(!Array.isArray(cases)) cases = [];
-        }catch(e){
-          cases = [];
-        }
-      }
-
-      function save(){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
-      }
-
-      function normalizeStatus(v){
-        if(v === "offen" || v === "inBearbeitung" || v === "abgeschlossen") return v;
-        return "offen";
-      }
-
-      function statusLabel(v){
-        if(v === "inBearbeitung") return "In Bearbeitung";
-        if(v === "abgeschlossen") return "Abgeschlossen";
-        return "Offen";
-      }
-
-      function clearForm(){
-        tenantEl.value = "";
-        unitEl.value = "";
-        statusEl.value = "offen";
-        dateEl.value = "";
-        contractorEl.value = "";
-        phoneEl.value = "";
-        costEl.value = "";
-        paidEl.value = "nein";
-        problemEl.value = "";
-        notesEl.value = "";
-      }
-
-      function fillForm(c){
-        tenantEl.value = c.tenant || "";
-        unitEl.value = c.unit || "";
-        statusEl.value = normalizeStatus(c.status);
-        dateEl.value = c.date || "";
-        contractorEl.value = c.contractor || "";
-        phoneEl.value = c.phone || "";
-        costEl.value = (c.cost ?? "") === 0 ? "0.00" : (c.cost ?? "");
-        paidEl.value = (c.paid === "ja") ? "ja" : "nein";
-        problemEl.value = c.problem || "";
-        notesEl.value = c.notes || "";
-      }
-
-      function readForm(){
-        return {
-          tenant: safe(tenantEl.value),
-          unit: safe(unitEl.value),
-          status: normalizeStatus(statusEl.value),
-          date: safe(dateEl.value),
-          contractor: safe(contractorEl.value),
-          phone: safe(phoneEl.value),
-          cost: safe(costEl.value),
-          paid: paidEl.value === "ja" ? "ja" : "nein",
-          problem: safe(problemEl.value),
-          notes: safe(notesEl.value),
-        };
-      }
-
-      function matchesFilter(c){
-        const q = safe(searchInput.value).toLowerCase();
-        const f = statusFilter.value;
-
-        const hay = [
-          c.tenant, c.unit, c.problem, c.contractor, c.phone, c.notes
-        ].join(" ").toLowerCase();
-
-        const okQuery = !q || hay.includes(q);
-        const okStatus = (f === "alle") ? true : (c.status === f);
-
-        return okQuery && okStatus;
-      }
-
-      function render(){
-        caseListEl.innerHTML = "";
-
-        const filtered = cases.filter(matchesFilter);
-
-        if(filtered.length === 0){
-          leftHint.textContent = "Keine Fälle gefunden.";
-          leftHint.style.display = "block";
-          return;
-        }
-
-        leftHint.style.display = "none";
-
-        filtered
-          .sort((a,b)=> (b.updatedAt||0) - (a.updatedAt||0))
-          .forEach(c => {
-            const item = document.createElement("div");
-            item.className = "case-item" + (c.id === activeId ? " active" : "");
-
-            const title = document.createElement("div");
-            title.className = "case-title";
-            title.textContent = `${c.tenant || "Unbekannt"}${c.unit ? " (Whg " + c.unit + ")" : ""}`;
-
-            const meta = document.createElement("div");
-            meta.className = "case-meta";
-
-            const p1 = document.createElement("span");
-            p1.className = "pill";
-            p1.textContent = statusLabel(c.status);
-
-            const p2 = document.createElement("span");
-            p2.className = "pill";
-            p2.textContent = (c.paid === "ja") ? "Bezahlt" : "Nicht bezahlt";
-
-            const p3 = document.createElement("span");
-            p3.className = "pill";
-            p3.textContent = c.date ? ("📅 " + c.date) : "📅 kein Datum";
-
-            meta.appendChild(p1);
-            meta.appendChild(p2);
-            meta.appendChild(p3);
-
-            const preview = document.createElement("div");
-            preview.className = "muted";
-            preview.style.marginTop = "6px";
-            preview.textContent = c.problem ? (c.problem.length > 70 ? c.problem.slice(0,70) + "…" : c.problem) : "(kein Problemtext)";
-
-            item.appendChild(title);
-            item.appendChild(meta);
-            item.appendChild(preview);
-
-            item.addEventListener("click", () => {
-              activeId = c.id;
-              fillForm(c);
-              render();
-            });
-
-            caseListEl.appendChild(item);
-          });
-      }
-
-      function getActive(){
-        return cases.find(x => x.id === activeId) || null;
-      }
-
-      // Actions
-      btnNewCase.addEventListener("click", () => {
-        const id = uid();
-        const now = Date.now();
-        const c = {
-          id,
-          tenant:"",
-          unit:"",
-          status:"offen",
-          date:"",
-          contractor:"",
-          phone:"",
-          cost:"",
-          paid:"nein",
-          problem:"",
-          notes:"",
-          createdAt: now,
-          updatedAt: now
-        };
-        cases.push(c);
-        activeId = id;
-        save();
-        clearForm();
-        fillForm(c);
-        render();
-        msg("Neuer Fall angelegt.");
-      });
-
-      btnSaveCase.addEventListener("click", () => {
-        if(!activeId){
-          msg("Bitte erst einen Fall auswählen oder 'Neuer Fall'.", true);
-          return;
-        }
-
-        const c = getActive();
-        if(!c){
-          msg("Aktiver Fall nicht gefunden.", true);
-          return;
-        }
-
-        const data = readForm();
-
-        // Minimal-Validierung
-        if(!data.tenant){
-          msg("Bitte Mieter eintragen.", true);
-          tenantEl.focus();
-          return;
-        }
-
-        Object.assign(c, data, { updatedAt: Date.now() });
-        save();
-        render();
-        msg("Gespeichert ✅");
-      });
-
-      btnMarkDone.addEventListener("click", () => {
-        const c = getActive();
-        if(!c){
-          msg("Bitte erst einen Fall auswählen.", true);
-          return;
-        }
-        c.status = "abgeschlossen";
-        c.updatedAt = Date.now();
-        statusEl.value = "abgeschlossen";
-        save();
-        render();
-        msg("Fall abgeschlossen ✅");
-      });
-
-      btnDeleteCase.addEventListener("click", () => {
-        const c = getActive();
-        if(!c){
-          msg("Bitte erst einen Fall auswählen.", true);
-          return;
-        }
-        if(!confirm("Diesen Fall wirklich löschen?")) return;
-
-        cases = cases.filter(x => x.id !== activeId);
-        activeId = null;
-        save();
-        clearForm();
-        render();
-        msg("Fall gelöscht.");
-      });
-
-      // Live filter
-      searchInput.addEventListener("input", render);
-      statusFilter.addEventListener("change", render);
-
-      // Init
-      load();
-      render();
-
-      // Optional: set default date when empty and user starts typing
-      if(!dateEl.value){
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth()+1).padStart(2,"0");
-        const dd = String(today.getDate()).padStart(2,"0");
-        dateEl.value = `${yyyy}-${mm}-${dd}`;
-      }
-    });
-  </script>
 <script>
-function toggleSidebarMenu() {
-  const menu = document.getElementById("submenu");
-  const arrow = document.getElementById("menuArrow");
-  if (!menu) return;
+const REPAIRS_URL = window.REPAIRS_URL;
 
-  const isOpen = menu.style.display === "block";
-  menu.style.display = isOpen ? "none" : "block";
+function toggleSidebarMenu() {
+  const submenu = document.getElementById("submenu");
+  const arrow = document.getElementById("menuArrow");
+  if (!submenu) return;
+
+  const isHidden = submenu.style.display === "none" || submenu.style.display === "";
+  submenu.style.display = isHidden ? "block" : "none";
 
   if (arrow) {
-    arrow.textContent = isOpen ? "▼" : "▲";
+    arrow.textContent = isHidden ? "▲" : "▼";
   }
 }
 
-window.addEventListener("DOMContentLoaded", function () {
-  const menu = document.getElementById("submenu");
-  const arrow = document.getElementById("menuArrow");
-  if (menu && !menu.style.display) {
-    menu.style.display = "none";
+document.addEventListener("DOMContentLoaded", () => {
+  const caseListEl = document.getElementById("caseList");
+  const leftHint = document.getElementById("leftHint");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
+
+  const tenantEl = document.getElementById("tenant");
+  const unitEl = document.getElementById("unit");
+  const statusEl = document.getElementById("status");
+  const dateEl = document.getElementById("date");
+  const contractorEl = document.getElementById("contractor");
+  const phoneEl = document.getElementById("phone");
+  const costEl = document.getElementById("cost");
+  const paidEl = document.getElementById("paid");
+  const problemEl = document.getElementById("problem");
+  const notesEl = document.getElementById("notes");
+  const midMsg = document.getElementById("midMsg");
+
+  const btnNewCase = document.getElementById("btnNewCase");
+  const btnSaveCase = document.getElementById("btnSaveCase");
+  const btnMarkDone = document.getElementById("btnMarkDone");
+  const btnDeleteCase = document.getElementById("btnDeleteCase");
+
+  let cases = [];
+  let activeId = null;
+
+  function msg(text, isErr = false) {
+    if (!midMsg) return;
+    midMsg.textContent = text;
+    midMsg.style.color = isErr ? "#b42318" : "#2e7d32";
+    setTimeout(() => {
+      midMsg.textContent = "";
+    }, 2200);
   }
-  if (arrow && menu && menu.style.display !== "block") {
-    arrow.textContent = "▼";
+
+  function safe(v) {
+    return (v ?? "").toString().trim();
   }
+
+  function getId(c) {
+    return c._id || c.id;
+  }
+
+  function normalizeStatus(v) {
+    if (v === "offen" || v === "inBearbeitung" || v === "abgeschlossen") {
+      return v;
+    }
+    return "offen";
+  }
+
+  function statusLabel(v) {
+    if (v === "inBearbeitung") return "In Bearbeitung";
+    if (v === "abgeschlossen") return "Abgeschlossen";
+    return "Offen";
+  }
+
+  function clearForm() {
+    activeId = null;
+    if (tenantEl) tenantEl.value = "";
+    if (unitEl) unitEl.value = "";
+    if (statusEl) statusEl.value = "offen";
+    if (dateEl) dateEl.value = "";
+    if (contractorEl) contractorEl.value = "";
+    if (phoneEl) phoneEl.value = "";
+    if (costEl) costEl.value = "";
+    if (paidEl) paidEl.value = "nein";
+    if (problemEl) problemEl.value = "";
+    if (notesEl) notesEl.value = "";
+  }
+
+  function fillForm(c) {
+    activeId = getId(c);
+
+    if (tenantEl) tenantEl.value = c.tenant || c.tenantName || "";
+    if (unitEl) unitEl.value = c.unit || "";
+    if (statusEl) statusEl.value = normalizeStatus(c.status);
+    if (dateEl) dateEl.value = c.date || c.reportedAt || "";
+    if (contractorEl) contractorEl.value = c.contractor || c.technician || "";
+    if (phoneEl) phoneEl.value = c.phone || "";
+    if (costEl) costEl.value = c.cost || "";
+    if (paidEl) paidEl.value = c.paid || "nein";
+    if (problemEl) problemEl.value = c.problem || "";
+    if (notesEl) notesEl.value = c.notes || "";
+  }
+
+  function collectForm() {
+    return {
+      tenant: safe(tenantEl?.value),
+      tenantName: safe(tenantEl?.value),
+      unit: safe(unitEl?.value),
+      status: normalizeStatus(statusEl?.value),
+      date: safe(dateEl?.value),
+      reportedAt: safe(dateEl?.value),
+      contractor: safe(contractorEl?.value),
+      technician: safe(contractorEl?.value),
+      phone: safe(phoneEl?.value),
+      cost: Number(costEl?.value || 0),
+      paid: safe(paidEl?.value) || "nein",
+      problem: safe(problemEl?.value),
+      notes: safe(notesEl?.value)
+    };
+  }
+
+  async function loadCases() {
+    if (!REPAIRS_URL) {
+      msg("REPAIRS_URL fehlt in config.js", true);
+      return;
+    }
+
+    try {
+      const res = await fetch(REPAIRS_URL, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      cases = await res.json();
+      render();
+    } catch (err) {
+      console.error("Fehler beim Laden:", err);
+      cases = [];
+      render();
+      msg("Fehler beim Laden aus MongoDB", true);
+    }
+  }
+
+  async function createCase(data) {
+    const res = await fetch(REPAIRS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    return await res.json();
+  }
+
+  async function updateCase(id, data) {
+    const res = await fetch(REPAIRS_URL + "/" + id, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    return await res.json();
+  }
+
+  async function deleteCase(id) {
+    const res = await fetch(REPAIRS_URL + "/" + id, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+  }
+
+  function getFilteredCases() {
+    const q = safe(searchInput?.value).toLowerCase();
+    const status = statusFilter?.value || "alle";
+
+    return cases.filter(c => {
+      const text = [
+        c.tenant,
+        c.tenantName,
+        c.unit,
+        c.problem,
+        c.contractor,
+        c.technician
+      ].join(" ").toLowerCase();
+
+      const matchesSearch = !q || text.includes(q);
+      const matchesStatus = status === "alle" || normalizeStatus(c.status) === status;
+
+      return matchesSearch && matchesStatus;
+    });
+  }
+
+  function render() {
+    if (!caseListEl) return;
+
+    const filtered = getFilteredCases();
+    caseListEl.innerHTML = "";
+
+    if (!filtered.length) {
+      caseListEl.innerHTML = '<div class="case-item">Keine Reparaturen gefunden.</div>';
+      if (leftHint) leftHint.textContent = "Keine Fälle vorhanden.";
+      return;
+    }
+
+    if (leftHint) leftHint.textContent = "Klicke links auf einen Fall.";
+
+    filtered.forEach(c => {
+      const id = getId(c);
+      const item = document.createElement("div");
+      item.className = "case-item";
+      item.style.cursor = "pointer";
+
+      item.innerHTML = `
+        <strong>${safe(c.tenant || c.tenantName) || "Unbekannt"}</strong><br>
+        ${safe(c.status) ? statusLabel(normalizeStatus(c.status)) : "Offen"}
+        ${safe(c.paid) ? " | Bezahlt: " + safe(c.paid) : ""}
+        ${safe(c.date || c.reportedAt) ? " | 📅 " + safe(c.date || c.reportedAt) : " | 📅 kein Datum"}
+        <br>
+        ${safe(c.problem) || "(kein Problemtext)"}
+      `;
+
+      item.addEventListener("click", () => {
+        fillForm(c);
+      });
+
+      caseListEl.appendChild(item);
+    });
+  }
+
+  if (btnNewCase) {
+    btnNewCase.addEventListener("click", async () => {
+      try {
+        const data = {
+          tenant: "",
+          tenantName: "",
+          unit: "",
+          status: "offen",
+          date: "",
+          reportedAt: "",
+          contractor: "",
+          technician: "",
+          phone: "",
+          cost: 0,
+          paid: "nein",
+          problem: "",
+          notes: ""
+        };
+
+        const saved = await createCase(data);
+        await loadCases();
+        fillForm(saved);
+        msg("Neuer Fall in MongoDB angelegt.");
+      } catch (err) {
+        console.error(err);
+        msg("Fehler beim Erstellen.", true);
+      }
+    });
+  }
+
+  if (btnSaveCase) {
+    btnSaveCase.addEventListener("click", async () => {
+      try {
+        const data = collectForm();
+
+        if (!data.problem) {
+          msg("Bitte Problem eingeben.", true);
+          return;
+        }
+
+        if (activeId) {
+          await updateCase(activeId, data);
+          msg("Fall gespeichert.");
+        } else {
+          const saved = await createCase(data);
+          activeId = getId(saved);
+          msg("Fall erstellt.");
+        }
+
+        await loadCases();
+      } catch (err) {
+        console.error(err);
+        msg("Fehler beim Speichern.", true);
+      }
+    });
+  }
+
+  if (btnMarkDone) {
+    btnMarkDone.addEventListener("click", async () => {
+      if (!activeId) {
+        msg("Bitte zuerst einen Fall auswählen.", true);
+        return;
+      }
+
+      try {
+        const data = collectForm();
+        data.status = "abgeschlossen";
+        await updateCase(activeId, data);
+        await loadCases();
+        if (statusEl) statusEl.value = "abgeschlossen";
+        msg("Fall abgeschlossen.");
+      } catch (err) {
+        console.error(err);
+        msg("Fehler beim Abschließen.", true);
+      }
+    });
+  }
+
+  if (btnDeleteCase) {
+    btnDeleteCase.addEventListener("click", async () => {
+      if (!activeId) {
+        msg("Bitte zuerst einen Fall auswählen.", true);
+        return;
+      }
+
+      if (!confirm("Fall wirklich löschen?")) return;
+
+      try {
+        await deleteCase(activeId);
+        clearForm();
+        await loadCases();
+        msg("Fall gelöscht.");
+      } catch (err) {
+        console.error(err);
+        msg("Fehler beim Löschen.", true);
+      }
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", render);
+  }
+
+  if (statusFilter) {
+    statusFilter.addEventListener("change", render);
+  }
+
+  loadCases();
 });
 </script>
-</body>
-</html>
+```
