@@ -1,797 +1,761 @@
-<!doctype html>
+  <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mieterhöhung (Auto) – Landlord Lite</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landlord Lite - Mieterhöhung</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.replace("./Login.html");
+    }
+  </script>
+
+  <script src="config.js"></script>
 
   <style>
     :root {
       --green: #2e7d32;
       --green-dark: #205624;
+      --green-soft: #e8f5e9;
       --red: #c62828;
       --bg: #f4f4f4;
-      --card-radius: 8px;
+      --border: #d9d9d9;
+      --text: #222;
+      --muted: #666;
       --shadow-soft: 0 2px 8px rgba(0,0,0,0.12);
-      --shadow-strong: 0 6px 18px rgba(0,0,0,0.25);
+      --shadow-strong: 0 6px 18px rgba(0,0,0,0.18);
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      display: flex;
-      background-color: var(--bg);
-      color: #222;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    /* SIDEBAR */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+      align-items: flex-start;
+    }
+
     .sidebar {
       width: 230px;
-      background: linear-gradient(180deg, #2e7d32, #1b5e20);
-      color: #fff;
       min-height: 100vh;
+      background: linear-gradient(180deg, var(--green), var(--green-dark));
+      color: white;
       padding: 20px 18px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-      position: sticky;
-      top: 0;
-    }
-    .sidebar h1 {
-      margin: 0 0 16px;
-      font-size: 1.4rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .sidebar h1 span.logo {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.18);
-      font-size: 16px;
-    }
-    .sidebar small {
-      opacity: 0.8;
-      display: block;
-      margin-bottom: 14px;
-      font-size: 0.8rem;
-    }
-    .sidebar-nav {
-      margin-top: 20px;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border-radius: 10px;
-      cursor: pointer;
-      text-decoration: none;
-      color: #fff;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-    .nav-item span.icon { font-size: 1.1rem; }
-    .nav-item.active {
-      background: rgba(255,255,255,0.22);
-      box-shadow: var(--shadow-soft);
-    }
-    .nav-item:hover {
       box-shadow: var(--shadow-strong);
-      transform: translateY(-1px);
+      flex: 0 0 230px;
     }
 
-    /* Submenu unter Mieterverwaltung */
-    .submenu {
-      margin-left: 10px;
-      display: none; /* Start: zu */
+    .sidebar h1 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
     }
+
+    .sidebar small {
+      display: block;
+      opacity: 0.85;
+      margin-bottom: 20px;
+    }
+
+    .nav-item,
     .submenu a {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 10px;
-      margin-bottom: 4px;
-      border-radius: 8px;
+      color: white;
       text-decoration: none;
-      color: #fff;
-      font-size: 0.85rem;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-    .submenu a:hover {
-      background: rgba(255,255,255,0.18);
-      box-shadow: var(--shadow-soft);
-      transform: translateY(-0.5px);
-    }
-    .submenu .icon {
-      font-size: 1rem;
-    }
-
-    /* CONTENT */
-    .content {
-      flex: 1;
-      padding: 22px 26px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .header-row h2 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #e0f2f1;
-      color: #00695c;
-      font-size: 0.8rem;
-    }
-    .badge span.dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #26a69a;
-    }
-
-    /* CARDS / FORM */
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px 18px;
-      box-shadow: var(--shadow-soft);
-      margin-top: 18px;
-    }
-    .card-title {
-      margin: 0 0 10px;
-      font-size: 1.05rem;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 420px;
-    }
-    .form-row-2 {
-      display: flex;
-      gap: 10px;
-    }
-    .form-row-2 > * { flex: 1; }
-
-    label {
-      font-size: 0.8rem;
-      margin-bottom: 3px;
-      display: block;
-      color: #555;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px 9px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 0.9rem;
-      font-family: inherit;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--green);
-      box-shadow: 0 0 0 2px rgba(46,125,50,0.15);
-    }
-
-    button.primary {
-      background-color: var(--green);
-      border: none;
-      color: #fff;
-      padding: 9px 10px;
-      border-radius: 7px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
       cursor: pointer;
-      font-size: 0.95rem;
-      margin-top: 4px;
-      transition: background 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
+      transition: 0.15s ease;
     }
-    button.primary:hover {
-      background-color: var(--green-dark);
+
+    .nav-item:hover,
+    .submenu a:hover {
+      background: rgba(255,255,255,0.14);
       box-shadow: var(--shadow-soft);
-      transform: translateY(-0.5px);
-    }
-    button.primary:active {
-      transform: translateY(0);
-      box-shadow: none;
+      transform: translateY(-1px);
     }
 
-    .section-title {
-      margin-top: 22px;
+    .submenu {
+      display: none;
+      margin-left: 10px;
       margin-bottom: 10px;
-      font-size: 1.15rem;
     }
 
-    /* FILTER / STATS */
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      max-width: 520px;
+    .submenu a {
+      font-size: 0.9rem;
+      padding: 7px 10px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 24px;
+      min-width: 0;
+    }
+
+    .page-title {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .msg {
+      min-height: 24px;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+    }
+
+    .msg.success {
+      color: var(--green);
+    }
+
+    .msg.error {
+      color: var(--red);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 14px;
+    }
+
+    .field {
       margin-bottom: 14px;
     }
-    .filter-bar input,
-    .filter-bar select {
-      padding: 8px 9px;
-      border-radius: 7px;
-      border: 1px solid #ccc;
+
+    .field label {
+      display: block;
       font-size: 0.9rem;
-      flex: 1;
-      min-width: 150px;
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 6px;
     }
-    .small-label {
-      font-size: 0.8rem;
-      color: #666;
-      margin-bottom: 4px;
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
     }
-    .stats-row {
-      display: flex;
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+    }
+
+    textarea {
+      min-height: 430px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
+    }
+
+    .btn-row {
+      display: flex;
       flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-    .stat-pill {
-      padding: 6px 9px;
-      border-radius: 999px;
-      background: #e8f5e9;
-      color: #1b5e20;
-      font-size: 0.8rem;
-    }
-    .stat-pill.red {
-      background: #ffebee;
-      color: #b71c1c;
-    }
-
-    /* TENANT LIST */
-    #tenantList { margin-top: 6px; }
-
-    .tenant-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
-      margin-bottom: 9px;
-      border-radius: 10px;
-      color: #fff;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-    }
-    .tenant-card.paid { background: var(--green); }
-    .tenant-card.unpaid { background: var(--red); }
-    .tenant-card:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-strong);
-    }
-    .tenant-main {
-      flex: 1;
-      padding-right: 10px;
-      font-size: 0.9rem;
-    }
-    .tenant-main strong { font-size: 1rem; }
-    .tenant-meta {
-      margin-top: 2px;
-      opacity: 0.9;
-    }
-    .tenant-status {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      opacity: 0.95;
-    }
-    .tenant-status span.badge-inline {
-      display: inline-block;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.18);
-      font-size: 0.75rem;
-    }
-
-    .tenant-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-end;
-      min-width: 130px;
-    }
-    .btn-small,
-    .btn-icon {
-      border: none;
-      border-radius: 999px;
-      padding: 4px 8px;
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.8rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .btn-small:hover,
-    .btn-icon:hover {
-      background: rgba(255,255,255,0.35);
-    }
-    .btn-danger {
-      background: rgba(244,67,54,0.35);
-    }
-    .btn-danger:hover {
-      background: rgba(244,67,54,0.6);
-    }
-
-    /* MODALS */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-    .modal {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px 18px;
-      width: 360px;
-      max-width: 92vw;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-      animation: popIn 0.18s ease-out;
-    }
-    @keyframes popIn {
-      from { transform: scale(0.94); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .modal header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .modal header h3 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-    .modal-close {
-      border: none;
-      background: transparent;
-      font-size: 1.1rem;
-      cursor: pointer;
-      color: #555;
-    }
-    .modal footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
+      gap: 10px;
       margin-top: 10px;
     }
-    .btn-secondary {
-      border-radius: 7px;
+
+    .btn {
       border: none;
-      padding: 7px 10px;
-      font-size: 0.85rem;
-      background: #e0e0e0;
+      border-radius: 9px;
+      padding: 10px 14px;
+      font-weight: bold;
       cursor: pointer;
+      transition: 0.15s ease;
     }
-    .btn-secondary:hover { background: #d5d5d5; }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
     .btn-primary {
-      border-radius: 7px;
-      border: none;
-      padding: 7px 11px;
-      font-size: 0.85rem;
       background: var(--green);
-      color: #fff;
-      cursor: pointer;
+      color: white;
     }
-    .btn-primary:hover { background: var(--green-dark); }
 
-    /* Messages */
-    #msg {
-      margin-top: 8px;
-      font-size: 0.85rem;
+    .btn-secondary {
+      background: #f1f1f1;
+      color: #222;
+      border: 1px solid #ddd;
     }
-    #msg.error { color: #c62828; }
-    #msg.success { color: #2e7d32; }
 
-    @media (max-width: 800px) {
-      body { flex-direction: column; }
+    .btn-danger {
+      background: var(--red);
+      color: white;
+    }
+
+    .info-box {
+      background: var(--green-soft);
+      border-left: 5px solid var(--green);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      color: #1f3b22;
+      line-height: 1.5;
+    }
+
+    .warn-box {
+      background: #fff8e1;
+      border-left: 5px solid #f9a825;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #4f3b00;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .result-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .result-item {
+      background: #f7f7f7;
+      border: 1px solid #e3e3e3;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .result-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+      }
+
       .sidebar {
         width: 100%;
         min-height: auto;
-        position: static;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-        margin-bottom: 8px;
+        flex: none;
       }
-      .content { padding: 14px; }
+
+      .grid,
+      .row,
+      .result-box {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        padding: 16px;
+      }
     }
   </style>
-
 </head>
 
 <body>
-  <div class="app">
+  <div class="layout">
     <aside class="sidebar">
-      <div class="brand">🏠Landlord Lite</div>
-      <div class="nav">
-        <a href="index.html">📁Mieterverwaltung</a>
-        <a class="active" href="mieterhoehungautohtml">Mieterhöhung (Auto)</a>
-        <a href="mieterhoehung_vorlage.html">Mieterhöhung (Vorlage)</a>
-      </div>
-      <div style="margin-top:auto; font-size:12px; opacity:.9;">
-        LocalStorage wird genutzt<br/>wie bei Mahnung
-      </div>
+      <h1>🏡 Landlord Lite</h1>
+      <small>Mieterverwaltung</small>
+
+      <nav>
+        <div class="nav-item" onclick="toggleSidebarMenu()">
+          <span>📁</span>
+          <span>Mieterverwaltung</span>
+          <span id="menuArrow" style="margin-left:auto;">▼</span>
+        </div>
+
+        <div id="submenu" class="submenu">
+          <a href="index.html">👥 Übersicht</a>
+          <a href="mahnung.html">📧 Mahnungssystem</a>
+          <a href="mieterhoehung.html">📈 Mieterhöhung</a>
+          <a href="reparatur.html">🛠️ Reparaturen</a>
+          <a href="import.html">📥 Massenimport</a>
+        </div>
+
+        <a class="nav-item" href="dashboard.html">📊 Dashboard</a>
+      </nav>
     </aside>
 
     <main class="main">
-      <div class="pageTitle">Mieterhöhung (Automatisch)</div>
+      <h1 class="page-title">Mieterhöhung</h1>
+      <div id="msg" class="msg"></div>
 
-      <!-- Vermieterdaten -->
-      <section class="card">
-        <h2>Vermieterdaten (werden gespeichert)</h2>
+      <div class="grid">
+        <section>
+          <div class="card">
+            <h3>Mieter auswählen</h3>
 
-        <div class="grid2">
-          <div class="field">
-            <div class="label">Name des Vermieters / der Verwaltung</div>
-            <input id="ll_name" class="input" placeholder="z.B. Max Mustermann" />
+            <div class="field">
+              <label for="tenantSelect">Mieter aus MongoDB</label>
+              <select id="tenantSelect">
+                <option value="">— Mieter auswählen —</option>
+              </select>
+            </div>
+
+            <div id="tenantInfo" class="info-box" style="display:none;"></div>
           </div>
 
-          <div class="field">
-            <div class="label">PLZ, Ort</div>
-            <input id="ll_city" class="input" placeholder="z.B. 64295 Darmstadt" />
+          <div class="card">
+            <h3>Berechnung</h3>
+
+            <div class="row">
+              <div class="field">
+                <label for="currentRent">Aktuelle Miete (€)</label>
+                <input id="currentRent" type="number" step="0.01" placeholder="z.B. 750" />
+              </div>
+
+              <div class="field">
+                <label for="increaseType">Berechnungsmethode</label>
+                <select id="increaseType">
+                  <option value="percent">Erhöhung in Prozent</option>
+                  <option value="amount">Neue Miete direkt eingeben</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field" id="percentField">
+                <label for="increasePercent">Erhöhung (%)</label>
+                <input id="increasePercent" type="number" step="0.01" placeholder="z.B. 8" />
+              </div>
+
+              <div class="field" id="newRentField">
+                <label for="newRent">Neue Miete (€)</label>
+                <input id="newRent" type="number" step="0.01" placeholder="z.B. 810" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="effectiveDate">Erhöhung ab</label>
+                <input id="effectiveDate" type="date" />
+              </div>
+
+              <div class="field">
+                <label for="reason">Begründung</label>
+                <select id="reason">
+                  <option value="vergleichsmiete">Anpassung an die ortsübliche Vergleichsmiete</option>
+                  <option value="modernisierung">Modernisierung / Verbesserung der Wohnung</option>
+                  <option value="kosten">Gestiegene Kosten</option>
+                  <option value="frei">Eigene Begründung</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="customReason">Eigene Begründung / Zusatztext</label>
+              <input id="customReason" type="text" placeholder="Optionaler Zusatztext..." />
+            </div>
+
+            <div class="result-box">
+              <div class="result-item">
+                <strong>Alte Miete</strong>
+                <span id="oldRentResult">0,00 €</span>
+              </div>
+              <div class="result-item">
+                <strong>Neue Miete</strong>
+                <span id="newRentResult">0,00 €</span>
+              </div>
+              <div class="result-item">
+                <strong>Differenz</strong>
+                <span id="diffResult">0,00 €</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button id="calculateBtn" class="btn btn-primary">Berechnen</button>
+              <button id="generateBtn" class="btn btn-primary">Brief generieren</button>
+              <button id="saveRentBtn" class="btn btn-secondary">Neue Miete beim Mieter speichern</button>
+            </div>
           </div>
-        </div>
 
-        <div style="height:12px"></div>
-
-        <div class="field">
-          <div class="label">Adresse</div>
-          <input id="ll_address" class="input" placeholder="z.B. Dieselstraße 7" />
-        </div>
-
-        <div class="actions">
-          <button id="btnSaveLandlord" class="btn green">Vermieterdaten speichern</button>
-          <button id="btnClearLandlord" class="btn grey">Vermieterdaten löschen</button>
-        </div>
-
-        <div id="msg"></div>
-        <div class="muted">Genau wie bei Mahnung: Daten werden im Browser gespeichert.</div>
-      </section>
-
-      <!-- Mieter + Werte -->
-      <section class="card">
-        <h2>Mieter auswählen & Mieterhöhung generieren</h2>
-
-        <div class="grid3">
-          <div class="field">
-            <div class="label">Mieter</div>
-            <select id="tenantSelect" class="input">
-              <option value="">— Mieter auswählen —</option>
-            </select>
+          <div class="card">
+            <h3>Hinweise</h3>
+            <div class="warn-box">
+              Dies ist keine Rechtsberatung. Prüfe vor einer echten Mieterhöhung die gesetzlichen Voraussetzungen,
+              Fristen, Kappungsgrenzen, Vergleichsmiete und ob eine Zustimmung des Mieters erforderlich ist.
+            </div>
           </div>
+        </section>
+
+        <section class="card">
+          <h3>Generierter Brief</h3>
 
           <div class="field">
-            <div class="label">Neue Miete (€)</div>
-            <input id="newRent" class="input" type="number" step="0.01" placeholder="z.B. 820" />
+            <textarea id="letterText" placeholder="Hier erscheint der Mieterhöhungsbrief..."></textarea>
           </div>
 
-          <div class="field">
-            <div class="label">Wirksam ab</div>
-            <input id="effectiveDate" class="input" type="date" />
+          <div class="btn-row">
+            <button id="copyBtn" class="btn btn-primary">Text kopieren</button>
+            <button id="downloadBtn" class="btn btn-secondary">Als TXT speichern</button>
           </div>
-        </div>
-
-        <div class="actions">
-          <button id="btnGenerate" class="btn green">Text generieren</button>
-          <button id="btnCopy" class="btn grey">Kopieren</button>
-        </div>
-
-        <div class="muted">
-          Tipp: Wenn du Mieter wechselst / neue Miete / Datum änderst, aktualisiert sich der Text automatisch.
-        </div>
-      </section>
-
-      <!-- Text -->
-      <section class="card">
-        <h2>Generierter Mieterhöhungstext</h2>
-        <textarea id="output" placeholder="Hier erscheint der Text..."></textarea>
-
-        <div class="actions">
-          <button id="btnExportTxt" class="btn grey">Als TXT speichern</button>
-          <button id="btnExportHtml" class="btn grey">Als HTML speichern</button>
-          <button id="btnExportDoc" class="btn grey">Als Word-Datei (.doc)</button>
-          <button id="btnExportPdf" class="btn grey">Als PDF exportieren</button>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   </div>
 
   <script>
-    // ====== BACKEND ======
-    const API_BASE = "http://127.0.0.1:3000";
+    const TENANTS_URL = window.TENANTS_URL;
 
-    // ====== STORAGE KEYS (Kompatibel zu Mahnung + deinen bisherigen) ======
-    const K1_NAME = "llp_landlord_name";
-    const K1_ADDR = "llp_landlord_address";
-    const K1_CITY = "llp_landlord_city";
+    function toggleSidebarMenu() {
+      const submenu = document.getElementById("submenu");
+      const arrow = document.getElementById("menuArrow");
+      if (!submenu) return;
 
-    // häufige Keys aus anderen Seiten
-    const K2_NAME = "landlordName";
-    const K2_ADDR = "landlordAddress";
-    const K2_CITY = "landlordZipCity";
-
-    // ====== DOM ======
-    const elMsg = document.getElementById("msg");
-    const llName = document.getElementById("ll_name");
-    const llAddress = document.getElementById("ll_address");
-    const llCity = document.getElementById("ll_city");
-
-    const tenantSelect = document.getElementById("tenantSelect");
-    const newRentEl = document.getElementById("newRent");
-    const effectiveDateEl = document.getElementById("effectiveDate");
-    const outEl = document.getElementById("output");
-
-    const btnSaveLandlord = document.getElementById("btnSaveLandlord");
-    const btnClearLandlord = document.getElementById("btnClearLandlord");
-    const btnGenerate = document.getElementById("btnGenerate");
-    const btnCopy = document.getElementById("btnCopy");
-    const btnExportTxt = document.getElementById("btnExportTxt");
-    const btnExportHtml = document.getElementById("btnExportHtml");
-    const btnExportDoc = document.getElementById("btnExportDoc");
-    const btnExportPdf = document.getElementById("btnExportPdf");
-
-    let tenantsCache = [];
-    let selectedTenant = null;
-
-    function safe(v){ return (v ?? "").toString(); }
-
-    function showMsg(text, type="success"){
-      if(!elMsg) return;
-      elMsg.textContent = text;
-      elMsg.className = type;
-      setTimeout(() => { elMsg.textContent=""; elMsg.className=""; }, 2500);
+      const isOpen = submenu.style.display === "block";
+      submenu.style.display = isOpen ? "none" : "block";
+      if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
     }
 
-    // ====== Vermieter: lesen (probiert alle Keys) ======
-    function readFirst(keys){
-      for(const k of keys){
-        const v = localStorage.getItem(k);
-        if(v && v.trim()) return v;
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.replace("./Login.html");
+        return;
       }
-      return "";
-    }
 
-    function loadLandlord(){
-      llName.value = readFirst([K1_NAME, K2_NAME]);
-      llAddress.value = readFirst([K1_ADDR, K2_ADDR]);
-      llCity.value = readFirst([K1_CITY, K2_CITY]);
-    }
+      const tenantSelect = document.getElementById("tenantSelect");
+      const tenantInfo = document.getElementById("tenantInfo");
+      const currentRent = document.getElementById("currentRent");
+      const increaseType = document.getElementById("increaseType");
+      const increasePercent = document.getElementById("increasePercent");
+      const newRent = document.getElementById("newRent");
+      const effectiveDate = document.getElementById("effectiveDate");
+      const reason = document.getElementById("reason");
+      const customReason = document.getElementById("customReason");
+      const letterText = document.getElementById("letterText");
+      const msgEl = document.getElementById("msg");
 
-    // ====== Vermieter: speichern (schreibt in ALLE Keys -> 100% kompatibel) ======
-    function saveLandlord(){
-      const name = llName.value.trim();
-      const addr = llAddress.value.trim();
-      const city = llCity.value.trim();
+      const oldRentResult = document.getElementById("oldRentResult");
+      const newRentResult = document.getElementById("newRentResult");
+      const diffResult = document.getElementById("diffResult");
 
-      localStorage.setItem(K1_NAME, name);
-      localStorage.setItem(K1_ADDR, addr);
-      localStorage.setItem(K1_CITY, city);
+      const calculateBtn = document.getElementById("calculateBtn");
+      const generateBtn = document.getElementById("generateBtn");
+      const saveRentBtn = document.getElementById("saveRentBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
 
-      localStorage.setItem(K2_NAME, name);
-      localStorage.setItem(K2_ADDR, addr);
-      localStorage.setItem(K2_CITY, city);
+      let tenants = [];
 
-      showMsg("Vermieterdaten gespeichert.", "success");
-      generateText();
-    }
-
-    function clearLandlord(){
-      [K1_NAME,K1_ADDR,K1_CITY,K2_NAME,K2_ADDR,K2_CITY].forEach(k => localStorage.removeItem(k));
-      loadLandlord();
-      showMsg("Vermieterdaten gelöscht.", "success");
-      generateText();
-    }
-
-    btnSaveLandlord.addEventListener("click", saveLandlord);
-    btnClearLandlord.addEventListener("click", clearLandlord);
-
-    // ====== Tenants ======
-    async function fetchTenants(){
-      const endpoints = [
-        `${API_BASE}/tenants`,
-        `${API_BASE}/api/tenants`,
-        `${API_BASE}/tenant`,
-        `${API_BASE}/api/tenant`,
-      ];
-
-      let lastErr = null;
-      for(const url of endpoints){
-        try{
-          const res = await fetch(url);
-          if(!res.ok){ lastErr = new Error(`HTTP ${res.status} @ ${url}`); continue; }
-          const data = await res.json();
-          if(Array.isArray(data)) return data;
-          if(data && Array.isArray(data.tenants)) return data.tenants;
-          lastErr = new Error(`Unerwartetes JSON @ ${url}`);
-        }catch(e){ lastErr = e; }
+      function showMsg(text, type = "error") {
+        msgEl.textContent = text;
+        msgEl.className = "msg " + (type === "success" ? "success" : "error");
       }
-      throw lastErr || new Error("Backend nicht erreichbar");
-    }
 
-    async function loadTenants(){
-      try{
-        const data = await fetchTenants();
-        tenantsCache = Array.isArray(data) ? data : [];
-
-        tenantSelect.innerHTML = `<option value="">— Mieter auswählen —</option>`;
-        tenantsCache.forEach(t => {
-          const id = String(t._id || t.id || "");
-          const unit = t.unit || t.apartment || t.wohnung || t.flat || "";
-          const opt = document.createElement("option");
-          opt.value = id;
-          opt.textContent = `${safe(t.name)} (${safe(unit)})`;
-          tenantSelect.appendChild(opt);
-        });
-      }catch(err){
-        console.error(err);
-        tenantSelect.innerHTML = `<option value="">(Backend nicht erreichbar)</option>`;
-        showMsg("Backend nicht erreichbar (Mieter nicht geladen).", "error");
+      function clearMsg() {
+        msgEl.textContent = "";
+        msgEl.className = "msg";
       }
-    }
 
-    tenantSelect.addEventListener("change", () => {
-      const id = String(tenantSelect.value || "");
-      selectedTenant = tenantsCache.find(t => String(t._id || t.id) === id) || null;
-      generateText();
-    });
+      function getTenantId(t) {
+        return t?._id || t?.id || "";
+      }
 
-    newRentEl.addEventListener("input", generateText);
-    effectiveDateEl.addEventListener("change", generateText);
+      function formatEuro(value) {
+        const num = Number(value || 0);
+        return num.toLocaleString("de-DE", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }) + " €";
+      }
 
-    // ====== Text Generator ======
-    function getOldRent(){
-      return (
-        safe(selectedTenant?.rent) ||
-        safe(selectedTenant?.miete) ||
-        safe(selectedTenant?.amount) ||
-        safe(selectedTenant?.mietbetrag) ||
-        ""
-      );
-    }
+      function formatDateGerman(value) {
+        if (!value) return "-";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return value;
+        return new Intl.DateTimeFormat("de-DE").format(d);
+      }
 
-    function formatDateDE(iso){
-      if(!iso) return "";
-      const parts = iso.split("-");
-      if(parts.length !== 3) return iso;
-      return `${parts[2]}.${parts[1]}.${parts[0]}`;
-    }
+      function getSelectedTenant() {
+        const id = tenantSelect.value;
+        return tenants.find(t => String(getTenantId(t)) === String(id)) || null;
+      }
 
-    function generateText(){
-      const landlordName = readFirst([K1_NAME, K2_NAME]) || llName.value.trim();
-      const landlordAddress = readFirst([K1_ADDR, K2_ADDR]) || llAddress.value.trim();
-      const landlordCity = readFirst([K1_CITY, K2_CITY]) || llCity.value.trim();
+      function getReasonText() {
+        if (reason.value === "modernisierung") {
+          return "Die Erhöhung wird mit durchgeführten Modernisierungs- bzw. Verbesserungsmaßnahmen begründet.";
+        }
 
-      const tenantName = safe(selectedTenant?.name);
-      const wohnung = safe(selectedTenant?.unit || selectedTenant?.apartment || selectedTenant?.wohnung || selectedTenant?.flat);
+        if (reason.value === "kosten") {
+          return "Die Erhöhung wird mit gestiegenen laufenden Kosten und einer Anpassung der Mietkonditionen begründet.";
+        }
 
-      const alteMiete = getOldRent();
-      const neueMiete = safe(newRentEl.value);
-      const wirksam = formatDateDE(safe(effectiveDateEl.value));
+        if (reason.value === "frei") {
+          return customReason.value.trim() || "Die Mieterhöhung wird hiermit sachlich begründet.";
+        }
 
-      const text =
-`${landlordName}
-${landlordAddress}
-${landlordCity}
+        return "Die Erhöhung erfolgt zur Anpassung an die ortsübliche Vergleichsmiete.";
+      }
 
-An: ${tenantName}
-Wohnung: ${wohnung}
+      function calculateValues() {
+        const oldRent = Number(currentRent.value || 0);
+        let calculatedNewRent = Number(newRent.value || 0);
 
-Betreff: Mieterhöhung
+        if (increaseType.value === "percent") {
+          const percent = Number(increasePercent.value || 0);
+          calculatedNewRent = oldRent + (oldRent * percent / 100);
+          newRent.value = calculatedNewRent.toFixed(2);
+        }
 
-Sehr geehrte/r ${tenantName},
+        const diff = calculatedNewRent - oldRent;
 
-hiermit teile ich Ihnen mit, dass die monatliche Miete für die Wohnung (${wohnung})
-von ${alteMiete} € auf ${neueMiete} € erhöht wird.
+        oldRentResult.textContent = formatEuro(oldRent);
+        newRentResult.textContent = formatEuro(calculatedNewRent);
+        diffResult.textContent = formatEuro(diff);
 
-Die Erhöhung gilt ab dem ${wirksam}.
+        return {
+          oldRent,
+          newRent: calculatedNewRent,
+          diff
+        };
+      }
+
+      function renderTenantInfo() {
+        const tenant = getSelectedTenant();
+
+        if (!tenant) {
+          tenantInfo.style.display = "none";
+          tenantInfo.innerHTML = "";
+          return;
+        }
+
+        currentRent.value = tenant.rent ?? 0;
+
+        tenantInfo.style.display = "block";
+        tenantInfo.innerHTML = `
+          <strong>${tenant.name || "-"}</strong><br>
+          Wohnung: ${tenant.unit || "-"}<br>
+          Aktuelle Miete: ${formatEuro(tenant.rent || 0)}<br>
+          Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}
+        `;
+
+        calculateValues();
+      }
+
+      async function loadTenants() {
+        if (!TENANTS_URL) {
+          showMsg("TENANTS_URL fehlt in config.js");
+          return;
+        }
+
+        try {
+          const res = await fetch(TENANTS_URL, {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token")
+            }
+          });
+
+          if (!res.ok) {
+            throw new Error(await res.text());
+          }
+
+          tenants = await res.json();
+
+          tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
+
+          tenants.forEach(t => {
+            const option = document.createElement("option");
+            option.value = getTenantId(t);
+            option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
+            tenantSelect.appendChild(option);
+          });
+
+          clearMsg();
+        } catch (err) {
+          console.error(err);
+          showMsg("Fehler beim Laden der Mieter aus MongoDB.");
+        }
+      }
+
+      function generateLetter() {
+        clearMsg();
+
+        const tenant = getSelectedTenant();
+        if (!tenant) {
+          showMsg("Bitte zuerst einen Mieter auswählen.");
+          return;
+        }
+
+        const values = calculateValues();
+
+        if (!values.oldRent || !values.newRent) {
+          showMsg("Bitte alte und neue Miete eintragen.");
+          return;
+        }
+
+        if (values.newRent <= values.oldRent) {
+          showMsg("Die neue Miete muss höher sein als die alte Miete.");
+          return;
+        }
+
+        const today = formatDateGerman(new Date());
+        const startDate = formatDateGerman(effectiveDate.value);
+        const reasonText = getReasonText();
+
+        letterText.value = `
+${today}
+
+An:
+${tenant.name || "-"}
+Wohnung: ${tenant.unit || "-"}
+
+Betreff: Mieterhöhung für Ihre Wohnung
+
+Sehr geehrte Damen und Herren,
+
+hiermit teile ich Ihnen mit, dass die Miete für die oben genannte Wohnung angepasst werden soll.
+
+Bisherige monatliche Miete: ${formatEuro(values.oldRent)}
+Neue monatliche Miete: ${formatEuro(values.newRent)}
+Erhöhung um: ${formatEuro(values.diff)}
+Wirksam ab: ${startDate}
+
+Begründung:
+${reasonText}
+
+Ich bitte Sie, die neue Miethöhe ab dem genannten Datum zu berücksichtigen und die Zahlung entsprechend anzupassen.
+
+Bitte prüfen Sie dieses Schreiben sorgfältig. Sollte eine Zustimmung erforderlich sein, bitte ich Sie um eine schriftliche Rückmeldung.
 
 Mit freundlichen Grüßen
 
-${landlordName}
-`.trim();
+Vermieter / Verwaltung
+        `.trim();
 
-      outEl.value = text;
-    }
-
-    btnGenerate.addEventListener("click", generateText);
-
-    // ====== Copy ======
-    btnCopy.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(outEl.value || "");
-        showMsg("Text kopiert.", "success");
-      }catch(e){
-        outEl.select();
-        document.execCommand("copy");
-        showMsg("Text kopiert.", "success");
+        showMsg("Mieterhöhungsbrief generiert.", "success");
       }
-    });
 
-    // ====== Export ======
-    function downloadFile(content, filename, mimeType){
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
+      async function saveNewRentToTenant() {
+        clearMsg();
 
-    btnExportTxt.addEventListener("click", () => {
-      downloadFile(outEl.value || "", "mieterhoehung.txt", "text/plain;charset=utf-8");
-    });
+        const tenant = getSelectedTenant();
+        if (!tenant) {
+          showMsg("Bitte zuerst einen Mieter auswählen.");
+          return;
+        }
 
-    btnExportHtml.addEventListener("click", () => {
-      const escaped = (outEl.value || "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll("\n","<br>");
-      const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;line-height:1.5">${escaped}</body></html>`;
-      downloadFile(html, "mieterhoehung.html", "text/html;charset=utf-8");
-    });
+        const values = calculateValues();
 
-    btnExportDoc.addEventListener("click", () => {
-      const escaped = (outEl.value || "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll("\n","<br>");
-      const docHtml = `<html><head><meta charset="UTF-8"></head><body style="font-family:Arial,sans-serif;line-height:1.5">${escaped}</body></html>`;
-      downloadFile(docHtml, "mieterhoehung.doc", "application/msword");
-    });
+        if (!values.newRent || values.newRent <= 0) {
+          showMsg("Bitte zuerst eine gültige neue Miete berechnen.");
+          return;
+        }
 
-    btnExportPdf.addEventListener("click", () => {
-      if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert("jsPDF fehlt. Prüfe ob du das jsPDF Script eingebunden hast.");
-        return;
+        try {
+          const id = getTenantId(tenant);
+
+          const res = await fetch(TENANTS_URL + "/" + id, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+              rent: values.newRent
+            })
+          });
+
+          if (!res.ok) {
+            throw new Error(await res.text());
+          }
+
+          showMsg("Neue Miete wurde beim Mieter gespeichert.", "success");
+          await loadTenants();
+        } catch (err) {
+          console.error(err);
+          showMsg("Fehler beim Speichern der neuen Miete.");
+        }
       }
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit:"pt", format:"a4" });
 
-      const text = outEl.value || "";
-      const marginLeft = 50;
-      const marginTop = 60;
-      const maxWidth = 500;
-      const lines = doc.splitTextToSize(text, maxWidth);
+      async function copyLetter() {
+        const text = letterText.value.trim();
+        if (!text) {
+          showMsg("Es gibt noch keinen Brieftext.");
+          return;
+        }
 
-      doc.setFont("Times", "Normal");
-      doc.setFontSize(12);
-
-      let y = marginTop;
-      for(const line of lines){
-        if(y > 780){ doc.addPage(); y = marginTop; }
-        doc.text(line, marginLeft, y);
-        y += 16;
+        try {
+          await navigator.clipboard.writeText(text);
+          showMsg("Text wurde kopiert.", "success");
+        } catch (_) {
+          showMsg("Kopieren nicht möglich.");
+        }
       }
-      doc.save("Mieterhoehung.pdf");
-    });
 
-    // ====== INIT ======
-    loadLandlord();
-    loadTenants();
-    generateText();
+      function downloadLetter() {
+        const text = letterText.value.trim();
+        if (!text) {
+          showMsg("Es gibt noch keinen Brieftext.");
+          return;
+        }
+
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "mieterhoehung.txt";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      tenantSelect.addEventListener("change", renderTenantInfo);
+      increaseType.addEventListener("change", calculateValues);
+      increasePercent.addEventListener("input", calculateValues);
+      newRent.addEventListener("input", calculateValues);
+      currentRent.addEventListener("input", calculateValues);
+
+      calculateBtn.addEventListener("click", calculateValues);
+      generateBtn.addEventListener("click", generateLetter);
+      saveRentBtn.addEventListener("click", saveNewRentToTenant);
+      copyBtn.addEventListener("click", copyLetter);
+      downloadBtn.addEventListener("click", downloadLetter);
+
+      loadTenants();
+    });
   </script>
 </body>
 </html>
