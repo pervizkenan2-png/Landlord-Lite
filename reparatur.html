@@ -859,22 +859,30 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  async function loadCases() {
-    if (!REPAIRS_URL) {
-      msg("REPAIRS_URL fehlt in config.js", true);
-      return;
+  ```js id="8n3k5q"
+async function loadCases() {
+  if (!REPAIRS_URL) {
+    msg("REPAIRS_URL fehlt in config.js", true);
+    return;
+  }
+
+  try {
+    const res = await fetch(REPAIRS_URL);
+
+    if (!res.ok) {
+      throw new Error(await res.text());
     }
 
-    try {
-      const res = await fetch(REPAIRS_URL, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
-        }
-      });
-
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
+    cases = await res.json();
+    render();
+  } catch (err) {
+    console.error("Fehler beim Laden:", err);
+    cases = [];
+    render();
+    msg("Fehler beim Laden aus MongoDB", true);
+  }
+}
+```
 
       cases = await res.json();
       render();
