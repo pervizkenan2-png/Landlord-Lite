@@ -859,8 +859,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  ```js id="8n3k5q"
-async function loadCases() {
+  async function loadCases() {
   if (!REPAIRS_URL) {
     msg("REPAIRS_URL fehlt in config.js", true);
     return;
@@ -882,17 +881,6 @@ async function loadCases() {
     msg("Fehler beim Laden aus MongoDB", true);
   }
 }
-```
-
-      cases = await res.json();
-      render();
-    } catch (err) {
-      console.error("Fehler beim Laden:", err);
-      cases = [];
-      render();
-      msg("Fehler beim Laden aus MongoDB", true);
-    }
-  }
 
   async function createCase(data) {
     const res = await fetch(REPAIRS_URL, {
@@ -1029,32 +1017,51 @@ async function loadCases() {
     });
   }
 
-  if (btnSaveCase) {
-    btnSaveCase.addEventListener("click", async () => {
-      try {
-        const data = collectForm();
+ if (btnSaveCase) {
+  btnSaveCase.addEventListener("click", async () => {
+    try {
+      const data = collectForm();
 
-        if (!data.problem) {
-          msg("Bitte Problem eingeben.", true);
-          return;
-        }
-
-        if (activeId) {
-          await updateCase(activeId, data);
-          msg("Fall gespeichert.");
-        } else {
-          const saved = await createCase(data);
-          activeId = getId(saved);
-          msg("Fall erstellt.");
-        }
-
-        await loadCases();
-      } catch (err) {
-        console.error(err);
-        msg("Fehler beim Speichern.", true);
+      if (!data.problem) {
+        msg("Bitte Problem eingeben.", true);
+        return;
       }
-    });
-  }
+
+      if (activeId) {
+        const res = await fetch(REPAIRS_URL + "/" + activeId, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        msg("Fall gespeichert.");
+      } else {
+        const res = await fetch(REPAIRS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        const saved = await res.json();
+        activeId = saved._id;
+        msg("Fall erstellt.");
+      }
+
+      await loadCases();
+    } catch (err) {
+      console.error(err);
+      msg("Fehler beim Speichern.", true);
+    }
+  });
+}
 
   if (btnMarkDone) {
     btnMarkDone.addEventListener("click", async () => {
