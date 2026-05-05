@@ -609,32 +609,34 @@
         }
       }
 
-      function generateLetter() {
-        clearMsg();
+     function generateLetter() {
+  clearMsg();
 
-        const tenant = getSelectedTenant();
-        if (!tenant) {
-          showMsg("Bitte zuerst einen Mieter auswählen.");
-          return;
-        }
+  const tenant = getSelectedTenant();
+  if (!tenant) {
+    showMsg("Bitte zuerst einen Mieter auswählen.");
+    return;
+  }
 
-        const values = calculateValues();
+  const values = calculateValues();
 
-        if (!values.oldRent || !values.newRent) {
-          showMsg("Bitte alte und neue Miete eintragen.");
-          return;
-        }
+  if (!values.oldRent || !values.newRent) {
+    showMsg("Bitte alte und neue Miete eintragen.");
+    return;
+  }
 
-        if (values.newRent <= values.oldRent) {
-          showMsg("Die neue Miete muss höher sein als die alte Miete.");
-          return;
-        }
+  if (values.newRent <= values.oldRent) {
+    showMsg("Die neue Miete muss höher sein als die aktuelle Miete.");
+    return;
+  }
 
-        const today = formatDateGerman(new Date());
-        const startDate = formatDateGerman(effectiveDate.value);
-        const reasonText = getReasonText();
+  const today = formatDateGerman(new Date());
+  const startDate = formatDateGerman(effectiveDate.value);
+  const reasonText = getReasonText();
 
-        letterText.value = `
+  const percentIncrease = ((values.diff / values.oldRent) * 100).toFixed(2);
+
+  letterText.value = `
 ${today}
 
 An:
@@ -645,27 +647,29 @@ Betreff: Mieterhöhung für Ihre Wohnung
 
 Sehr geehrte Damen und Herren,
 
-hiermit teile ich Ihnen mit, dass die Miete für die oben genannte Wohnung angepasst werden soll.
+hiermit teile ich Ihnen mit, dass die monatliche Miete für die oben genannte Wohnung angepasst werden soll.
 
-Bisherige monatliche Miete: ${formatEuro(values.oldRent)}
-Neue monatliche Miete: ${formatEuro(values.newRent)}
-Erhöhung um: ${formatEuro(values.diff)}
-Wirksam ab: ${startDate}
+Die bisherige monatliche Miete beträgt ${formatEuro(values.oldRent)}.
+Die neue monatliche Miete beträgt ab dem ${startDate} ${formatEuro(values.newRent)}.
+
+Dies entspricht einer Erhöhung um ${formatEuro(values.diff)} beziehungsweise ${percentIncrease} %.
 
 Begründung:
 ${reasonText}
 
-Ich bitte Sie, die neue Miethöhe ab dem genannten Datum zu berücksichtigen und die Zahlung entsprechend anzupassen.
+Ich bitte Sie, die neue Miethöhe ab dem genannten Datum bei Ihrer Zahlung zu berücksichtigen.
 
-Bitte prüfen Sie dieses Schreiben sorgfältig. Sollte eine Zustimmung erforderlich sein, bitte ich Sie um eine schriftliche Rückmeldung.
+Sollte für diese Mieterhöhung Ihre Zustimmung erforderlich sein, bitte ich Sie, mir diese schriftlich zu bestätigen.
+
+Sollten Sie Fragen zu diesem Schreiben haben, können Sie sich gerne mit mir in Verbindung setzen.
 
 Mit freundlichen Grüßen
 
 Vermieter / Verwaltung
-        `.trim();
+  `.trim();
 
-        showMsg("Mieterhöhungsbrief generiert.", "success");
-      }
+  showMsg("Mieterhöhungsbrief wurde generiert.", "success");
+}
 
      async function saveNewRentToTenant() {
   clearMsg();
