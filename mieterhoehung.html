@@ -13,6 +13,7 @@
   </script>
 
   <script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root {
@@ -429,6 +430,7 @@
           <div class="btn-row">
             <button id="copyBtn" class="btn btn-primary">Text kopieren</button>
             <button id="downloadBtn" class="btn btn-secondary">Als TXT speichern</button>
+<button id="downloadPdfBtn" class="btn btn-secondary">Als PDF speichern</button>
           </div>
         </section>
       </div>
@@ -453,6 +455,7 @@
       if (!token) {
         window.location.replace("./Login.html");
         return;
+downloadPdfBtn.addEventListener("click", downloadPdfLetter);
       }
 
       const tenantSelect = document.getElementById("tenantSelect");
@@ -476,7 +479,7 @@
       const saveRentBtn = document.getElementById("saveRentBtn");
       const copyBtn = document.getElementById("copyBtn");
       const downloadBtn = document.getElementById("downloadBtn");
-
+const downloadPdfBtn = document.getElementById("downloadPdfBtn");
       let tenants = [];
 
       function showMsg(text, type = "error") {
@@ -737,38 +740,46 @@ Vermieter / Verwaltung
         }
       }
 
-      function downloadLetter() {
-        const text = letterText.value.trim();
-        if (!text) {
-          showMsg("Es gibt noch keinen Brieftext.");
-          return;
-        }
 
-        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "mieterhoehung.txt";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      }
+function downloadPdfLetter() {
+  const text = letterText.value.trim();
 
-      tenantSelect.addEventListener("change", renderTenantInfo);
-      increaseType.addEventListener("change", calculateValues);
-      increasePercent.addEventListener("input", calculateValues);
-      newRent.addEventListener("input", calculateValues);
-      currentRent.addEventListener("input", calculateValues);
+  if (!text) {
+    showMsg("Es gibt noch keinen Brieftext.");
+    return;
+  }
 
-      calculateBtn.addEventListener("click", calculateValues);
-      generateBtn.addEventListener("click", generateLetter);
-      saveRentBtn.addEventListener("click", saveNewRentToTenant);
-      copyBtn.addEventListener("click", copyLetter);
-      downloadBtn.addEventListener("click", downloadLetter);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-      loadTenants();
-    });
+  const marginLeft = 20;
+  const marginTop = 20;
+  const maxWidth = 170;
+  const lineHeight = 7;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+
+  const lines = doc.splitTextToSize(text, maxWidth);
+
+  let y = marginTop;
+
+  lines.forEach(line => {
+    if (y > 280) {
+      doc.addPage();
+      y = marginTop;
+    }
+
+    doc.text(line, marginLeft, y);
+    y += lineHeight;
+  });
+
+  doc.save("mieterhoehung.pdf");
+
+  showMsg("PDF wurde erstellt.", "success");
+}
+```
+
   </script>
 </body>
 </html>
