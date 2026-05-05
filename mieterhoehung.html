@@ -667,47 +667,56 @@ Vermieter / Verwaltung
         showMsg("Mieterhöhungsbrief generiert.", "success");
       }
 
-      async function saveNewRentToTenant() {
-        clearMsg();
+     async function saveNewRentToTenant() {
+  clearMsg();
 
-        const tenant = getSelectedTenant();
-        if (!tenant) {
-          showMsg("Bitte zuerst einen Mieter auswählen.");
-          return;
-        }
+  const tenant = getSelectedTenant();
+  if (!tenant) {
+    showMsg("Bitte zuerst einen Mieter auswählen.");
+    return;
+  }
 
-        const values = calculateValues();
+  const values = calculateValues();
 
-        if (!values.newRent || values.newRent <= 0) {
-          showMsg("Bitte zuerst eine gültige neue Miete berechnen.");
-          return;
-        }
+  if (!values.newRent || values.newRent <= 0) {
+    showMsg("Bitte zuerst eine gültige neue Miete berechnen.");
+    return;
+  }
 
-        try {
-          const id = getTenantId(tenant);
+  if (values.newRent <= values.oldRent) {
+    showMsg("Die neue Miete muss höher sein als die aktuelle Miete.");
+    return;
+  }
 
-          const res = await fetch(TENANTS_URL + "/" + id, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token")
-            },
-            body: JSON.stringify({
-              rent: values.newRent
-            })
-          });
+  try {
+    const id = getTenantId(tenant);
 
-          if (!res.ok) {
-            throw new Error(await res.text());
-          }
+    const res = await fetch(TENANTS_URL + "/" + id, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        rent: values.newRent
+      })
+    });
 
-          showMsg("Neue Miete wurde beim Mieter gespeichert.", "success");
-          await loadTenants();
-        } catch (err) {
-          console.error(err);
-          showMsg("Fehler beim Speichern der neuen Miete.");
-        }
-      }
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    showMsg("Neue Miete wurde erfolgreich gespeichert.", "success");
+
+    await loadTenants();
+
+    currentRent.value = values.newRent.toFixed(2);
+    oldRentResult.textContent = formatEuro(values.newRent);
+  } catch (err) {
+    console.error(err);
+    showMsg("Die neue Miete konnte nicht gespeichert werden.");
+  }
+}
 
       async function copyLetter() {
         const text = letterText.value.trim();
