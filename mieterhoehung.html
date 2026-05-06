@@ -612,88 +612,74 @@ document.addEventListener("DOMContentLoaded", () => {
   calculateBtn.addEventListener("click", calculateRent);
 
   function generateLetter() {
+  clearMsg();
 
-    clearMsg();
+  const tenant = getSelectedTenant();
 
-    const tenant = getSelectedTenant();
+  if (!tenant) {
+    showMsg("Bitte zuerst einen Mieter auswählen.");
+    return;
+  }
 
-    if (!tenant) {
-      showMsg("Bitte zuerst einen Mieter auswählen.");
-      return;
-    }
+  calculateRent();
 
-    calculateRent();
+  const oldRent = Number(currentRent.value) || 0;
+  const newRentValue = Number(newRent.value) || 0;
 
-    const oldRent = Number(currentRent.value) || 0;
-    const newRentValue = Number(newRent.value) || 0;
+  if (newRentValue <= oldRent) {
+    showMsg("Die neue Miete muss höher sein als die aktuelle Miete.");
+    return;
+  }
 
-    const text = `
-Sehr geehrte/r ${tenant.name},
+  const diff = newRentValue - oldRent;
+  const percentIncrease = ((diff / oldRent) * 100).toFixed(2);
 
-hiermit informieren wir Sie über eine Anpassung der Miete.
+  const today = new Date().toLocaleDateString("de-DE");
 
-Aktuelle Miete:
+  const text = `
+${today}
+
+An:
+${tenant.name || "-"}
+Wohnung: ${tenant.unit || "-"}
+
+Betreff: Mieterhöhung gemäß § 558 BGB
+
+Sehr geehrte Damen und Herren,
+
+hiermit möchte ich Sie darüber informieren, dass die monatliche Nettokaltmiete für die oben genannte Wohnung angepasst wird.
+
+Die bisherige monatliche Miete beträgt:
 ${oldRent.toFixed(2)} €
 
-Neue Miete:
+Die neue monatliche Miete beträgt ab dem ${effectiveDate.value || "-"}:
 ${newRentValue.toFixed(2)} €
 
-Gültig ab:
-${effectiveDate.value || "-"}
+Dies entspricht einer Erhöhung um:
+${diff.toFixed(2)} € (${percentIncrease} %)
 
-Begründung:
+Begründung der Mieterhöhung:
 ${reason.value}
 
 ${customReason.value || ""}
 
+Die Anpassung erfolgt unter Berücksichtigung der gesetzlichen Regelungen sowie der aktuellen ortsüblichen Vergleichsmiete.
+
+Ich bitte Sie, die neue Miethöhe ab dem oben genannten Zeitpunkt bei Ihren zukünftigen Zahlungen zu berücksichtigen.
+
+Sollte Ihre Zustimmung erforderlich sein, bitte ich Sie höflich um eine schriftliche Bestätigung innerhalb der gesetzlichen Frist.
+
+Für Rückfragen stehe ich Ihnen selbstverständlich gerne zur Verfügung.
+
 Mit freundlichen Grüßen
 
-Landlord Lite
+Vermieter / Hausverwaltung
 `;
 
-    letterText.value = text.trim();
+  letterText.value = text.trim();
 
-    showMsg("Brief erfolgreich generiert.", "success");
-  }
-
-  generateBtn.addEventListener("click", generateLetter);
-
-  saveRentBtn.addEventListener("click", async () => {
-
-    clearMsg();
-
-    const tenant = getSelectedTenant();
-
-    if (!tenant) {
-      showMsg("Bitte zuerst einen Mieter auswählen.");
-      return;
-    }
-
-    try {
-
-      const res = await fetch(
-        `${TENANTS_URL}/${getTenantId(tenant)}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token")
-          },
-          body: JSON.stringify({
-            rent: Number(newRent.value)
-          })
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
-
-      showMsg(
-        "Neue Miete wurde erfolgreich gespeichert.",
-        "success"
-      );
-
+  showMsg("Mieterhöhungsbrief wurde generiert.", "success");
+}
       await loadTenants();
 
     } catch (err) {
