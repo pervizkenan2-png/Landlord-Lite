@@ -446,6 +446,7 @@ function toggleSidebarMenu() {
   if (!submenu) return;
 
   const isOpen = submenu.style.display === "block";
+
   submenu.style.display = isOpen ? "none" : "block";
 
   if (arrow) {
@@ -503,7 +504,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getSelectedTenant() {
-    return tenants.find(t => getTenantId(t) === tenantSelect.value);
+    return tenants.find(
+      t => String(getTenantId(t)) === String(tenantSelect.value)
+    );
   }
 
   async function loadTenants() {
@@ -512,7 +515,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const res = await fetch(TENANTS_URL, {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
+          Authorization:
+            "Bearer " + localStorage.getItem("token")
         }
       });
 
@@ -522,9 +526,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       tenants = await res.json();
 
-      tenantSelect.innerHTML = `
-        <option value="">— Mieter auswählen —</option>
-      `;
+      tenantSelect.innerHTML =
+        '<option value="">— Mieter auswählen —</option>';
 
       tenants.forEach(t => {
 
@@ -560,9 +563,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tenantInfo.innerHTML = `
       <div class="tenant-card">
-        <h3>${tenant.name}</h3>
+        <h3>${tenant.name || "-"}</h3>
         <p>Wohnung: ${tenant.unit || "-"}</p>
-        <p>Aktuelle Miete: ${tenant.rent || 0} €</p>
+        <p>Aktuelle Miete: ${Number(tenant.rent || 0).toFixed(2)} €</p>
         <p>Status: ${tenant.status || "-"}</p>
       </div>
     `;
@@ -574,27 +577,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function calculateRent() {
 
-    const oldRent = Number(currentRent.value) || 0;
+    const oldRent =
+      Number(currentRent.value) || 0;
 
-    let newRentValue = oldRent;
+    let newRentValue =
+      Number(newRent.value) || oldRent;
 
     if (increaseType.value === "percent") {
 
-      const percent = Number(increasePercent.value) || 0;
+      const percent =
+        Number(increasePercent.value) || 0;
 
       newRentValue =
         oldRent + (oldRent * percent / 100);
 
+      newRent.value =
+        newRentValue.toFixed(2);
     }
-
-    if (increaseType.value === "direct") {
-
-      newRentValue =
-        Number(newRent.value) || oldRent;
-
-    }
-
-    newRent.value = newRentValue.toFixed(2);
 
     const diff =
       newRentValue - oldRent;
@@ -609,34 +608,47 @@ document.addEventListener("DOMContentLoaded", () => {
       diff.toFixed(2) + " €";
   }
 
-  calculateBtn.addEventListener("click", calculateRent);
+  calculateBtn.addEventListener(
+    "click",
+    calculateRent
+  );
 
   function generateLetter() {
-  clearMsg();
 
-  const tenant = getSelectedTenant();
+    clearMsg();
 
-  if (!tenant) {
-    showMsg("Bitte zuerst einen Mieter auswählen.");
-    return;
-  }
+    const tenant = getSelectedTenant();
 
-  calculateRent();
+    if (!tenant) {
+      showMsg("Bitte zuerst einen Mieter auswählen.");
+      return;
+    }
 
-  const oldRent = Number(currentRent.value) || 0;
-  const newRentValue = Number(newRent.value) || 0;
+    calculateRent();
 
-  if (newRentValue <= oldRent) {
-    showMsg("Die neue Miete muss höher sein als die aktuelle Miete.");
-    return;
-  }
+    const oldRent =
+      Number(currentRent.value) || 0;
 
-  const diff = newRentValue - oldRent;
-  const percentIncrease = ((diff / oldRent) * 100).toFixed(2);
+    const newRentValue =
+      Number(newRent.value) || 0;
 
-  const today = new Date().toLocaleDateString("de-DE");
+    if (newRentValue <= oldRent) {
+      showMsg(
+        "Die neue Miete muss höher sein als die aktuelle Miete."
+      );
+      return;
+    }
 
-  const text = `
+    const diff =
+      newRentValue - oldRent;
+
+    const percentIncrease =
+      ((diff / oldRent) * 100).toFixed(2);
+
+    const today =
+      new Date().toLocaleDateString("de-DE");
+
+    const text = `
 ${today}
 
 An:
@@ -676,62 +688,134 @@ Mit freundlichen Grüßen
 Vermieter / Hausverwaltung
 `;
 
-  letterText.value = text.trim();
+    letterText.value = text.trim();
 
-  showMsg("Mieterhöhungsbrief wurde generiert.", "success");
-}
-      await loadTenants();
-
-    } catch (err) {
-
-      console.error(err);
-
-      showMsg("Fehler beim Speichern.");
-
-    }
-  });
-
-  copyBtn.addEventListener("click", async () => {
-
-    try {
-
-      await navigator.clipboard.writeText(letterText.value);
-
-      showMsg("Brief kopiert.", "success");
-
-    } catch (err) {
-
-      console.error(err);
-
-      showMsg("Kopieren fehlgeschlagen.");
-
-    }
-  });
-
-  downloadBtn.addEventListener("click", () => {
-
-    const blob = new Blob(
-      [letterText.value],
-      { type: "text/plain" }
+    showMsg(
+      "Professioneller Mieterhöhungsbrief wurde generiert.",
+      "success"
     );
+  }
 
-    const url = URL.createObjectURL(blob);
+  generateBtn.addEventListener(
+    "click",
+    generateLetter
+  );
 
-    const a = document.createElement("a");
+  saveRentBtn.addEventListener(
+    "click",
+    async () => {
 
-    a.href = url;
+      clearMsg();
 
-    a.download = "mieterhoehung.txt";
+      const tenant =
+        getSelectedTenant();
 
-    a.click();
+      if (!tenant) {
+        showMsg(
+          "Bitte zuerst einen Mieter auswählen."
+        );
+        return;
+      }
 
-    URL.revokeObjectURL(url);
-  });
+      try {
+
+        const res = await fetch(
+          `${TENANTS_URL}/${getTenantId(tenant)}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type":
+                "application/json",
+              Authorization:
+                "Bearer " +
+                localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+              rent: Number(newRent.value)
+            })
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+
+        showMsg(
+          "Neue Miete wurde erfolgreich gespeichert.",
+          "success"
+        );
+
+        await loadTenants();
+
+      } catch (err) {
+
+        console.error(err);
+
+        showMsg(
+          "Fehler beim Speichern."
+        );
+      }
+    }
+  );
+
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      try {
+
+        await navigator.clipboard.writeText(
+          letterText.value
+        );
+
+        showMsg(
+          "Text kopiert.",
+          "success"
+        );
+
+      } catch (err) {
+
+        console.error(err);
+
+        showMsg(
+          "Kopieren fehlgeschlagen."
+        );
+      }
+    }
+  );
+
+  downloadBtn.addEventListener(
+    "click",
+    () => {
+
+      const blob = new Blob(
+        [letterText.value],
+        { type: "text/plain" }
+      );
+
+      const url =
+        URL.createObjectURL(blob);
+
+      const a =
+        document.createElement("a");
+
+      a.href = url;
+
+      a.download =
+        "mieterhoehung.txt";
+
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }
+  );
 
   function downloadPdfLetter() {
 
     if (!letterText.value.trim()) {
-      showMsg("Bitte zuerst einen Brief generieren.");
+      showMsg(
+        "Bitte zuerst einen Brief generieren."
+      );
       return;
     }
 
@@ -740,9 +824,10 @@ Vermieter / Hausverwaltung
     const doc = new jsPDF();
 
     const lines =
-      doc.splitTextToSize(letterText.value, 180);
-
-    doc.setFont("helvetica", "normal");
+      doc.splitTextToSize(
+        letterText.value,
+        180
+      );
 
     doc.setFontSize(12);
 
@@ -750,7 +835,10 @@ Vermieter / Hausverwaltung
 
     doc.save("mieterhoehung.pdf");
 
-    showMsg("PDF erfolgreich erstellt.", "success");
+    showMsg(
+      "PDF erfolgreich erstellt.",
+      "success"
+    );
   }
 
   downloadPdfBtn.addEventListener(
