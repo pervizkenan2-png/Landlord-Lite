@@ -434,10 +434,17 @@
           </div>
         </section>
       </div>
+<section class="card">
+  <h3>Mieterhöhungs-Historie</h3>
+  <div id="historyList">
+    Noch keine Historie geladen.
+  </div>
+</section>
     </main>
   </div>
 <script>
 const TENANTS_URL = window.TENANTS_URL;
+const RENT_INCREASE_HISTORY_URL = window.RENT_INCREASE_HISTORY_URL;
 
 function toggleSidebarMenu() {
   const submenu = document.getElementById("submenu");
@@ -508,6 +515,44 @@ document.addEventListener("DOMContentLoaded", () => {
       t => String(getTenantId(t)) === String(tenantSelect.value)
     );
   }
+
+async function loadRentIncreaseHistory() {
+  const historyList = document.getElementById("historyList");
+
+  try {
+    const res = await fetch(RENT_INCREASE_HISTORY_URL, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    const history = await res.json();
+
+    if (!history.length) {
+      historyList.innerHTML = "Noch keine Mieterhöhungen gespeichert.";
+      return;
+    }
+
+    historyList.innerHTML = history.map(item => `
+      <div class="result-item" style="margin-bottom:10px;">
+        <strong>${item.tenantName || "-"}</strong><br>
+        Wohnung: ${item.unit || "-"}<br>
+        Alte Miete: ${Number(item.oldRent || 0).toFixed(2)} €<br>
+        Neue Miete: ${Number(item.newRent || 0).toFixed(2)} €<br>
+        Erhöhung: ${Number(item.difference || 0).toFixed(2)} € (${Number(item.percent || 0).toFixed(2)} %)<br>
+        Gültig ab: ${item.effectiveDate || "-"}
+      </div>
+    `).join("");
+
+  } catch (err) {
+    console.error(err);
+    historyList.innerHTML = "Historie konnte nicht geladen werden.";
+  }
+}
 
   async function loadTenants() {
 
@@ -847,7 +892,7 @@ Vermieter / Hausverwaltung
   );
 
   loadTenants();
-
+loadRentIncreaseHistory();
 });
 </script>
 </body>
