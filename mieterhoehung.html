@@ -515,7 +515,6 @@ document.addEventListener("DOMContentLoaded", () => {
       t => String(getTenantId(t)) === String(tenantSelect.value)
     );
   }
-
 async function loadRentIncreaseHistory() {
   const historyList = document.getElementById("historyList");
 
@@ -529,35 +528,6 @@ async function loadRentIncreaseHistory() {
     if (!res.ok) {
       throw new Error(await res.text());
     }
-
-const oldRentValue = Number(currentRent.value) || 0;
-const newRentValue = Number(newRent.value) || 0;
-const differenceValue = newRentValue - oldRentValue;
-const percentValue = oldRentValue > 0
-  ? (differenceValue / oldRentValue) * 100
-  : 0;
-
-await fetch(RENT_INCREASE_HISTORY_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: "Bearer " + localStorage.getItem("token")
-  },
-  body: JSON.stringify({
-    tenantId: getTenantId(tenant),
-    tenantName: tenant.name || "",
-    unit: tenant.unit || "",
-    oldRent: oldRentValue,
-    newRent: newRentValue,
-    difference: differenceValue,
-    percent: percentValue,
-    effectiveDate: effectiveDate.value || "",
-    reason: reason.value || "",
-    customReason: customReason.value || ""
-  })
-});
-
-await loadRentIncreaseHistory();
 
     const history = await res.json();
 
@@ -582,7 +552,6 @@ await loadRentIncreaseHistory();
     historyList.innerHTML = "Historie konnte nicht geladen werden.";
   }
 }
-
   async function loadTenants() {
 
     try {
@@ -919,7 +888,45 @@ Vermieter / Hausverwaltung
     "click",
     downloadPdfLetter
   );
+saveRentBtn.addEventListener("click", async () => {
+  try {
+    const tenant = getSelectedTenant();
 
+    const oldRentValue = Number(currentRent.value) || 0;
+    const newRentValue = Number(newRent.value) || 0;
+    const differenceValue = newRentValue - oldRentValue;
+
+    const percentValue =
+      oldRentValue > 0
+        ? (differenceValue / oldRentValue) * 100
+        : 0;
+
+    await fetch(RENT_INCREASE_HISTORY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        tenantId: getTenantId(tenant),
+        tenantName: tenant.name || "",
+        unit: tenant.unit || "",
+        oldRent: oldRentValue,
+        newRent: newRentValue,
+        difference: differenceValue,
+        percent: percentValue,
+        effectiveDate: effectiveDate.value || "",
+        reason: reason.value || "",
+        customReason: customReason.value || ""
+      })
+    });
+
+    await loadRentIncreaseHistory();
+
+  } catch (err) {
+    console.error(err);
+  }
+});
   loadTenants();
 loadRentIncreaseHistory();
 });
