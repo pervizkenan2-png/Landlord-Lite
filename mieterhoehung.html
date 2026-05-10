@@ -744,62 +744,50 @@ Vermieter / Hausverwaltung
     generateLetter
   );
 
-  saveRentBtn.addEventListener(
-    "click",
-    async () => {
+  saveRentBtn.addEventListener("click", async () => {
+  try {
+    const tenant = getSelectedTenant();
 
-      clearMsg();
-
-      const tenant =
-        getSelectedTenant();
-
-      if (!tenant) {
-        showMsg(
-          "Bitte zuerst einen Mieter auswählen."
-        );
-        return;
-      }
-
-      try {
-
-        const res = await fetch(
-          `${TENANTS_URL}/${getTenantId(tenant)}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type":
-                "application/json",
-              Authorization:
-                "Bearer " +
-                localStorage.getItem("token")
-            },
-            body: JSON.stringify({
-              rent: Number(newRent.value)
-            })
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error(await res.text());
-        }
-
-        showMsg(
-          "Neue Miete wurde erfolgreich gespeichert.",
-          "success"
-        );
-
-        await loadTenants();
-
-      } catch (err) {
-
-        console.error(err);
-
-        showMsg(
-          "Fehler beim Speichern."
-        );
-      }
+    if (!tenant) {
+      showMsg("Bitte zuerst einen Mieter auswählen.");
+      return;
     }
-  );
+
+    const oldRentValue = Number(currentRent.value) || 0;
+    const newRentValue = Number(newRent.value) || 0;
+    const differenceValue = newRentValue - oldRentValue;
+
+    const percentValue =
+      oldRentValue > 0
+        ? (differenceValue / oldRentValue) * 100
+        : 0;
+
+    await fetch(RENT_INCREASE_HISTORY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        tenantId: getTenantId(tenant),
+        tenantName: tenant.name || "",
+        unit: tenant.unit || "",
+        oldRent: oldRentValue,
+        newRent: newRentValue,
+        difference: differenceValue,
+        percent: percentValue,
+        effectiveDate: effectiveDate.value || "",
+        reason: reason.value || "",
+        customReason: customReason.value || ""
+      })
+    });
+
+    await loadRentIncreaseHistory();
+
+  } catch (err) {
+    console.error(err);
+  }
+});
 
   copyBtn.addEventListener(
     "click",
@@ -888,45 +876,6 @@ Vermieter / Hausverwaltung
     "click",
     downloadPdfLetter
   );
-saveRentBtn.addEventListener("click", async () => {
-  try {
-    const tenant = getSelectedTenant();
-
-    const oldRentValue = Number(currentRent.value) || 0;
-    const newRentValue = Number(newRent.value) || 0;
-    const differenceValue = newRentValue - oldRentValue;
-
-    const percentValue =
-      oldRentValue > 0
-        ? (differenceValue / oldRentValue) * 100
-        : 0;
-
-    await fetch(RENT_INCREASE_HISTORY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token")
-      },
-      body: JSON.stringify({
-        tenantId: getTenantId(tenant),
-        tenantName: tenant.name || "",
-        unit: tenant.unit || "",
-        oldRent: oldRentValue,
-        newRent: newRentValue,
-        difference: differenceValue,
-        percent: percentValue,
-        effectiveDate: effectiveDate.value || "",
-        reason: reason.value || "",
-        customReason: customReason.value || ""
-      })
-    });
-
-    await loadRentIncreaseHistory();
-
-  } catch (err) {
-    console.error(err);
-  }
-});
   loadTenants();
 loadRentIncreaseHistory();
 });
