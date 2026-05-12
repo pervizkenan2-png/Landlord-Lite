@@ -931,9 +931,6 @@ function renderHistory(historyData) {
     "click",
     downloadPdfLetter
   );
-  loadTenants();
-loadRentIncreaseHistory();
-});
 document.getElementById("historySearch")
   .addEventListener("input", () => {
     renderHistory(window.rentHistoryData || []);
@@ -943,6 +940,10 @@ document.getElementById("historyFilter")
   .addEventListener("change", () => {
     renderHistory(window.rentHistoryData || []);
   });
+
+  loadTenants();
+loadRentIncreaseHistory();
+});
 </script>
 </body>
 </html>
