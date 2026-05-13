@@ -934,18 +934,18 @@ function renderHistory(historyData) {
 
       URL.revokeObjectURL(url);
     }
-  );
+);
+
 
   function downloadPdfLetter() {
+if (!letterText.value.trim()) {
+    showMsg(
+        "Bitte zuerst einen Brief generieren."
+    );
 
-    if (!letterText.value.trim()) {
-      showMsg(
-        "Bitte zuerst einen Brief generieren.");   
-
-      return;
-    }
-
-    const { jsPDF } = window.jspdf;
+    return;
+}    
+const { jsPDF } = window.jspdf;
 
     const doc = new jsPDF();
 
@@ -972,7 +972,7 @@ document.getElementById("historyFilter").addEventListener("change", renderHistor
 
   loadTenants();
 loadRentIncreaseHistory();
-});
+);
 </script>
 </body>
 </html>
