@@ -529,8 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
       t => String(getTenantId(t)) === String(tenantSelect.value)
     );
   }
-async function loadRentIncreaseHistory() {
-  let rentHistoryData = [];
+let rentHistoryData = [];
 
 async function loadRentIncreaseHistory() {
   const historyList = document.getElementById("historyList");
