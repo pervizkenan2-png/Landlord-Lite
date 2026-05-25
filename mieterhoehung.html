@@ -547,20 +547,15 @@ async function loadRentIncreaseHistory() {
 }
 
 function renderHistory() {
-  const historyList = document.getElementById("historyList");
-  const historySearch = document.getElementById("historySearch");
+ const historySearch = document.getElementById("historySearch");
   const historyFilter = document.getElementById("historyFilter");
 
-  const searchText = (historySearch.value || "").toLowerCase();
-
-  let filtered = rentHistoryData.filter(item => {
+    let filtered = rentHistoryData.filter(item => {
     const name = (item.tenantName || "").toLowerCase();
 
-    const matchesSearch = !searchText || name.includes(searchText);
-    const matchesFilter = !historyFilter.value || item.tenantName === historyFilter.value;
+   const matchesFilter = !historyFilter.value || item.tenantName === historyFilter.value;
 
-    return matchesSearch && matchesFilter;
-  });
+return matchesFilter;
 
   const names = [...new Set(rentHistoryData.map(item => item.tenantName).filter(Boolean))];
 
