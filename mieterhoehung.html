@@ -546,7 +546,7 @@ async function loadRentIncreaseHistory() {
     }
 
     rentHistoryData = await res.json();
-    renderHistory();
+    renderHistory(rentHistoryData);
 
   } catch (err) {
     console.error(err);
@@ -966,9 +966,13 @@ function renderHistory(historyData) {
     );
   }
 
-  document.getElementById("historySearch").addEventListener("input", renderHistory);
-document.getElementById("historyFilter").addEventListener("change", renderHistory);
+ document.getElementById("historySearch").addEventListener("input", () => {
+  renderHistory(rentHistoryData);
+});
 
+document.getElementById("historyFilter").addEventListener("change", () => {
+  renderHistory(rentHistoryData);
+});
   loadTenants();
 loadRentIncreaseHistory();
 });
