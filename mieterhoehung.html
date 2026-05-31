@@ -820,38 +820,23 @@ Vermieter / Hausverwaltung
     console.error(err);
   }
 });
-function renderHistory(historyData) {
+function renderHistory() {
   const historyList = document.getElementById("historyList");
-  const historySearch = document.getElementById("historySearch");
   const historyFilter = document.getElementById("historyFilter");
 
-  let filtered = [...historyData];
+  let filtered = rentHistoryData.filter(item => {
+    const matchesFilter = !historyFilter.value || item.tenantName === historyFilter.value;
+    return matchesFilter;
+  });
 
-  const searchText = historySearch.value.toLowerCase();
-
-  if (searchText) {
-    filtered = filtered.filter(item =>
-      (item.tenantName || "")
-        .toLowerCase()
-        .includes(searchText)
-    );
-  }
-
-  if (historyFilter.value) {
-    filtered = filtered.filter(
-      item => item.tenantName === historyFilter.value
-    );
-  }
-
-  const uniqueNames = [
-    ...new Set(historyData.map(item => item.tenantName))
-  ];
+  const names = [...new Set(rentHistoryData.map(item => item.tenantName).filter(Boolean))];
+  const currentFilter = historyFilter.value;
 
   historyFilter.innerHTML =
     `<option value="">Alle Mieter</option>` +
-    uniqueNames.map(name =>
-      `<option value="${name}">${name}</option>`
-    ).join("");
+    names.map(name => `<option value="${name}">${name}</option>`).join("");
+
+  historyFilter.value = currentFilter;
 
   if (!filtered.length) {
     historyList.innerHTML = "Keine Ergebnisse gefunden.";
@@ -859,13 +844,12 @@ function renderHistory(historyData) {
   }
 
   historyList.innerHTML = filtered.map(item => `
-    <div class="result-item" style="margin-bottom:10px;">
+    <div class="history-item">
       <strong>${item.tenantName || "-"}</strong><br>
       Wohnung: ${item.unit || "-"}<br>
       Alte Miete: ${Number(item.oldRent || 0).toFixed(2)} €<br>
       Neue Miete: ${Number(item.newRent || 0).toFixed(2)} €<br>
-      Erhöhung: ${Number(item.difference || 0).toFixed(2)} €
-      (${Number(item.percent || 0).toFixed(2)} %)<br>
+      Erhöhung: ${Number(item.difference || 0).toFixed(2)} € (${Number(item.percent || 0).toFixed(2)} %)<br>
       Gültig ab: ${item.effectiveDate || "-"}
     </div>
   `).join("");
