@@ -855,18 +855,18 @@ function renderHistory() {
     return;
   }
 
-  historyList.innerHTML = filtered.map(item => `
-    <div class="history-item">
-      <strong>${item.tenantName || "-"}</strong><br>
-      Wohnung: ${item.unit || "-"}<br>
-      Alte Miete: ${Number(item.oldRent || 0).toFixed(2)} €<br>
-      Neue Miete: ${Number(item.newRent || 0).toFixed(2)} €<br>
-      Erhöhung: ${Number(item.difference || 0).toFixed(2)} €
-      (${Number(item.percent || 0).toFixed(2)} %)<br>
-      Gültig ab: ${item.effectiveDate || "-"}
-    </div>
-  `).join("");
-}
+ historyList.innerHTML = filtered.map(item => `
+  <div class="history-item">
+    <strong>${item.tenantName || "-"}</strong><br>
+    Wohnung: ${item.unit || "-"}<br>
+    Alte Miete: ${Number(item.oldRent || 0).toFixed(2)} €<br>
+    Neue Miete: ${Number(item.newRent || 0).toFixed(2)} €<br>
+    Erhöhung: ${Number(item.difference || 0).toFixed(2)} €
+    (${Number(item.percent || 0).toFixed(2)} %)<br>
+    Gültig ab: ${item.effectiveDate || "-"}
+  </div>
+`).join("");
+
   copyBtn.addEventListener(
     "click",
     async () => {
