@@ -820,16 +820,28 @@ Vermieter / Hausverwaltung
     console.error(err);
   }
 });
+rentHistoryData = await res.json();
+renderHistory();
+
+} catch (err) {
+  console.error(err);
+  historyList.innerHTML = "Historie konnte nicht geladen werden.";
+}
+}
+
 function renderHistory() {
   const historyList = document.getElementById("historyList");
   const historyFilter = document.getElementById("historyFilter");
 
   let filtered = rentHistoryData.filter(item => {
-    const matchesFilter = !historyFilter.value || item.tenantName === historyFilter.value;
+    const matchesFilter =
+      !historyFilter.value || item.tenantName === historyFilter.value;
+
     return matchesFilter;
   });
 
   const names = [...new Set(rentHistoryData.map(item => item.tenantName).filter(Boolean))];
+
   const currentFilter = historyFilter.value;
 
   historyFilter.innerHTML =
@@ -849,7 +861,8 @@ function renderHistory() {
       Wohnung: ${item.unit || "-"}<br>
       Alte Miete: ${Number(item.oldRent || 0).toFixed(2)} €<br>
       Neue Miete: ${Number(item.newRent || 0).toFixed(2)} €<br>
-      Erhöhung: ${Number(item.difference || 0).toFixed(2)} € (${Number(item.percent || 0).toFixed(2)} %)<br>
+      Erhöhung: ${Number(item.difference || 0).toFixed(2)} €
+      (${Number(item.percent || 0).toFixed(2)} %)<br>
       Gültig ab: ${item.effectiveDate || "-"}
     </div>
   `).join("");
