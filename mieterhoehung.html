@@ -459,7 +459,6 @@ function toggleSidebarMenu() {
   if (!submenu) return;
 
   const isOpen = submenu.style.display === "block";
-
   submenu.style.display = isOpen ? "none" : "block";
 
   if (arrow) {
@@ -468,7 +467,6 @@ function toggleSidebarMenu() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -501,6 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
 
   let tenants = [];
+  let rentHistoryData = [];
 
   function showMsg(text, type = "error") {
     msgEl.textContent = text;
@@ -517,81 +516,71 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getSelectedTenant() {
-    return tenants.find(
-      t => String(getTenantId(t)) === String(tenantSelect.value)
-    );
-  }
-let rentHistoryData = [];
-
-async function loadRentIncreaseHistory() {
-  const historyList = document.getElementById("historyList");
-
-  try {
-    const res = await fetch(RENT_INCREASE_HISTORY_URL, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token")
-      }
-    });
-
-    if (!res.ok) {
-      throw new Error(await res.text());
-    }
-
-    rentHistoryData = await res.json();
-    renderHistory(rentHistoryData);
-
-  } catch (err) {
-    console.error(err);
-    historyList.innerHTML = "Historie konnte nicht geladen werden.";
-  }
-}
-
-function renderHistory() {
- const historySearch = document.getElementById("historySearch");
-  const historyFilter = document.getElementById("historyFilter");
-
-    let filtered = rentHistoryData.filter(item => {
-    const name = (item.tenantName || "").toLowerCase();
-
-   const matchesFilter = !historyFilter.value || item.tenantName === historyFilter.value;
-
-return matchesFilter;
-
-  const names = [...new Set(rentHistoryData.map(item => item.tenantName).filter(Boolean))];
-
-  const currentFilter = historyFilter.value;
-
-  historyFilter.innerHTML =
-    `<option value="">Alle Mieter</option>` +
-    names.map(name => `<option value="${name}">${name}</option>`).join("");
-
-  historyFilter.value = currentFilter;
-
-  if (!filtered.length) {
-    historyList.innerHTML = "Keine Ergebnisse gefunden.";
-    return;
+    return tenants.find(t => String(getTenantId(t)) === String(tenantSelect.value));
   }
 
-  historyList.innerHTML = filtered.map(item => `
-    <div class="history-item">
-      <strong>${item.tenantName || "-"}</strong><br>
-      Wohnung: ${item.unit || "-"}<br>
-      Alte Miete: ${Number(item.oldRent || 0).toFixed(2)} €<br>
-      Neue Miete: ${Number(item.newRent || 0).toFixed(2)} €<br>
-      Erhöhung: ${Number(item.difference || 0).toFixed(2)} €
-      (${Number(item.percent || 0).toFixed(2)} %)<br>
-      Gültig ab: ${item.effectiveDate || "-"}
-    </div>
-  `).join("");
-}
-  async function loadTenants() {
+  async function loadRentIncreaseHistory() {
+    const historyList = document.getElementById("historyList");
 
     try {
+      const res = await fetch(RENT_INCREASE_HISTORY_URL, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token")
+        }
+      });
 
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      rentHistoryData = await res.json();
+      renderHistory();
+    } catch (err) {
+      console.error(err);
+      historyList.innerHTML = "Historie konnte nicht geladen werden.";
+    }
+  }
+
+  function renderHistory() {
+    const historyList = document.getElementById("historyList");
+    const historyFilter = document.getElementById("historyFilter");
+
+    let filtered = rentHistoryData.filter(item => {
+      return !historyFilter.value || item.tenantName === historyFilter.value;
+    });
+
+    const names = [...new Set(rentHistoryData.map(item => item.tenantName).filter(Boolean))];
+    const currentFilter = historyFilter.value;
+
+    historyFilter.innerHTML =
+      '<option value="">Alle Mieter</option>' +
+      names.map(name => '<option value="' + name + '">' + name + '</option>').join("");
+
+    historyFilter.value = currentFilter;
+
+    if (!filtered.length) {
+      historyList.innerHTML = "Keine Ergebnisse gefunden.";
+      return;
+    }
+
+    historyList.innerHTML = filtered.map(item => {
+      return '<div class="history-item">' +
+        '<strong>' + (item.tenantName || "-") + '</strong><br>' +
+        'Wohnung: ' + (item.unit || "-") + '<br>' +
+        'Alte Miete: ' + Number(item.oldRent || 0).toFixed(2) + ' €<br>' +
+        'Neue Miete: ' + Number(item.newRent || 0).toFixed(2) + ' €<br>' +
+        'Erhöhung: ' + Number(item.difference || 0).toFixed(2) + ' € (' +
+        Number(item.percent || 0).toFixed(2) + ' %)<br>' +
+        'Gültig ab: ' + (item.effectiveDate || "-") +
+        '</div>';
+    }).join("");
+  }
+
+  async function loadTenants() {
+    try {
       const res = await fetch(TENANTS_URL, {
         headers: {
-          Authorization:
-            "Bearer " + localStorage.getItem("token")
+          Authorization: "Bearer " + localStorage.getItem("token")
         }
       });
 
@@ -601,34 +590,23 @@ return matchesFilter;
 
       tenants = await res.json();
 
-      tenantSelect.innerHTML =
-        '<option value="">— Mieter auswählen —</option>';
+      tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
 
       tenants.forEach(t => {
-
         const option = document.createElement("option");
-
         option.value = getTenantId(t);
-
-        option.textContent =
-          `${t.name || "-"} | ${t.unit || "-"} | ${t.rent || 0} €`;
-
+        option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent || 0} €`;
         tenantSelect.appendChild(option);
       });
 
       clearMsg();
-
     } catch (err) {
-
       console.error(err);
-
       showMsg("Fehler beim Laden der Mieter.");
-
     }
   }
 
   tenantSelect.addEventListener("change", () => {
-
     const tenant = getSelectedTenant();
 
     if (!tenant) {
@@ -646,50 +624,33 @@ return matchesFilter;
     `;
 
     currentRent.value = tenant.rent || 0;
-
     calculateRent();
   });
 
   function calculateRent() {
-
-    const oldRent =
-      Number(currentRent.value) || 0;
-
-    let newRentValue =
-      Number(newRent.value) || oldRent;
+    const oldRent = Number(currentRent.value) || 0;
+    let newRentValue = Number(newRent.value) || oldRent;
 
     if (increaseType.value === "percent") {
-
-      const percent =
-        Number(increasePercent.value) || 0;
-
-      newRentValue =
-        oldRent + (oldRent * percent / 100);
-
-      newRent.value =
-        newRentValue.toFixed(2);
+      const percent = Number(increasePercent.value) || 0;
+      newRentValue = oldRent + (oldRent * percent / 100);
+      newRent.value = newRentValue.toFixed(2);
     }
 
-    const diff =
-      newRentValue - oldRent;
+    if (increaseType.value === "amount") {
+      newRentValue = Number(newRent.value) || oldRent;
+    }
 
-    oldRentResult.textContent =
-      oldRent.toFixed(2) + " €";
+    const diff = newRentValue - oldRent;
 
-    newRentResult.textContent =
-      newRentValue.toFixed(2) + " €";
-
-    diffResult.textContent =
-      diff.toFixed(2) + " €";
+    oldRentResult.textContent = oldRent.toFixed(2) + " €";
+    newRentResult.textContent = newRentValue.toFixed(2) + " €";
+    diffResult.textContent = diff.toFixed(2) + " €";
   }
 
-  calculateBtn.addEventListener(
-    "click",
-    calculateRent
-  );
+  calculateBtn.addEventListener("click", calculateRent);
 
   function generateLetter() {
-
     clearMsg();
 
     const tenant = getSelectedTenant();
@@ -701,27 +662,17 @@ return matchesFilter;
 
     calculateRent();
 
-    const oldRent =
-      Number(currentRent.value) || 0;
-
-    const newRentValue =
-      Number(newRent.value) || 0;
+    const oldRent = Number(currentRent.value) || 0;
+    const newRentValue = Number(newRent.value) || 0;
 
     if (newRentValue <= oldRent) {
-      showMsg(
-        "Die neue Miete muss höher sein als die aktuelle Miete."
-      );
+      showMsg("Die neue Miete muss höher sein als die aktuelle Miete.");
       return;
     }
 
-    const diff =
-      newRentValue - oldRent;
-
-    const percentIncrease =
-      ((diff / oldRent) * 100).toFixed(2);
-
-    const today =
-      new Date().toLocaleDateString("de-DE");
+    const diff = newRentValue - oldRent;
+    const percentIncrease = oldRent > 0 ? ((diff / oldRent) * 100).toFixed(2) : "0.00";
+    const today = new Date().toLocaleDateString("de-DE");
 
     const text = `
 ${today}
@@ -765,178 +716,102 @@ Vermieter / Hausverwaltung
 
     letterText.value = text.trim();
 
-    showMsg(
-      "Professioneller Mieterhöhungsbrief wurde generiert.",
-      "success"
-    );
+    showMsg("Professioneller Mieterhöhungsbrief wurde generiert.", "success");
   }
 
-  generateBtn.addEventListener(
-    "click",
-    generateLetter
-  );
+  generateBtn.addEventListener("click", generateLetter);
 
   saveRentBtn.addEventListener("click", async () => {
-  try {
-    const tenant = getSelectedTenant();
+    try {
+      const tenant = getSelectedTenant();
 
-    if (!tenant) {
-      showMsg("Bitte zuerst einen Mieter auswählen.");
-      return;
+      if (!tenant) {
+        showMsg("Bitte zuerst einen Mieter auswählen.");
+        return;
+      }
+
+      const oldRentValue = Number(currentRent.value) || 0;
+      const newRentValue = Number(newRent.value) || 0;
+      const differenceValue = newRentValue - oldRentValue;
+
+      const percentValue =
+        oldRentValue > 0
+          ? (differenceValue / oldRentValue) * 100
+          : 0;
+
+      await fetch(RENT_INCREASE_HISTORY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token")
+        },
+        body: JSON.stringify({
+          tenantId: getTenantId(tenant),
+          tenantName: tenant.name || "",
+          unit: tenant.unit || "",
+          oldRent: oldRentValue,
+          newRent: newRentValue,
+          difference: differenceValue,
+          percent: percentValue,
+          effectiveDate: effectiveDate.value || "",
+          reason: reason.value || "",
+          customReason: customReason.value || ""
+        })
+      });
+
+      await loadRentIncreaseHistory();
+    } catch (err) {
+      console.error(err);
     }
-
-    const oldRentValue = Number(currentRent.value) || 0;
-    const newRentValue = Number(newRent.value) || 0;
-    const differenceValue = newRentValue - oldRentValue;
-
-    const percentValue =
-      oldRentValue > 0
-        ? (differenceValue / oldRentValue) * 100
-        : 0;
-
-    await fetch(RENT_INCREASE_HISTORY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token")
-      },
-      body: JSON.stringify({
-        tenantId: getTenantId(tenant),
-        tenantName: tenant.name || "",
-        unit: tenant.unit || "",
-        oldRent: oldRentValue,
-        newRent: newRentValue,
-        difference: differenceValue,
-        percent: percentValue,
-        effectiveDate: effectiveDate.value || "",
-        reason: reason.value || "",
-        customReason: customReason.value || ""
-      })
-    });
-
-    await loadRentIncreaseHistory();
-
-  } catch (err) {
-    console.error(err);
-  }
-});
-rentHistoryData = await res.json();
-renderHistory();
-
-} catch (err) {
-  console.error(err);
-  historyList.innerHTML = "Historie konnte nicht geladen werden.";
-}
-}
-
-function renderHistory() {
-  const historyList = document.getElementById("historyList");
-  const historyFilter = document.getElementById("historyFilter");
-
-  let filtered = rentHistoryData.filter(item => {
-    return !historyFilter.value || item.tenantName === historyFilter.value;
   });
 
-  const names = [...new Set(rentHistoryData.map(item => item.tenantName).filter(Boolean))];
-  const currentFilter = historyFilter.value;
-
-  historyFilter.innerHTML =
-    '<option value="">Alle Mieter</option>' +
-    names.map(name => '<option value="' + name + '">' + name + '</option>').join("");
-
-  historyFilter.value = currentFilter;
-
-  if (!filtered.length) {
-    historyList.innerHTML = "Keine Ergebnisse gefunden.";
-    return;
-  }
-
-  historyList.innerHTML = filtered.map(item => {
-    return '<div class="history-item">' +
-      '<strong>' + (item.tenantName || "-") + '</strong><br>' +
-      'Wohnung: ' + (item.unit || "-") + '<br>' +
-      'Alte Miete: ' + Number(item.oldRent || 0).toFixed(2) + ' €<br>' +
-      'Neue Miete: ' + Number(item.newRent || 0).toFixed(2) + ' €<br>' +
-      'Erhöhung: ' + Number(item.difference || 0).toFixed(2) + ' € (' +
-      Number(item.percent || 0).toFixed(2) + ' %)<br>' +
-      'Gültig ab: ' + (item.effectiveDate || "-") +
-      '</div>';
-  }).join("");
-
-}  copyBtn.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(letterText.value);
-    showMsg("Text kopiert.", "success");
-  } catch (err) {
-    console.error(err);
-    showMsg("Kopieren fehlgeschlagen.");
-  }
-});
- 
-
-  downloadBtn.addEventListener(
-    "click",
-    () => {
-
-      const blob = new Blob(
-        [letterText.value],
-        { type: "text/plain" }
-      );
-
-      const url =
-        URL.createObjectURL(blob);
-
-      const a =
-        document.createElement("a");
-
-      a.href = url;
-
-      a.download =
-        "mieterhoehung.txt";
-
-      a.click();
-
-      URL.revokeObjectURL(url);
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(letterText.value);
+      showMsg("Text kopiert.", "success");
+    } catch (err) {
+      console.error(err);
+      showMsg("Kopieren fehlgeschlagen.");
     }
-);
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    const blob = new Blob([letterText.value], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "mieterhoehung.txt";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  });
 
   function downloadPdfLetter() {
-
     if (!letterText.value.trim()) {
-      showMsg(
-        "Bitte zuerst einen Brief generieren.");   
-
+      showMsg("Bitte zuerst einen Brief generieren.");
       return;
     }
 
     const { jsPDF } = window.jspdf;
-
     const doc = new jsPDF();
 
-    const lines =
-      doc.splitTextToSize(
-        letterText.value,
-        180
-      );
+    const lines = doc.splitTextToSize(letterText.value, 180);
 
     doc.setFontSize(12);
-
     doc.text(lines, 15, 20);
-
     doc.save("mieterhoehung.pdf");
 
-    showMsg(
-      "PDF erfolgreich erstellt.",
-      "success"
-    );
+    showMsg("PDF erfolgreich erstellt.", "success");
   }
 
+  downloadPdfBtn.addEventListener("click", downloadPdfLetter);
 
-document.getElementById("historyFilter").addEventListener("change", () => {
-  renderHistory(rentHistoryData);
-});
+  const historyFilter = document.getElementById("historyFilter");
+  historyFilter.addEventListener("change", renderHistory);
+
   loadTenants();
-loadRentIncreaseHistory();
+  loadRentIncreaseHistory();
 });
 </script>
 </body>
