@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Landlord Lite - Nebenkostenabrechnung</title>
+  <script src="./config.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f7f4;
+      color: #1f2937;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 270px;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #2eb62c, #0f6b1d);
+      color: white;
+      padding: 25px 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 15px;
+      margin-bottom: 28px;
+      opacity: 0.9;
+    }
+
+    .menu-title {
+      background: rgba(255,255,255,0.12);
+      padding: 15px;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .menu-link {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 13px 18px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .menu-link:hover,
+    .menu-link.active {
+      background: rgba(255,255,255,0.18);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+
+    .main {
+      margin-left: 270px;
+      width: calc(100% - 270px);
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      max-width: 900px;
+      margin: 0 auto 30px auto;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #166534;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+    }
+
+    button {
+      background: #168a2e;
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 22px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0f6b1d;
+    }
+
+    .btn-secondary {
+      background: #374151;
+      margin-left: 10px;
+    }
+
+    .result {
+      display: none;
+      background: #ecfdf5;
+      border: 1px solid #bbf7d0;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+      font-size: 16px;
+    }
+
+    .final {
+      border-top: 2px solid #16a34a;
+      margin-top: 18px;
+      padding-top: 16px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .red {
+      color: #dc2626;
+    }
+
+    .green {
+      color: #16a34a;
+    }
+
+    @media print {
+      .sidebar, button {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      body {
+        background: white;
+      }
+
+      .card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">🏠 Landlord Lite</div>
+    <div class="sidebar-subtitle">Mieterverwaltung</div>
+
+    <div class="menu-title">📁 Mieterverwaltung ▲</div>
+
+    <a class="menu-link" href="./index.html">👥 Übersicht</a>
+    <a class="menu-link" href="./Mahnung.html">💵 Mahnungssystem</a>
+    <a class="menu-link" href="./Mieterhoehung.html">📈 Mieterhöhung</a>
+    <a class="menu-link active" href="./Nebenkostenabrechnung.html">🧾 Nebenkosten</a>
+    <a class="menu-link" href="./Reparaturen.html">🛠️ Reparaturen</a>
+    <a class="menu-link" href="./Massenimport.html">📥 Massenimport</a>
+    <a class="menu-link" href="./Dashboard.html">📊 Dashboard</a>
+  </aside>
+
+  <main class="main">
+    <h1>Nebenkostenabrechnung</h1>
+
+    <div class="card">
+      <h2>Abrechnung erstellen</h2>
+
+      <div class="grid">
+        <div>
+          <label>Mieter</label>
+          <select id="tenantSelect">
+            <option value="">Mieter auswählen</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Abrechnungsjahr</label>
+          <input type="number" id="year" placeholder="z.B. 2026">
+        </div>
+
+        <div>
+          <label>Wohnfläche Mieter in m²</label>
+          <input type="number" id="tenantArea" placeholder="z.B. 50">
+        </div>
+
+        <div>
+          <label>Gesamtfläche Haus in m²</label>
+          <input type="number" id="totalArea" placeholder="z.B. 225">
+        </div>
+
+        <div>
+          <label>Gezahlte Vorauszahlungen in €</label>
+          <input type="number" id="prepaid" placeholder="z.B. 1500">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Kosten eintragen</h2>
+
+      <div class="grid">
+        <div>
+          <label>Wasser €</label>
+          <input type="number" id="water" placeholder="z.B. 1200">
+        </div>
+
+        <div>
+          <label>Heizung €</label>
+          <input type="number" id="heating" placeholder="z.B. 3500">
+        </div>
+
+        <div>
+          <label>Müll €</label>
+          <input type="number" id="garbage" placeholder="z.B. 400">
+        </div>
+
+        <div>
+          <label>Hausmeister €</label>
+          <input type="number" id="caretaker" placeholder="z.B. 1000">
+        </div>
+
+        <div>
+          <label>Versicherung €</label>
+          <input type="number" id="insurance" placeholder="z.B. 900">
+        </div>
+
+        <div>
+          <label>Grundsteuer €</label>
+          <input type="number" id="propertyTax" placeholder="z.B. 600">
+        </div>
+      </div>
+
+      <button onclick="calculateBill()">Nebenkosten berechnen</button>
+      <button onclick="saveBill()">Speichern</button>
+      <button class="btn-secondary" onclick="window.print()">PDF / Drucken</button>
+    </div>
+
+    <div class="card result" id="resultBox">
+      <h2>Ergebnis</h2>
+
+      <div class="row">
+        <span>Mieter:</span>
+        <strong id="resultTenant"></strong>
+      </div>
+
+      <div class="row">
+        <span>Wohnung:</span>
+        <strong id="resultApartment"></strong>
+      </div>
+
+      <div class="row">
+        <span>Jahr:</span>
+        <strong id="resultYear"></strong>
+      </div>
+
+      <div class="row">
+        <span>Gesamtkosten:</span>
+        <strong id="resultTotalCosts"></strong>
+      </div>
+
+      <div class="row">
+        <span>Anteil Mieter:</span>
+        <strong id="resultTenantShare"></strong>
+      </div>
+
+      <div class="row">
+        <span>Vorauszahlungen:</span>
+        <strong id="resultPrepaid"></strong>
+      </div>
+
+      <div class="final">
+        <span id="finalText"></span>
+        <span id="finalAmount"></span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const TENANTS_URL = window.TENANTS_URL;
+    const UTILITY_BILLS_URL = window.UTILITY_BILLS_URL;
+
+    let tenants = [];
+    let currentResult = null;
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.replace("./Login.html");
+    }
+
+    function getTenantId(tenant) {
+      return tenant._id || tenant.id;
+    }
+
+    function getValue(id) {
+      return Number(document.getElementById(id).value) || 0;
+    }
+
+    function formatEuro(amount) {
+      return Number(amount || 0).toFixed(2).replace(".", ",") + " €";
+    }
+
+    async function loadTenants() {
+      try {
+        const response = await fetch(TENANTS_URL, {
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        tenants = await response.json();
+
+        const tenantSelect = document.getElementById("tenantSelect");
+        tenantSelect.innerHTML = '<option value="">Mieter auswählen</option>';
+
+        tenants.forEach(tenant => {
+          const option = document.createElement("option");
+          option.value = getTenantId(tenant);
+          option.textContent = (tenant.name || "-") + " - " + (tenant.unit || "-");
+          tenantSelect.appendChild(option);
+        });
+
+      } catch (error) {
+        console.error(error);
+        alert("Mieter konnten nicht geladen werden.");
+      }
+    }
+
+    function calculateBill() {
+      const tenantId = document.getElementById("tenantSelect").value;
+      const tenant = tenants.find(t => String(getTenantId(t)) === String(tenantId));
+
+      if (!tenant) {
+        alert("Bitte Mieter auswählen.");
+        return;
+      }
+
+      const year = getValue("year");
+      const tenantArea = getValue("tenantArea");
+      const totalArea = getValue("totalArea");
+      const prepaid = getValue("prepaid");
+
+      const water = getValue("water");
+      const heating = getValue("heating");
+      const garbage = getValue("garbage");
+      const caretaker = getValue("caretaker");
+      const insurance = getValue("insurance");
+      const propertyTax = getValue("propertyTax");
+
+      if (!year || tenantArea <= 0 || totalArea <= 0) {
+        alert("Bitte Jahr, Wohnfläche und Gesamtfläche ausfüllen.");
+        return;
+      }
+
+      const totalCosts = water + heating + garbage + caretaker + insurance + propertyTax;
+      const tenantShare = (tenantArea / totalArea) * totalCosts;
+      const finalResult = tenantShare - prepaid;
+
+      currentResult = {
+        tenantId: getTenantId(tenant),
+        tenantName: tenant.name || "",
+        unit: tenant.unit || "",
+        year: year,
+        tenantArea: tenantArea,
+        totalArea: totalArea,
+        prepaid: prepaid,
+        water: water,
+        heating: heating,
+        garbage: garbage,
+        caretaker: caretaker,
+        insurance: insurance,
+        propertyTax: propertyTax,
+        totalCosts: totalCosts,
+        tenantShare: tenantShare,
+        finalResult: finalResult
+      };
+
+      document.getElementById("resultTenant").textContent = tenant.name || "-";
+      document.getElementById("resultApartment").textContent = tenant.unit || "-";
+      document.getElementById("resultYear").textContent = year;
+      document.getElementById("resultTotalCosts").textContent = formatEuro(totalCosts);
+      document.getElementById("resultTenantShare").textContent = formatEuro(tenantShare);
+      document.getElementById("resultPrepaid").textContent = formatEuro(prepaid);
+
+      const finalText = document.getElementById("finalText");
+      const finalAmount = document.getElementById("finalAmount");
+
+      if (finalResult > 0) {
+        finalText.textContent = "Nachzahlung: ";
+        finalAmount.textContent = formatEuro(finalResult);
+        finalAmount.className = "red";
+      } else if (finalResult < 0) {
+        finalText.textContent = "Guthaben: ";
+        finalAmount.textContent = formatEuro(Math.abs(finalResult));
+        finalAmount.className = "green";
+      } else {
+        finalText.textContent = "Ausgeglichen: ";
+        finalAmount.textContent = "0,00 €";
+        finalAmount.className = "";
+      }
+
+      document.getElementById("resultBox").style.display = "block";
+    }
+
+    async function saveBill() {
+      if (!currentResult) {
+        alert("Bitte zuerst Nebenkosten berechnen.");
+        return;
+      }
+
+      try {
+        const response = await fetch(UTILITY_BILLS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+          },
+          body: JSON.stringify(currentResult)
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        alert("Nebenkostenabrechnung wurde gespeichert.");
+
+      } catch (error) {
+        console.error(error);
+        alert("Fehler beim Speichern der Nebenkostenabrechnung.");
+      }
+    }
+
+    loadTenants();
+  </script>
+
+</body>
+</html>
