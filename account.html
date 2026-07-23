@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mein Konto | Landlord Lite</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f4f6fb;
+      color: #1f2937;
+    }
+
+    header {
+      background: #2563eb;
+      color: white;
+      padding: 18px 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .back-link {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 9px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+    }
+
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 17px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #6b7280;
+      font-weight: bold;
+    }
+
+    .value {
+      color: #111827;
+      font-weight: bold;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .plan-badge {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .plan-free {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .plan-pro {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .pro-box {
+      margin-top: 25px;
+      padding: 22px;
+      border-radius: 14px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .pro-box h2 {
+      color: #1d4ed8;
+      margin-bottom: 10px;
+      font-size: 21px;
+    }
+
+    .pro-box p {
+      color: #4b5563;
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+
+    .features {
+      margin: 0 0 20px 20px;
+      color: #374151;
+      line-height: 1.8;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 15px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .upgrade-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .upgrade-btn:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+
+    .logout-btn {
+      margin-top: 14px;
+      background: #ef4444;
+      color: white;
+    }
+
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+
+    .status-message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      line-height: 1.4;
+    }
+
+    .status-error {
+      display: block;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status-success {
+      display: block;
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 14px;
+      padding: 10px 0 30px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 15px;
+      }
+
+      .logo {
+        font-size: 20px;
+      }
+
+      .container {
+        margin-top: 22px;
+        padding: 0 14px;
+      }
+
+      .card {
+        padding: 21px;
+      }
+
+      .card h1 {
+        font-size: 24px;
+      }
+
+      .info-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 7px;
+      }
+
+      .value {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo">Landlord Lite</div>
+
+      <a href="dashboard.html" class="back-link">
+        Zurück zum Dashboard
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+      <h1>Mein Konto</h1>
+
+      <p class="subtitle">
+        Hier siehst du deine Kontodaten und deinen aktuellen Tarif.
+      </p>
+
+      <div class="info-row">
+        <span class="label">Name</span>
+        <span class="value" id="name">Wird geladen...</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">E-Mail</span>
+        <span class="value" id="email">Wird geladen...</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Aktueller Tarif</span>
+
+        <span class="value">
+          <span id="planBadge" class="plan-badge plan-free">
+            Free
+          </span>
+        </span>
+      </div>
+
+      <div class="pro-box" id="proBox">
+        <h2>Landlord Lite Pro</h2>
+
+        <p>
+          Schalte alle Pro-Funktionen für deine Vermieterverwaltung frei.
+        </p>
+
+        <ul class="features">
+          <li>Erweiterte Vermieter-Funktionen</li>
+          <li>Unbegrenzte Nutzung der Pro-Bereiche</li>
+          <li>9,99 € pro Monat</li>
+        </ul>
+
+        <button type="button" class="upgrade-btn" id="upgradeBtn">
+          Upgrade auf Pro – 9,99 €/Monat
+        </button>
+      </div>
+
+      <div id="statusMessage" class="status-message"></div>
+
+      <button type="button" class="logout-btn" id="logoutBtn">
+        Abmelden
+      </button>
+    </section>
+
+    <div class="footer">
+      Landlord Lite © 2026
+    </div>
+
+  </main>
+
+  <script>
+    const token = localStorage.getItem("token");
+
+    const API =
+      window.API_BASE ||
+      "https://api.landlord-lite.de";
+
+    const nameElement = document.getElementById("name");
+    const emailElement = document.getElementById("email");
+    const planBadge = document.getElementById("planBadge");
+    const proBox = document.getElementById("proBox");
+    const upgradeBtn = document.getElementById("upgradeBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const statusMessage = document.getElementById("statusMessage");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    function showMessage(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className = "status-message";
+
+      if (type === "success") {
+        statusMessage.classList.add("status-success");
+      } else {
+        statusMessage.classList.add("status-error");
+      }
+    }
+
+    async function loadUser() {
+      try {
+        const response = await fetch(API + "/api/auth/me", {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem("token");
+            window.location.href = "login.html";
+            return;
+          }
+
+          throw new Error(
+            data.error || "Benutzerdaten konnten nicht geladen werden."
+          );
+        }
+
+        nameElement.textContent = data.name || "Benutzer";
+        emailElement.textContent = data.email || "-";
+
+        if (data.plan === "pro") {
+          planBadge.textContent = "Pro";
+          planBadge.classList.remove("plan-free");
+          planBadge.classList.add("plan-pro");
+
+          proBox.innerHTML = `
+            <h2>Landlord Lite Pro</h2>
+            <p>
+              Dein Pro-Tarif ist aktiv. Du kannst alle freigeschalteten
+              Pro-Funktionen verwenden.
+            </p>
+          `;
+        } else {
+          planBadge.textContent = "Free";
+          planBadge.classList.remove("plan-pro");
+          planBadge.classList.add("plan-free");
+        }
+      } catch (error) {
+        nameElement.textContent = "-";
+        emailElement.textContent = "-";
+
+        showMessage(
+          error.message || "Benutzerdaten konnten nicht geladen werden.",
+          "error"
+        );
+      }
+    }
+
+    upgradeBtn.addEventListener("click", async function () {
+      const originalText = upgradeBtn.textContent;
+
+      try {
+        upgradeBtn.disabled = true;
+        upgradeBtn.textContent = "Stripe wird geöffnet...";
+
+        const response = await fetch(
+          API + "/api/stripe/create-checkout-session",
+          {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + token,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Stripe Checkout konnte nicht gestartet werden."
+          );
+        }
+
+        if (!data.url) {
+          throw new Error("Stripe hat keine Checkout-URL zurückgegeben.");
+        }
+
+        window.location.href = data.url;
+      } catch (error) {
+        showMessage(
+          error.message || "Stripe Checkout konnte nicht gestartet werden.",
+          "error"
+        );
+
+        upgradeBtn.disabled = false;
+        upgradeBtn.textContent = originalText;
+      }
+    });
+
+    logoutBtn.addEventListener("click", function () {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+
+    loadUser();
+  </script>
+
+</body>
+</html>

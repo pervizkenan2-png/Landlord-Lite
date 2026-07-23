@@ -2,10 +2,35 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Landlord Lite - Nebenkostenabrechnung</title>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.replace("./Login.html");
+    }
+  </script>
+
   <script src="./config.js"></script>
 
   <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #145a1f;
+      --green-light: #e8f5e9;
+      --red: #c62828;
+      --blue: #1565c0;
+      --bg: #f4f7f4;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d9e2d9;
+      --shadow-soft: 0 3px 10px rgba(0,0,0,0.10);
+      --shadow-strong: 0 8px 24px rgba(0,0,0,0.18);
+    }
+
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
@@ -13,9 +38,9 @@
 
     body {
       margin: 0;
-      background: #f4f7f4;
-      color: #1f2937;
-      display: flex;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
     }
 
     .sidebar {
@@ -27,150 +52,335 @@
       position: fixed;
       left: 0;
       top: 0;
+      box-shadow: var(--shadow-strong);
     }
 
     .logo {
       font-size: 26px;
       font-weight: bold;
-      margin-bottom: 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .sidebar-subtitle {
       font-size: 15px;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
       opacity: 0.9;
     }
 
-    .menu-title {
-      background: rgba(255,255,255,0.12);
-      padding: 15px;
+    .menu-title,
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      text-decoration: none;
+      padding: 12px 14px;
       border-radius: 12px;
+      margin-bottom: 10px;
       font-weight: bold;
-      margin-bottom: 15px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .menu-title {
+      background: rgba(255,255,255,0.14);
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
     .menu-link {
-      display: block;
-      color: white;
-      text-decoration: none;
-      padding: 13px 18px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      font-weight: bold;
-      transition: 0.2s;
+      margin-left: 18px;
+      font-size: 14px;
+      padding: 9px 12px;
     }
 
+    .menu-title:hover,
     .menu-link:hover,
     .menu-link.active {
       background: rgba(255,255,255,0.18);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .arrow {
+      margin-left: auto;
+      font-size: 12px;
     }
 
     .main {
       margin-left: 270px;
       width: calc(100% - 270px);
-      padding: 40px;
+      padding: 34px;
     }
 
-    h1 {
-      text-align: center;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      margin: 0;
       font-size: 34px;
-      margin-bottom: 30px;
+      color: #15351a;
+      font-weight: 800;
     }
 
-    .card {
-      background: white;
-      max-width: 900px;
-      margin: 0 auto 30px auto;
-      padding: 28px;
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-    }
-
-    h2 {
-      margin-top: 0;
-      color: #166534;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    label {
-      font-weight: bold;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 13px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
+    .page-desc {
+      margin-top: 6px;
+      color: var(--muted);
       font-size: 15px;
     }
 
-    button {
-      background: #168a2e;
-      color: white;
+    .logout-btn {
       border: none;
-      padding: 14px 22px;
+      background: #efefef;
+      color: #222;
+      padding: 11px 15px;
       border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 22px;
       font-weight: bold;
+      cursor: pointer;
+      transition: 0.15s ease;
     }
 
-    button:hover {
-      background: #0f6b1d;
+    .logout-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(0,0,0,0.04);
+      margin-bottom: 22px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 18px;
+      color: #183b1d;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 11px;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: white;
     }
 
     .btn-secondary {
       background: #374151;
-      margin-left: 10px;
+      color: white;
     }
 
-    .result {
+    .btn-light {
+      background: #eef2ee;
+      color: #1f2937;
+      border: 1px solid #d8dfd8;
+    }
+
+    .msg {
+      min-height: 22px;
+      font-weight: bold;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .msg.success {
+      color: var(--green);
+    }
+
+    .msg.error {
+      color: var(--red);
+    }
+
+    .info-box {
+      background: var(--green-light);
+      border-left: 5px solid var(--green);
+      padding: 13px 15px;
+      border-radius: 11px;
+      color: #1f5125;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .result-card {
       display: none;
-      background: #ecfdf5;
-      border: 1px solid #bbf7d0;
     }
 
-    .row {
+    .result-row {
       display: flex;
       justify-content: space-between;
-      margin: 12px 0;
-      font-size: 16px;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 15px;
     }
 
-    .final {
-      border-top: 2px solid #16a34a;
+    .result-row strong {
+      text-align: right;
+    }
+
+    .final-box {
       margin-top: 18px;
-      padding-top: 16px;
-      font-size: 22px;
+      padding: 18px;
+      border-radius: 14px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 20px;
       font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .red {
-      color: #dc2626;
+      color: var(--red);
     }
 
     .green {
-      color: #16a34a;
+      color: var(--green);
     }
 
-    @media print {
-      .sidebar, button {
-        display: none;
+    .cost-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .cost-item {
+      display: flex;
+      justify-content: space-between;
+      background: #f7faf7;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8e2;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1000px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        min-height: auto;
       }
 
       .main {
         margin-left: 0;
         width: 100%;
+        padding: 18px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-row {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      .sidebar,
+      .topbar,
+      .btn-row,
+      .msg,
+      .hint {
+        display: none !important;
+      }
+
+      .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 0;
       }
 
       body {
@@ -179,141 +389,211 @@
 
       .card {
         box-shadow: none;
+        border: none;
+      }
+
+      .result-card {
+        display: block !important;
       }
     }
   </style>
 </head>
 
 <body>
-
   <aside class="sidebar">
-    <div class="logo">🏠 Landlord Lite</div>
+    <div class="logo">🏡 Landlord Lite</div>
     <div class="sidebar-subtitle">Mieterverwaltung</div>
 
-    <div class="menu-title">📁 Mieterverwaltung ▲</div>
+    <div class="menu-title" onclick="toggleSidebarMenu()">
+      <span>📁</span>
+      <span>Mieterverwaltung</span>
+      <span id="menuArrow" class="arrow">▲</span>
+    </div>
 
-    <a class="menu-link" href="./index.html">👥 Übersicht</a>
-    <a class="menu-link" href="./Mahnung.html">💵 Mahnungssystem</a>
-    <a class="menu-link" href="./Mieterhoehung.html">📈 Mieterhöhung</a>
-    <a class="menu-link active" href="./Nebenkostenabrechnung.html">🧾 Nebenkosten</a>
-    <a class="menu-link" href="./Reparaturen.html">🛠️ Reparaturen</a>
-    <a class="menu-link" href="./Massenimport.html">📥 Massenimport</a>
-    <a class="menu-link" href="./Dashboard.html">📊 Dashboard</a>
+    <div id="submenu">
+      <a class="menu-link" href="./index.html">👥 Übersicht</a>
+      <a class="menu-link" href="./mahnung.html">💵 Mahnungssystem</a>
+      <a class="menu-link" href="./mieterhoehung.html">📈 Mieterhöhung</a>
+      <a class="menu-link active" href="./Nebenkostenabrechnung.html">🧾 Nebenkosten</a>
+      <a class="menu-link" href="./reparatur.html">🛠️ Reparaturen</a>
+      <a class="menu-link" href="./import.html">📥 Massenimport</a>
+    </div>
+
+    <a class="menu-title" href="./dashboard.html">
+      <span>📊</span>
+      <span>Dashboard</span>
+    </a>
   </aside>
 
   <main class="main">
-    <h1>Nebenkostenabrechnung</h1>
-
-    <div class="card">
-      <h2>Abrechnung erstellen</h2>
-
-      <div class="grid">
-        <div>
-          <label>Mieter</label>
-          <select id="tenantSelect">
-            <option value="">Mieter auswählen</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Abrechnungsjahr</label>
-          <input type="number" id="year" placeholder="z.B. 2026">
-        </div>
-
-        <div>
-          <label>Wohnfläche Mieter in m²</label>
-          <input type="number" id="tenantArea" placeholder="z.B. 50">
-        </div>
-
-        <div>
-          <label>Gesamtfläche Haus in m²</label>
-          <input type="number" id="totalArea" placeholder="z.B. 225">
-        </div>
-
-        <div>
-          <label>Gezahlte Vorauszahlungen in €</label>
-          <input type="number" id="prepaid" placeholder="z.B. 1500">
-        </div>
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Nebenkostenabrechnung</h1>
+        <div class="page-desc">Berechne Nebenkosten fair nach Wohnfläche und speichere die Abrechnung.</div>
       </div>
+
+      <button class="logout-btn" onclick="logout()">Abmelden</button>
     </div>
 
-    <div class="card">
-      <h2>Kosten eintragen</h2>
+    <div id="msg" class="msg"></div>
 
-      <div class="grid">
-        <div>
-          <label>Wasser €</label>
-          <input type="number" id="water" placeholder="z.B. 1200">
+    <div class="grid-layout">
+      <section>
+        <div class="card">
+          <h2>Abrechnung erstellen</h2>
+
+          <div class="info-box">
+            Wähle einen Mieter aus MongoDB, trage Flächen, Vorauszahlungen und Kosten ein. Danach kannst du die Abrechnung berechnen, speichern oder als PDF drucken.
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="tenantSelect">Mieter</label>
+              <select id="tenantSelect">
+                <option value="">Mieter auswählen</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="year">Abrechnungsjahr</label>
+              <input type="number" id="year" placeholder="z.B. 2026" />
+            </div>
+
+            <div class="field">
+              <label for="tenantArea">Wohnfläche Mieter in m²</label>
+              <input type="number" id="tenantArea" placeholder="z.B. 50" />
+            </div>
+
+            <div class="field">
+              <label for="totalArea">Gesamtfläche Haus in m²</label>
+              <input type="number" id="totalArea" placeholder="z.B. 225" />
+            </div>
+
+            <div class="field">
+              <label for="prepaid">Gezahlte Vorauszahlungen in €</label>
+              <input type="number" id="prepaid" placeholder="z.B. 1500" />
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label>Heizung €</label>
-          <input type="number" id="heating" placeholder="z.B. 3500">
+        <div class="card">
+          <h2>Kosten eintragen</h2>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="water">Wasser €</label>
+              <input type="number" id="water" placeholder="z.B. 1200" />
+            </div>
+
+            <div class="field">
+              <label for="heating">Heizung €</label>
+              <input type="number" id="heating" placeholder="z.B. 3500" />
+            </div>
+
+            <div class="field">
+              <label for="garbage">Müll €</label>
+              <input type="number" id="garbage" placeholder="z.B. 400" />
+            </div>
+
+            <div class="field">
+              <label for="caretaker">Hausmeister €</label>
+              <input type="number" id="caretaker" placeholder="z.B. 1000" />
+            </div>
+
+            <div class="field">
+              <label for="insurance">Versicherung €</label>
+              <input type="number" id="insurance" placeholder="z.B. 900" />
+            </div>
+
+            <div class="field">
+              <label for="propertyTax">Grundsteuer €</label>
+              <input type="number" id="propertyTax" placeholder="z.B. 600" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="calculateBill()">Berechnen</button>
+            <button class="btn btn-light" onclick="saveBill()">Speichern</button>
+            <button class="btn btn-secondary" onclick="window.print()">PDF / Drucken</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card result-card" id="resultBox">
+          <h2>Ergebnis</h2>
+
+          <div class="result-row">
+            <span>Mieter</span>
+            <strong id="resultTenant">-</strong>
+          </div>
+
+          <div class="result-row">
+            <span>Wohnung</span>
+            <strong id="resultApartment">-</strong>
+          </div>
+
+          <div class="result-row">
+            <span>Jahr</span>
+            <strong id="resultYear">-</strong>
+          </div>
+
+          <div class="result-row">
+            <span>Gesamtkosten</span>
+            <strong id="resultTotalCosts">0,00 €</strong>
+          </div>
+
+          <div class="result-row">
+            <span>Anteil Mieter</span>
+            <strong id="resultTenantShare">0,00 €</strong>
+          </div>
+
+          <div class="result-row">
+            <span>Vorauszahlungen</span>
+            <strong id="resultPrepaid">0,00 €</strong>
+          </div>
+
+          <div class="final-box">
+            <span id="finalText">Ergebnis:</span>
+            <span id="finalAmount">0,00 €</span>
+          </div>
         </div>
 
-        <div>
-          <label>Müll €</label>
-          <input type="number" id="garbage" placeholder="z.B. 400">
+        <div class="card">
+          <h3>Kostenübersicht</h3>
+
+          <div class="cost-list">
+            <div class="cost-item">
+              <span>Wasser</span>
+              <strong id="previewWater">0,00 €</strong>
+            </div>
+            <div class="cost-item">
+              <span>Heizung</span>
+              <strong id="previewHeating">0,00 €</strong>
+            </div>
+            <div class="cost-item">
+              <span>Müll</span>
+              <strong id="previewGarbage">0,00 €</strong>
+            </div>
+            <div class="cost-item">
+              <span>Hausmeister</span>
+              <strong id="previewCaretaker">0,00 €</strong>
+            </div>
+            <div class="cost-item">
+              <span>Versicherung</span>
+              <strong id="previewInsurance">0,00 €</strong>
+            </div>
+            <div class="cost-item">
+              <span>Grundsteuer</span>
+              <strong id="previewPropertyTax">0,00 €</strong>
+            </div>
+          </div>
+
+          <p class="hint">
+            Hinweis: Diese Berechnung ist eine technische Hilfe und keine Rechtsberatung. Prüfe Umlageschlüssel, Mietvertrag und gesetzliche Vorgaben.
+          </p>
         </div>
-
-        <div>
-          <label>Hausmeister €</label>
-          <input type="number" id="caretaker" placeholder="z.B. 1000">
-        </div>
-
-        <div>
-          <label>Versicherung €</label>
-          <input type="number" id="insurance" placeholder="z.B. 900">
-        </div>
-
-        <div>
-          <label>Grundsteuer €</label>
-          <input type="number" id="propertyTax" placeholder="z.B. 600">
-        </div>
-      </div>
-
-      <button onclick="calculateBill()">Nebenkosten berechnen</button>
-      <button onclick="saveBill()">Speichern</button>
-      <button class="btn-secondary" onclick="window.print()">PDF / Drucken</button>
-    </div>
-
-    <div class="card result" id="resultBox">
-      <h2>Ergebnis</h2>
-
-      <div class="row">
-        <span>Mieter:</span>
-        <strong id="resultTenant"></strong>
-      </div>
-
-      <div class="row">
-        <span>Wohnung:</span>
-        <strong id="resultApartment"></strong>
-      </div>
-
-      <div class="row">
-        <span>Jahr:</span>
-        <strong id="resultYear"></strong>
-      </div>
-
-      <div class="row">
-        <span>Gesamtkosten:</span>
-        <strong id="resultTotalCosts"></strong>
-      </div>
-
-      <div class="row">
-        <span>Anteil Mieter:</span>
-        <strong id="resultTenantShare"></strong>
-      </div>
-
-      <div class="row">
-        <span>Vorauszahlungen:</span>
-        <strong id="resultPrepaid"></strong>
-      </div>
-
-      <div class="final">
-        <span id="finalText"></span>
-        <span id="finalAmount"></span>
-      </div>
+      </section>
     </div>
   </main>
 
@@ -330,6 +610,36 @@
       window.location.replace("./Login.html");
     }
 
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.replace("./Login.html");
+    }
+
+    function toggleSidebarMenu() {
+      const submenu = document.getElementById("submenu");
+      const arrow = document.getElementById("menuArrow");
+
+      if (!submenu) return;
+
+      const isOpen = submenu.style.display !== "none";
+      submenu.style.display = isOpen ? "none" : "block";
+
+      if (arrow) {
+        arrow.textContent = isOpen ? "▼" : "▲";
+      }
+    }
+
+    function showMsg(text, type = "success") {
+      const msg = document.getElementById("msg");
+      msg.textContent = text;
+      msg.className = "msg " + type;
+
+      setTimeout(() => {
+        msg.textContent = "";
+        msg.className = "msg";
+      }, 3000);
+    }
+
     function getTenantId(tenant) {
       return tenant._id || tenant.id;
     }
@@ -342,7 +652,21 @@
       return Number(amount || 0).toFixed(2).replace(".", ",") + " €";
     }
 
+    function updatePreview() {
+      document.getElementById("previewWater").textContent = formatEuro(getValue("water"));
+      document.getElementById("previewHeating").textContent = formatEuro(getValue("heating"));
+      document.getElementById("previewGarbage").textContent = formatEuro(getValue("garbage"));
+      document.getElementById("previewCaretaker").textContent = formatEuro(getValue("caretaker"));
+      document.getElementById("previewInsurance").textContent = formatEuro(getValue("insurance"));
+      document.getElementById("previewPropertyTax").textContent = formatEuro(getValue("propertyTax"));
+    }
+
     async function loadTenants() {
+      if (!TENANTS_URL) {
+        showMsg("TENANTS_URL fehlt in config.js", "error");
+        return;
+      }
+
       try {
         const response = await fetch(TENANTS_URL, {
           headers: {
@@ -362,22 +686,24 @@
         tenants.forEach(tenant => {
           const option = document.createElement("option");
           option.value = getTenantId(tenant);
-          option.textContent = (tenant.name || "-") + " - " + (tenant.unit || "-");
+          option.textContent = (tenant.name || "-") + " | " + (tenant.unit || "-");
           tenantSelect.appendChild(option);
         });
 
       } catch (error) {
         console.error(error);
-        alert("Mieter konnten nicht geladen werden.");
+        showMsg("Mieter konnten nicht geladen werden.", "error");
       }
     }
 
     function calculateBill() {
+      updatePreview();
+
       const tenantId = document.getElementById("tenantSelect").value;
       const tenant = tenants.find(t => String(getTenantId(t)) === String(tenantId));
 
       if (!tenant) {
-        alert("Bitte Mieter auswählen.");
+        showMsg("Bitte Mieter auswählen.", "error");
         return;
       }
 
@@ -394,7 +720,7 @@
       const propertyTax = getValue("propertyTax");
 
       if (!year || tenantArea <= 0 || totalArea <= 0) {
-        alert("Bitte Jahr, Wohnfläche und Gesamtfläche ausfüllen.");
+        showMsg("Bitte Jahr, Wohnfläche und Gesamtfläche ausfüllen.", "error");
         return;
       }
 
@@ -432,25 +758,31 @@
       const finalAmount = document.getElementById("finalAmount");
 
       if (finalResult > 0) {
-        finalText.textContent = "Nachzahlung: ";
+        finalText.textContent = "Nachzahlung";
         finalAmount.textContent = formatEuro(finalResult);
         finalAmount.className = "red";
       } else if (finalResult < 0) {
-        finalText.textContent = "Guthaben: ";
+        finalText.textContent = "Guthaben";
         finalAmount.textContent = formatEuro(Math.abs(finalResult));
         finalAmount.className = "green";
       } else {
-        finalText.textContent = "Ausgeglichen: ";
+        finalText.textContent = "Ausgeglichen";
         finalAmount.textContent = "0,00 €";
         finalAmount.className = "";
       }
 
       document.getElementById("resultBox").style.display = "block";
+      showMsg("Nebenkosten wurden berechnet.");
     }
 
     async function saveBill() {
       if (!currentResult) {
-        alert("Bitte zuerst Nebenkosten berechnen.");
+        showMsg("Bitte zuerst Nebenkosten berechnen.", "error");
+        return;
+      }
+
+      if (!UTILITY_BILLS_URL) {
+        showMsg("UTILITY_BILLS_URL fehlt in config.js", "error");
         return;
       }
 
@@ -468,16 +800,20 @@
           throw new Error(await response.text());
         }
 
-        alert("Nebenkostenabrechnung wurde gespeichert.");
+        showMsg("Nebenkostenabrechnung wurde gespeichert.");
 
       } catch (error) {
         console.error(error);
-        alert("Fehler beim Speichern der Nebenkostenabrechnung.");
+        showMsg("Fehler beim Speichern der Nebenkostenabrechnung.", "error");
       }
     }
 
-    loadTenants();
-  </script>
+    ["water", "heating", "garbage", "caretaker", "insurance", "propertyTax"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updatePreview);
+    });
 
+    loadTenants();
+    updatePreview();
+  </script>
 </body>
 </html>
