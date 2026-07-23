@@ -38,7 +38,7 @@
       min-height: 100vh;
       padding: 20px 18px;
       box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-      position: sticky;
+      position: relative;
       top: 0;
     }
     .sidebar h1 {
@@ -420,12 +420,36 @@
       }
       .content { padding: 14px; }
     }
+.account-btn{
+    position:absolute;
+    top:15px;
+    right:15px;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#fff;
+    color:#2e7d32;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+    z-index:1000;
+}
+
+.account-btn:hover{
+    background:#f1f1f1;
+}
   </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
+
+<a href="account.html" class="account-btn">👤</a>
+
   <h1><span class="logo">🏡</span> Landlord Lite</h1>
   <small>Mieterverwaltung</small>
 
