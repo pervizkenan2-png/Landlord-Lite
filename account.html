@@ -2,352 +2,1032 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <title>Mein Konto | Landlord Lite</title>
+  <title>Kontoeinstellungen | Landlord Lite</title>
 
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    }
+
+    :root {
+      --background: #f2f3f5;
+      --sidebar: #e5e7eb;
+      --sidebar-hover: #d7d9dd;
+      --sidebar-active: #ffffff;
+      --border: #d1d5db;
+      --text: #18181b;
+      --muted: #6b7280;
+      --dark: #27272a;
+      --dark-hover: #18181b;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --success-background: #dcfce7;
+      --success-text: #166534;
+      --error-background: #fee2e2;
+      --error-text: #991b1b;
+      --warning-background: #fef3c7;
+      --warning-text: #92400e;
     }
 
     body {
       min-height: 100vh;
-      background: #f4f6fb;
-      color: #1f2937;
+      background: var(--background);
+      color: var(--text);
+      font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
     }
 
-    header {
-      background: #2563eb;
-      color: white;
-      padding: 18px 24px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-    }
-
-    .header-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .back-link {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 9px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      border-radius: 8px;
-    }
-
-    .back-link:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .container {
-      width: 100%;
-      max-width: 900px;
-      margin: 35px auto;
-      padding: 0 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .card h1 {
-      font-size: 28px;
-      margin-bottom: 8px;
-      color: #111827;
-    }
-
-    .subtitle {
-      color: #6b7280;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      padding: 17px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .info-row:last-of-type {
-      border-bottom: none;
-    }
-
-    .label {
-      color: #6b7280;
-      font-weight: bold;
-    }
-
-    .value {
-      color: #111827;
-      font-weight: bold;
-      text-align: right;
-      overflow-wrap: anywhere;
-    }
-
-    .plan-badge {
-      display: inline-block;
-      padding: 7px 16px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .plan-free {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
-    .plan-pro {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .pro-box {
-      margin-top: 25px;
-      padding: 22px;
-      border-radius: 14px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-    }
-
-    .pro-box h2 {
-      color: #1d4ed8;
-      margin-bottom: 10px;
-      font-size: 21px;
-    }
-
-    .pro-box p {
-      color: #4b5563;
-      line-height: 1.55;
-      margin-bottom: 16px;
-    }
-
-    .features {
-      margin: 0 0 20px 20px;
-      color: #374151;
-      line-height: 1.8;
+    button,
+    input {
+      font: inherit;
     }
 
     button {
-      width: 100%;
-      border: none;
-      border-radius: 10px;
-      padding: 15px 18px;
-      font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.65;
+    .app {
+      display: flex;
+      min-height: 100vh;
     }
 
-    .upgrade-btn {
-      background: #2563eb;
-      color: white;
+    .settings-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 265px;
+      padding: 28px 18px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
     }
 
-    .upgrade-btn:hover:not(:disabled) {
-      background: #1d4ed8;
+    .brand {
+      padding: 0 12px 25px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .logout-btn {
-      margin-top: 14px;
-      background: #ef4444;
-      color: white;
+    .brand-name {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--text);
     }
 
-    .logout-btn:hover {
-      background: #dc2626;
+    .brand-description {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    .status-message {
-      display: none;
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      line-height: 1.4;
+    .navigation {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 24px;
     }
 
-    .status-error {
-      display: block;
-      background: #fee2e2;
-      color: #b91c1c;
+    .navigation-button {
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #3f3f46;
+      padding: 12px 13px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      transition: 0.18s ease;
     }
 
-    .status-success {
-      display: block;
-      background: #dcfce7;
-      color: #15803d;
+    .navigation-button:hover {
+      background: var(--sidebar-hover);
     }
 
-    .footer {
+    .navigation-button.active {
+      background: var(--sidebar-active);
+      border-color: var(--border);
+      color: var(--text);
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .navigation-icon {
+      width: 22px;
       text-align: center;
-      color: #9ca3af;
+      font-size: 18px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .avatar {
+      width: 39px;
+      height: 39px;
+      border-radius: 50%;
+      background: var(--dark);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .sidebar-user-text {
+      min-width: 0;
+    }
+
+    .sidebar-user-name {
       font-size: 14px;
-      padding: 10px 0 30px;
+      font-weight: 700;
+    }
+
+    .sidebar-user-email {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 155px;
+    }
+
+    .content {
+      width: calc(100% - 265px);
+      margin-left: 265px;
+      padding: 55px 7vw 80px;
+    }
+
+    .content-inner {
+      width: 100%;
+      max-width: 850px;
+    }
+
+    .page-heading {
+      margin-bottom: 42px;
+    }
+
+    .page-heading h1 {
+      font-size: 31px;
+      letter-spacing: -0.8px;
+    }
+
+    .page-heading p {
+      margin-top: 9px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .section {
+      display: none;
+      animation: fade-in 0.18s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(3px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-heading {
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+      font-size: 23px;
+      letter-spacing: -0.35px;
+    }
+
+    .section-heading p {
+      margin-top: 7px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 23px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .form-hint {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .input {
+      display: block;
+      width: 100%;
+      max-width: 540px;
+      height: 46px;
+      padding: 0 13px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      outline: none;
+      transition: 0.15s ease;
+    }
+
+    .input:focus {
+      border-color: #71717a;
+      box-shadow: 0 0 0 3px rgba(113, 113, 122, 0.12);
+    }
+
+    .input:disabled,
+    .input[readonly] {
+      background: #e9eaec;
+      color: #71717a;
+      cursor: not-allowed;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 43px;
+      padding: 0 17px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      transition: 0.17s ease;
+    }
+
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .button-primary {
+      background: var(--dark);
+      color: #ffffff;
+    }
+
+    .button-primary:hover:not(:disabled) {
+      background: var(--dark-hover);
+    }
+
+    .button-secondary {
+      background: #ffffff;
+      color: var(--dark);
+      border-color: var(--border);
+    }
+
+    .button-secondary:hover:not(:disabled) {
+      background: #eceef0;
+    }
+
+    .button-danger {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .button-danger:hover:not(:disabled) {
+      background: var(--danger-hover);
+    }
+
+    .plan-area {
+      padding: 24px 0 27px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 25px;
+    }
+
+    .plan-title-area h3 {
+      font-size: 20px;
+    }
+
+    .plan-title-area p {
+      margin-top: 7px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .plan-badge {
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .plan-badge.pro {
+      background: var(--dark);
+      border-color: var(--dark);
+      color: #ffffff;
+    }
+
+    .price {
+      margin-top: 25px;
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+    }
+
+    .price strong {
+      font-size: 34px;
+      letter-spacing: -1px;
+    }
+
+    .price span {
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 25px;
+      margin-top: 25px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 9px;
+      color: #3f3f46;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .feature-check {
+      color: #18181b;
+      font-weight: 900;
+    }
+
+    .message {
+      display: none;
+      max-width: 600px;
+      padding: 12px 14px;
+      margin-top: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: var(--success-background);
+      color: var(--success-text);
+    }
+
+    .message.error {
+      background: var(--error-background);
+      color: var(--error-text);
+    }
+
+    .message.warning {
+      background: var(--warning-background);
+      color: var(--warning-text);
+    }
+
+    .logout-area {
+      max-width: 620px;
+    }
+
+    .logout-area p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .danger-zone {
+      max-width: 650px;
+      padding-top: 2px;
+    }
+
+    .danger-warning {
+      padding: 17px 18px;
+      border-left: 4px solid var(--danger);
+      background: #fee2e2;
+      color: #7f1d1d;
+      line-height: 1.55;
+      margin-bottom: 28px;
+    }
+
+    .confirmation-label {
+      display: block;
+      margin-bottom: 9px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .confirmation-label code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #dedfe2;
+    }
+
+    .mobile-menu-button {
+      display: none;
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      width: 43px;
+      height: 43px;
+      z-index: 30;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: #ffffff;
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    .mobile-overlay {
+      display: none;
+    }
+
+    @media (max-width: 850px) {
+      .mobile-menu-button {
+        display: block;
+      }
+
+      .settings-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        box-shadow: 8px 0 25px rgba(0, 0, 0, 0.12);
+      }
+
+      .settings-sidebar.open {
+        transform: translateX(0);
+      }
+
+      .mobile-overlay.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 9;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .content {
+        width: 100%;
+        margin-left: 0;
+        padding: 85px 22px 65px;
+      }
     }
 
     @media (max-width: 600px) {
-      header {
-        padding: 15px;
+      .content {
+        padding-left: 17px;
+        padding-right: 17px;
       }
 
-      .logo {
-        font-size: 20px;
+      .page-heading h1 {
+        font-size: 27px;
       }
 
-      .container {
-        margin-top: 22px;
-        padding: 0 14px;
+      .features {
+        grid-template-columns: 1fr;
       }
 
-      .card {
-        padding: 21px;
-      }
-
-      .card h1 {
-        font-size: 24px;
-      }
-
-      .info-row {
-        align-items: flex-start;
+      .plan-header {
         flex-direction: column;
-        gap: 7px;
       }
 
-      .value {
-        text-align: left;
+      .button-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .button {
+        width: 100%;
       }
     }
   </style>
 </head>
 
 <body>
+  <button
+    class="mobile-menu-button"
+    id="mobileMenuButton"
+    type="button"
+    aria-label="Menü öffnen"
+  >
+    ☰
+  </button>
 
-  <header>
-    <div class="header-inner">
-      <div class="logo">Landlord Lite</div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
 
-      <a href="dashboard.html" class="back-link">
-        Zurück zum Dashboard
-      </a>
-    </div>
-  </header>
-
-  <main class="container">
-
-    <section class="card">
-      <h1>Mein Konto</h1>
-
-      <p class="subtitle">
-        Hier siehst du deine Kontodaten und deinen aktuellen Tarif.
-      </p>
-
-      <div class="info-row">
-        <span class="label">Name</span>
-        <span class="value" id="name">Wird geladen...</span>
+  <div class="app">
+    <aside class="settings-sidebar" id="settingsSidebar">
+      <div class="brand">
+        <div class="brand-name">Landlord Lite</div>
+        <div class="brand-description">Kontoeinstellungen</div>
       </div>
 
-      <div class="info-row">
-        <span class="label">E-Mail</span>
-        <span class="value" id="email">Wird geladen...</span>
-      </div>
-
-      <div class="info-row">
-        <span class="label">Aktueller Tarif</span>
-
-        <span class="value">
-          <span id="planBadge" class="plan-badge plan-free">
-            Free
-          </span>
-        </span>
-      </div>
-
-      <div class="pro-box" id="proBox">
-        <h2>Landlord Lite Pro</h2>
-
-        <p>
-          Schalte alle Pro-Funktionen für deine Vermieterverwaltung frei.
-        </p>
-
-        <ul class="features">
-          <li>Erweiterte Vermieter-Funktionen</li>
-          <li>Unbegrenzte Nutzung der Pro-Bereiche</li>
-          <li>9,99 € pro Monat</li>
-        </ul>
-
-        <button type="button" class="upgrade-btn" id="upgradeBtn">
-          Upgrade auf Pro – 9,99 €/Monat
+      <nav class="navigation">
+        <button
+          class="navigation-button active"
+          type="button"
+          data-section="profile"
+        >
+          <span class="navigation-icon">👤</span>
+          <span>Profil</span>
         </button>
+
+        <button
+          class="navigation-button"
+          type="button"
+          data-section="subscription"
+        >
+          <span class="navigation-icon">💳</span>
+          <span>Abonnement</span>
+        </button>
+
+        <button
+          class="navigation-button"
+          type="button"
+          data-section="password"
+        >
+          <span class="navigation-icon">🔒</span>
+          <span>Passwort ändern</span>
+        </button>
+
+        <button
+          class="navigation-button"
+          type="button"
+          data-section="logout"
+        >
+          <span class="navigation-icon">🚪</span>
+          <span>Abmelden</span>
+        </button>
+
+        <button
+          class="navigation-button"
+          type="button"
+          data-section="delete"
+        >
+          <span class="navigation-icon">🗑️</span>
+          <span>Konto löschen</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-user">
+          <div class="avatar" id="sidebarAvatar">U</div>
+
+          <div class="sidebar-user-text">
+            <div class="sidebar-user-name" id="sidebarName">
+              Benutzer
+            </div>
+
+            <div class="sidebar-user-email" id="sidebarEmail">
+              Wird geladen...
+            </div>
+          </div>
+        </div>
       </div>
+    </aside>
 
-      <div id="statusMessage" class="status-message"></div>
+    <main class="content">
+      <div class="content-inner">
+        <header class="page-heading">
+          <h1>Mein Konto</h1>
+          <p>
+            Verwalte dein Profil, dein Abonnement und deine
+            Sicherheitseinstellungen.
+          </p>
+        </header>
 
-      <button type="button" class="logout-btn" id="logoutBtn">
-        Abmelden
-      </button>
-    </section>
+        <section class="section active" id="profile">
+          <div class="section-heading">
+            <h2>Profil</h2>
+            <p>Deine persönlichen Kontoinformationen.</p>
+          </div>
 
-    <div class="footer">
-      Landlord Lite © 2026
-    </div>
+          <form id="profileForm">
+            <div class="form-group">
+              <label class="form-label" for="nameInput">
+                Name
+              </label>
 
-  </main>
+              <input
+                class="input"
+                id="nameInput"
+                name="name"
+                type="text"
+                maxlength="80"
+                placeholder="Dein Name"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="emailInput">
+                E-Mail-Adresse
+              </label>
+
+              <input
+                class="input"
+                id="emailInput"
+                name="email"
+                type="email"
+                readonly
+              >
+
+              <p class="form-hint">
+                Deine E-Mail-Adresse kann derzeit nicht auf dieser
+                Seite geändert werden.
+              </p>
+            </div>
+
+            <div class="button-row">
+              <button
+                class="button button-primary"
+                id="saveProfileButton"
+                type="submit"
+              >
+                Profil speichern
+              </button>
+            </div>
+
+            <div class="message" id="profileMessage"></div>
+          </form>
+        </section>
+
+        <section class="section" id="subscription">
+          <div class="section-heading">
+            <h2>Abonnement</h2>
+            <p>
+              Verwalte deinen aktuellen Landlord-Lite-Tarif.
+            </p>
+          </div>
+
+          <div class="plan-area">
+            <div class="plan-header">
+              <div class="plan-title-area">
+                <h3 id="planTitle">Landlord Lite Free</h3>
+
+                <p id="planDescription">
+                  Du verwendest derzeit den kostenlosen Tarif.
+                </p>
+              </div>
+
+              <span class="plan-badge" id="planBadge">
+                Free
+              </span>
+            </div>
+
+            <div class="price">
+              <strong id="planPrice">0 €</strong>
+              <span id="planInterval">dauerhaft</span>
+            </div>
+
+            <div class="features">
+              <div class="feature">
+                <span class="feature-check">✓</span>
+                <span>Mieterverwaltung</span>
+              </div>
+
+              <div class="feature">
+                <span class="feature-check">✓</span>
+                <span>Reparaturverwaltung</span>
+              </div>
+
+              <div class="feature">
+                <span class="feature-check">✓</span>
+                <span>Mieterhöhungshistorie</span>
+              </div>
+
+              <div class="feature">
+                <span class="feature-check">✓</span>
+                <span>Weitere Pro-Funktionen</span>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button
+                class="button button-primary"
+                id="upgradeButton"
+                type="button"
+              >
+                Auf Pro upgraden – 9,99 €/Monat
+              </button>
+            </div>
+
+            <div class="message" id="subscriptionMessage"></div>
+          </div>
+        </section>
+
+        <section class="section" id="password">
+          <div class="section-heading">
+            <h2>Passwort ändern</h2>
+            <p>
+              Verwende ein sicheres Passwort mit mindestens acht Zeichen.
+            </p>
+          </div>
+
+          <form id="passwordForm">
+            <div class="form-group">
+              <label class="form-label" for="currentPassword">
+                Aktuelles Passwort
+              </label>
+
+              <input
+                class="input"
+                id="currentPassword"
+                type="password"
+                autocomplete="current-password"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newPassword">
+                Neues Passwort
+              </label>
+
+              <input
+                class="input"
+                id="newPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirmPassword">
+                Neues Passwort bestätigen
+              </label>
+
+              <input
+                class="input"
+                id="confirmPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              >
+            </div>
+
+            <div class="button-row">
+              <button
+                class="button button-primary"
+                id="changePasswordButton"
+                type="submit"
+              >
+                Passwort speichern
+              </button>
+            </div>
+
+            <div class="message" id="passwordMessage"></div>
+          </form>
+        </section>
+
+        <section class="section" id="logout">
+          <div class="section-heading">
+            <h2>Abmelden</h2>
+            <p>Beende deine aktuelle Landlord-Lite-Sitzung.</p>
+          </div>
+
+          <div class="logout-area">
+            <p>
+              Nach dem Abmelden musst du dich erneut mit deiner
+              E-Mail-Adresse und deinem Passwort anmelden.
+            </p>
+
+            <div class="button-row">
+              <button
+                class="button button-secondary"
+                id="logoutButton"
+                type="button"
+              >
+                Jetzt abmelden
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="delete">
+          <div class="section-heading">
+            <h2>Konto löschen</h2>
+            <p>
+              Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+          </div>
+
+          <div class="danger-zone">
+            <div class="danger-warning">
+              Beim Löschen deines Kontos werden deine Kontodaten
+              dauerhaft entfernt. Überprüfe vorher, ob du noch wichtige
+              Daten benötigst.
+            </div>
+
+            <label
+              class="confirmation-label"
+              for="deleteConfirmation"
+            >
+              Schreibe <code>LÖSCHEN</code>, um fortzufahren:
+            </label>
+
+            <input
+              class="input"
+              id="deleteConfirmation"
+              type="text"
+              autocomplete="off"
+              placeholder="LÖSCHEN"
+            >
+
+            <div class="button-row">
+              <button
+                class="button button-danger"
+                id="deleteAccountButton"
+                type="button"
+                disabled
+              >
+                Konto dauerhaft löschen
+              </button>
+            </div>
+
+            <div class="message" id="deleteMessage"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
 
   <script>
-    const token = localStorage.getItem("token");
-
     const API =
       window.API_BASE ||
       "https://api.landlord-lite.de";
 
-    const nameElement = document.getElementById("name");
-    const emailElement = document.getElementById("email");
-    const planBadge = document.getElementById("planBadge");
-    const proBox = document.getElementById("proBox");
-    const upgradeBtn = document.getElementById("upgradeBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const statusMessage = document.getElementById("statusMessage");
+    const token = localStorage.getItem("token");
 
     if (!token) {
       window.location.href = "login.html";
     }
 
-    function showMessage(message, type) {
-      statusMessage.textContent = message;
-      statusMessage.className = "status-message";
+    const sidebar = document.getElementById("settingsSidebar");
+    const mobileMenuButton =
+      document.getElementById("mobileMenuButton");
+    const mobileOverlay =
+      document.getElementById("mobileOverlay");
 
-      if (type === "success") {
-        statusMessage.classList.add("status-success");
-      } else {
-        statusMessage.classList.add("status-error");
-      }
+    const navigationButtons =
+      document.querySelectorAll(".navigation-button");
+    const sections =
+      document.querySelectorAll(".section");
+
+    const nameInput =
+      document.getElementById("nameInput");
+    const emailInput =
+      document.getElementById("emailInput");
+
+    const sidebarName =
+      document.getElementById("sidebarName");
+    const sidebarEmail =
+      document.getElementById("sidebarEmail");
+    const sidebarAvatar =
+      document.getElementById("sidebarAvatar");
+
+    const planTitle =
+      document.getElementById("planTitle");
+    const planDescription =
+      document.getElementById("planDescription");
+    const planBadge =
+      document.getElementById("planBadge");
+    const planPrice =
+      document.getElementById("planPrice");
+    const planInterval =
+      document.getElementById("planInterval");
+    const upgradeButton =
+      document.getElementById("upgradeButton");
+
+    const profileForm =
+      document.getElementById("profileForm");
+    const passwordForm =
+      document.getElementById("passwordForm");
+
+    const profileMessage =
+      document.getElementById("profileMessage");
+    const subscriptionMessage =
+      document.getElementById("subscriptionMessage");
+    const passwordMessage =
+      document.getElementById("passwordMessage");
+    const deleteMessage =
+      document.getElementById("deleteMessage");
+
+    const currentPassword =
+      document.getElementById("currentPassword");
+    const newPassword =
+      document.getElementById("newPassword");
+    const confirmPassword =
+      document.getElementById("confirmPassword");
+
+    const logoutButton =
+      document.getElementById("logoutButton");
+
+    const deleteConfirmation =
+      document.getElementById("deleteConfirmation");
+    const deleteAccountButton =
+      document.getElementById("deleteAccountButton");
+
+    function showMessage(element, message, type) {
+      element.textContent = message;
+      element.className = "message show " + type;
     }
+
+    function clearMessage(element) {
+      element.textContent = "";
+      element.className = "message";
+    }
+
+    function openMobileMenu() {
+      sidebar.classList.add("open");
+      mobileOverlay.classList.add("open");
+    }
+
+    function closeMobileMenu() {
+      sidebar.classList.remove("open");
+      mobileOverlay.classList.remove("open");
+    }
+
+    mobileMenuButton.addEventListener("click", openMobileMenu);
+    mobileOverlay.addEventListener("click", closeMobileMenu);
+
+    navigationButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        const sectionId = button.dataset.section;
+
+        navigationButtons.forEach(function (item) {
+          item.classList.remove("active");
+        });
+
+        sections.forEach(function (section) {
+          section.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        document
+          .getElementById(sectionId)
+          .classList.add("active");
+
+        closeMobileMenu();
+      });
+    });
 
     async function loadUser() {
       try {
@@ -361,97 +1041,381 @@
         const data = await response.json();
 
         if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
+          if (
+            response.status === 401 ||
+            response.status === 403
+          ) {
             localStorage.removeItem("token");
             window.location.href = "login.html";
             return;
           }
 
           throw new Error(
-            data.error || "Benutzerdaten konnten nicht geladen werden."
+            data.error ||
+            "Kontodaten konnten nicht geladen werden."
           );
         }
 
-        nameElement.textContent = data.name || "Benutzer";
-        emailElement.textContent = data.email || "-";
+        const displayName =
+          data.name && data.name.trim()
+            ? data.name.trim()
+            : "Benutzer";
+
+        const displayEmail =
+          data.email || "-";
+
+        nameInput.value =
+          data.name || "";
+
+        emailInput.value =
+          displayEmail;
+
+        sidebarName.textContent =
+          displayName;
+
+        sidebarEmail.textContent =
+          displayEmail;
+
+        sidebarAvatar.textContent =
+          displayName.charAt(0).toUpperCase();
 
         if (data.plan === "pro") {
-          planBadge.textContent = "Pro";
-          planBadge.classList.remove("plan-free");
-          planBadge.classList.add("plan-pro");
+          planTitle.textContent =
+            "Landlord Lite Pro";
 
-          proBox.innerHTML = `
-            <h2>Landlord Lite Pro</h2>
-            <p>
-              Dein Pro-Tarif ist aktiv. Du kannst alle freigeschalteten
-              Pro-Funktionen verwenden.
-            </p>
-          `;
+          planDescription.textContent =
+            "Dein Pro-Abonnement ist aktiv.";
+
+          planBadge.textContent = "Pro";
+          planBadge.classList.add("pro");
+
+          planPrice.textContent = "9,99 €";
+          planInterval.textContent = "pro Monat";
+
+          upgradeButton.style.display = "none";
         } else {
+          planTitle.textContent =
+            "Landlord Lite Free";
+
+          planDescription.textContent =
+            "Du verwendest derzeit den kostenlosen Tarif.";
+
           planBadge.textContent = "Free";
-          planBadge.classList.remove("plan-pro");
-          planBadge.classList.add("plan-free");
+          planBadge.classList.remove("pro");
+
+          planPrice.textContent = "0 €";
+          planInterval.textContent = "dauerhaft";
+
+          upgradeButton.style.display = "inline-block";
         }
       } catch (error) {
-        nameElement.textContent = "-";
-        emailElement.textContent = "-";
-
         showMessage(
-          error.message || "Benutzerdaten konnten nicht geladen werden.",
+          profileMessage,
+          error.message ||
+          "Kontodaten konnten nicht geladen werden.",
           "error"
         );
       }
     }
 
-    upgradeBtn.addEventListener("click", async function () {
-      const originalText = upgradeBtn.textContent;
+    profileForm.addEventListener(
+      "submit",
+      async function (event) {
+        event.preventDefault();
+        clearMessage(profileMessage);
 
-      try {
-        upgradeBtn.disabled = true;
-        upgradeBtn.textContent = "Stripe wird geöffnet...";
+        const saveButton =
+          document.getElementById("saveProfileButton");
 
-        const response = await fetch(
-          API + "/api/stripe/create-checkout-session",
-          {
-            method: "POST",
-            headers: {
-              Authorization: "Bearer " + token,
-              "Content-Type": "application/json"
-            }
-          }
-        );
+        const name =
+          nameInput.value.trim();
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.error || "Stripe Checkout konnte nicht gestartet werden."
+        if (!name) {
+          showMessage(
+            profileMessage,
+            "Bitte gib einen Namen ein.",
+            "error"
           );
+          return;
         }
 
-        if (!data.url) {
-          throw new Error("Stripe hat keine Checkout-URL zurückgegeben.");
+        saveButton.disabled = true;
+        saveButton.textContent = "Wird gespeichert...";
+
+        try {
+          const response = await fetch(
+            API + "/api/auth/me",
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                name: name
+              })
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.error ||
+              "Das Profil konnte nicht gespeichert werden."
+            );
+          }
+
+          sidebarName.textContent = name;
+          sidebarAvatar.textContent =
+            name.charAt(0).toUpperCase();
+
+          showMessage(
+            profileMessage,
+            "Dein Profil wurde gespeichert.",
+            "success"
+          );
+        } catch (error) {
+          if (error.message.includes("404")) {
+            showMessage(
+              profileMessage,
+              "Die Profiländerung muss noch im Backend aktiviert werden.",
+              "warning"
+            );
+          } else {
+            showMessage(
+              profileMessage,
+              error.message ||
+              "Das Profil konnte nicht gespeichert werden.",
+              "error"
+            );
+          }
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = "Profil speichern";
+        }
+      }
+    );
+
+    upgradeButton.addEventListener(
+      "click",
+      async function () {
+        clearMessage(subscriptionMessage);
+
+        const originalText =
+          upgradeButton.textContent;
+
+        upgradeButton.disabled = true;
+        upgradeButton.textContent =
+          "Stripe wird geöffnet...";
+
+        try {
+          const response = await fetch(
+            API +
+            "/api/stripe/create-checkout-session",
+            {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+              }
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.error ||
+              "Stripe Checkout konnte nicht gestartet werden."
+            );
+          }
+
+          if (!data.url) {
+            throw new Error(
+              "Stripe hat keine Checkout-Adresse zurückgegeben."
+            );
+          }
+
+          window.location.href = data.url;
+        } catch (error) {
+          showMessage(
+            subscriptionMessage,
+            error.message ||
+            "Stripe Checkout konnte nicht gestartet werden.",
+            "error"
+          );
+
+          upgradeButton.disabled = false;
+          upgradeButton.textContent = originalText;
+        }
+      }
+    );
+
+    passwordForm.addEventListener(
+      "submit",
+      async function (event) {
+        event.preventDefault();
+        clearMessage(passwordMessage);
+
+        const changeButton =
+          document.getElementById(
+            "changePasswordButton"
+          );
+
+        if (newPassword.value.length < 8) {
+          showMessage(
+            passwordMessage,
+            "Das neue Passwort muss mindestens acht Zeichen haben.",
+            "error"
+          );
+          return;
         }
 
-        window.location.href = data.url;
-      } catch (error) {
-        showMessage(
-          error.message || "Stripe Checkout konnte nicht gestartet werden.",
-          "error"
+        if (
+          newPassword.value !==
+          confirmPassword.value
+        ) {
+          showMessage(
+            passwordMessage,
+            "Die neuen Passwörter stimmen nicht überein.",
+            "error"
+          );
+          return;
+        }
+
+        changeButton.disabled = true;
+        changeButton.textContent =
+          "Wird gespeichert...";
+
+        try {
+          const response = await fetch(
+            API + "/api/auth/change-password",
+            {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                currentPassword:
+                  currentPassword.value,
+                newPassword:
+                  newPassword.value
+              })
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.error ||
+              "Das Passwort konnte nicht geändert werden."
+            );
+          }
+
+          passwordForm.reset();
+
+          showMessage(
+            passwordMessage,
+            "Dein Passwort wurde geändert.",
+            "success"
+          );
+        } catch (error) {
+          showMessage(
+            passwordMessage,
+            error.message ||
+            "Die Passwortfunktion muss noch im Backend aktiviert werden.",
+            "error"
+          );
+        } finally {
+          changeButton.disabled = false;
+          changeButton.textContent =
+            "Passwort speichern";
+        }
+      }
+    );
+
+    logoutButton.addEventListener(
+      "click",
+      function () {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+      }
+    );
+
+    deleteConfirmation.addEventListener(
+      "input",
+      function () {
+        deleteAccountButton.disabled =
+          deleteConfirmation.value.trim() !==
+          "LÖSCHEN";
+      }
+    );
+
+    deleteAccountButton.addEventListener(
+      "click",
+      async function () {
+        clearMessage(deleteMessage);
+
+        if (
+          deleteConfirmation.value.trim() !==
+          "LÖSCHEN"
+        ) {
+          return;
+        }
+
+        const confirmed = window.confirm(
+          "Soll dein Konto wirklich dauerhaft gelöscht werden?"
         );
 
-        upgradeBtn.disabled = false;
-        upgradeBtn.textContent = originalText;
-      }
-    });
+        if (!confirmed) {
+          return;
+        }
 
-    logoutBtn.addEventListener("click", function () {
-      localStorage.removeItem("token");
-      window.location.href = "login.html";
-    });
+        deleteAccountButton.disabled = true;
+        deleteAccountButton.textContent =
+          "Konto wird gelöscht...";
+
+        try {
+          const response = await fetch(
+            API + "/api/auth/me",
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: "Bearer " + token
+              }
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.error ||
+              "Das Konto konnte nicht gelöscht werden."
+            );
+          }
+
+          localStorage.removeItem("token");
+          window.location.href = "login.html";
+        } catch (error) {
+          showMessage(
+            deleteMessage,
+            error.message ||
+            "Die Löschfunktion muss noch im Backend aktiviert werden.",
+            "error"
+          );
+
+          deleteAccountButton.disabled = false;
+          deleteAccountButton.textContent =
+            "Konto dauerhaft löschen";
+        }
+      }
+    );
 
     loadUser();
   </script>
-
 </body>
 </html>
