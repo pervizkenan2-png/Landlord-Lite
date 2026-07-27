@@ -2,487 +2,1672 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard – Landlord Lite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#145f35" />
+  <title>Dashboard | Landlord Lite</title>
 
   <style>
-    body { margin:0; font-family: Arial, sans-serif; background:#f4f6f8; }
-    .main { padding:28px; }
-    h1 { margin:0 0 18px; font-size:28px; }
+    :root {
+      --sidebar-top: #2f932f;
+      --sidebar-middle: #166d2f;
+      --sidebar-bottom: #07391f;
+      --green-950: #07351f;
+      --green-900: #0b4729;
+      --green-800: #105c35;
+      --green-700: #167343;
+      --green-600: #1d8a50;
+      --green-500: #27a560;
+      --green-400: #4abd7c;
+      --green-300: #85d9a6;
+      --green-200: #beeacd;
+      --green-100: #e0f5e7;
+      --green-50: #f1fbf4;
+      --surface: #ffffff;
+      --surface-soft: #f7faf8;
+      --page: #eef4f0;
+      --text: #153124;
+      --muted: #6f8277;
+      --line: #dce8e0;
+      --warning: #e2a12a;
+      --warning-soft: #fff6df;
+      --danger: #d95959;
+      --danger-soft: #fdeaea;
+      --blue: #3e7ed0;
+      --blue-soft: #eaf2fd;
+      --shadow-sm: 0 8px 24px rgba(21, 68, 41, 0.08);
+      --shadow-md: 0 18px 48px rgba(21, 68, 41, 0.13);
+      --sidebar-width: 290px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 13px;
+    }
 
-    .top-row {
-      display:flex; gap:12px; flex-wrap:wrap; align-items:center;
-      margin-bottom:18px;
-    }
-    .pill {
-      background:#fff; border:1px solid #e7e7e7; border-radius:999px;
-      padding:8px 12px; box-shadow:0 2px 10px rgba(0,0,0,.05);
-      font-size:13px; color:#222;
-    }
-    .pill select {
-      border:none; outline:none; font-size:13px; background:transparent; cursor:pointer;
+    * {
+      box-sizing: border-box;
     }
 
-    .grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap:16px;
+    html {
+      scroll-behavior: smooth;
     }
 
-    .card {
-      background:#fff;
-      border-radius:14px;
-      padding:18px;
-      box-shadow:0 6px 20px rgba(0,0,0,0.06);
-      border:1px solid #eee;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 92% 0%, rgba(72, 184, 129, 0.12), transparent 28%),
+        var(--page);
+      color: var(--text);
     }
 
-    .card h3 { margin:0 0 12px; font-size:16px; color:#333; }
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-    .donut-wrap { display:flex; gap:16px; align-items:center; }
-    .donut {
-      width:130px; height:130px; border-radius:50%;
-      background: conic-gradient(#3ccf91 0% 0%, #f7c948 0% 0%, #ff6b6b 0% 100%);
-      position:relative;
+    a {
+      color: inherit;
     }
-    .donut::after {
-      content:"";
-      position:absolute;
-      inset:16px;
-      background:#fff;
-      border-radius:50%;
-      box-shadow: inset 0 0 0 1px #eee;
+
+    .app-shell {
+      min-height: 100vh;
     }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 1000;
+      width: var(--sidebar-width);
+      padding: 28px 22px 22px;
+      overflow-y: auto;
+      color: #fff;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.11), transparent 22%),
+        linear-gradient(180deg, var(--sidebar-top) 0%, var(--sidebar-middle) 45%, var(--sidebar-bottom) 100%);
+      box-shadow: 16px 0 44px rgba(3, 41, 21, 0.2);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.25) transparent;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 27px;
+      font-weight: 850;
+      letter-spacing: -0.8px;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      font-size: 23px;
+    }
+
+    .profile-button {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(255, 255, 255, 0.82);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      cursor: pointer;
+      color: #5d4ea1;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,.16);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .profile-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,.2);
+    }
+
+    .sidebar-subtitle {
+      margin: 0 0 26px 3px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .nav-group {
+      margin-top: 10px;
+    }
+
+    .nav-toggle,
+    .nav-link {
+      width: 100%;
+      border: 0;
+      color: rgba(255, 255, 255, 0.95);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 13px 15px;
+      border-radius: 14px;
+      cursor: pointer;
+      background: transparent;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: left;
+      transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+
+    .nav-toggle:hover,
+    .nav-link:hover {
+      background: rgba(255,255,255,.11);
+      transform: translateX(2px);
+    }
+
+    .nav-toggle.active,
+    .nav-link.active {
+      background: rgba(255,255,255,.12);
+      box-shadow: 0 11px 24px rgba(2, 38, 19, 0.22), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .nav-icon {
+      width: 25px;
+      flex: 0 0 25px;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .nav-chevron {
+      margin-left: auto;
+      transition: transform .22s ease;
+    }
+
+    .nav-toggle[aria-expanded="true"] .nav-chevron {
+      transform: rotate(180deg);
+    }
+
+    .submenu {
+      display: grid;
+      gap: 2px;
+      overflow: hidden;
+      max-height: 420px;
+      padding: 8px 0 8px 17px;
+      opacity: 1;
+      transition: max-height .25s ease, opacity .2s ease, padding .25s ease;
+    }
+
+    .submenu.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .submenu .nav-link {
+      padding: 11px 12px;
+      font-size: 15px;
+      font-weight: 650;
+      color: rgba(255,255,255,.88);
+    }
+
+    .sidebar-bottom {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.14);
+    }
+
+    .main {
+      min-height: 100vh;
+      margin-left: var(--sidebar-width);
+      padding: 36px clamp(22px, 3vw, 48px) 54px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .headline h1 {
+      margin: 0;
+      font-size: clamp(30px, 3vw, 45px);
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+    }
+
+    .headline p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-button,
+    .primary-button,
+    .secondary-button {
+      border: 0;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .icon-button {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--green-800);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      font-size: 20px;
+    }
+
+    .icon-button:hover,
+    .primary-button:hover,
+    .secondary-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .primary-button {
+      border-radius: 14px;
+      padding: 13px 18px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--green-600), var(--green-800));
+      box-shadow: 0 10px 24px rgba(21, 122, 72, 0.24);
+      font-weight: 800;
+    }
+
+    .secondary-button {
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 11px 14px;
+      color: var(--green-800);
+      background: #fff;
+      font-weight: 750;
+    }
+
+    .status-strip {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 13px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .status-strip.visible {
+      display: flex;
+    }
+
+    .status-strip.loading {
+      color: var(--green-900);
+      background: var(--green-100);
+      border: 1px solid var(--green-200);
+    }
+
+    .status-strip.error {
+      color: #882d2d;
+      background: var(--danger-soft);
+      border: 1px solid #f5c4c4;
+    }
+
+    .status-strip.success {
+      color: var(--green-900);
+      background: var(--green-100);
+      border: 1px solid var(--green-200);
+    }
+
+    .spinner {
+      width: 17px;
+      height: 17px;
+      border: 2px solid rgba(21, 122, 72, .25);
+      border-top-color: var(--green-700);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 154px;
+      padding: 22px;
+      border: 1px solid rgba(206, 226, 214, 0.75);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow-sm);
+      animation: rise .55s both;
+    }
+
+    .stat-card:nth-child(2) { animation-delay: .06s; }
+    .stat-card:nth-child(3) { animation-delay: .12s; }
+    .stat-card:nth-child(4) { animation-delay: .18s; }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      right: -48px;
+      bottom: -54px;
+      border-radius: 50%;
+      background: var(--green-100);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    .stat-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      font-size: 20px;
+      background: var(--green-100);
+      color: var(--green-800);
+    }
+
+    .stat-card.warning .stat-icon {
+      color: #9a6810;
+      background: var(--warning-soft);
+    }
+
+    .stat-card.blue .stat-icon {
+      color: #285b9e;
+      background: var(--blue-soft);
+    }
+
+    .stat-card.danger .stat-icon {
+      color: #a33a3a;
+      background: var(--danger-soft);
+    }
+
+    .stat-value {
+      position: relative;
+      z-index: 1;
+      margin-top: 20px;
+      font-size: clamp(29px, 3vw, 38px);
+      line-height: 1;
+      letter-spacing: -1.4px;
+      font-weight: 850;
+    }
+
+    .stat-meta {
+      position: relative;
+      z-index: 1;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, .9fr) minmax(0, 1.6fr);
+      gap: 22px;
+    }
+
+    .panel {
+      border: 1px solid rgba(206, 226, 214, 0.75);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.94);
+      box-shadow: var(--shadow-sm);
+      animation: rise .6s .2s both;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 23px 24px 0;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -.45px;
+    }
+
+    .panel-subtitle {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chart-panel {
+      min-height: 475px;
+    }
+
+    .donut-wrap {
+      position: relative;
+      width: min(315px, 82%);
+      aspect-ratio: 1;
+      margin: 30px auto 18px;
+    }
+
+    .donut-chart {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      filter: drop-shadow(0 15px 23px rgba(17, 109, 62, .12));
+    }
+
+    .donut-track,
+    .donut-paid,
+    .donut-open,
+    .donut-other {
+      fill: none;
+      stroke-width: 17;
+    }
+
+    .donut-track {
+      stroke: #edf3ef;
+    }
+
+    .donut-paid {
+      stroke: var(--green-500);
+      stroke-linecap: round;
+      transition: stroke-dasharray 1s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .donut-open {
+      stroke: var(--warning);
+      stroke-linecap: round;
+      transition: stroke-dasharray 1s cubic-bezier(.2,.8,.2,1),
+                  stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .donut-other {
+      stroke: var(--danger);
+      stroke-linecap: round;
+      transition: stroke-dasharray 1s cubic-bezier(.2,.8,.2,1),
+                  stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1);
+    }
+
     .donut-center {
-      position:absolute; inset:0;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      z-index:2;
-      font-weight:700;
+      position: absolute;
+      inset: 24%;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(211, 228, 218, .8);
+      text-align: center;
     }
-    .donut-center small { font-weight:400; color:#777; margin-top:4px; }
 
-    .legend { font-size:13px; color:#555; }
-    .legend div { margin-bottom:6px; }
+    .donut-percent {
+      font-size: clamp(35px, 4vw, 48px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
 
-    .stats {
-      display:grid;
+    .donut-label {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .legend {
+      display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap:12px;
-      margin-top:10px;
-      margin-bottom:10px;
-    }
-    .stat {
-      background:#f7f9fb;
-      border-radius:12px;
-      padding:12px;
-      text-align:center;
-      border:1px solid #edf0f4;
-    }
-    .stat strong { font-size:18px; display:block; }
-    .stat span { font-size:12px; color:#777; }
-
-    .bars { display:flex; align-items:flex-end; gap:12px; height:170px; margin-top:8px; }
-    .bar-col { width:34px; text-align:center; font-size:11px; color:#777; }
-    .bar {
-      width:34px;
-      border-radius:8px 8px 0 0;
-      background: linear-gradient(180deg, #4f9cff, #2f6fd6);
-      height:20px;
+      gap: 10px;
+      padding: 0 24px 24px;
     }
 
-    .hint { margin-top:10px; font-size:12px; color:#777; }
-    .error { color:#c62828; font-size:13px; margin-top:10px; }
+    .legend-item {
+      padding: 13px;
+      border-radius: 14px;
+      background: var(--surface-soft);
+      border: 1px solid #e5eee8;
+    }
 
-    .landlord-box{
-      margin-bottom:16px;
-      background:#fff;
-      border:1px solid #eee;
-      border-radius:14px;
-      padding:14px 16px;
-      box-shadow:0 6px 20px rgba(0,0,0,0.06);
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
+    .legend-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
     }
-    .landlord-left{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      min-width:260px;
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
     }
-    .landlord-title{ font-size:13px; color:#777; }
-    .landlord-value{ font-size:14px; font-weight:700; color:#111; }
-    .landlord-actions{ display:flex; gap:10px; flex-wrap:wrap; }
-    .btn{
-      border:none; border-radius:10px; padding:10px 12px;
-      cursor:pointer; font-size:13px;
+
+    .legend-value {
+      margin-top: 8px;
+      font-weight: 850;
+      font-size: 15px;
     }
-    .btn.green{ background:#2e7d32; color:#fff; }
-    .btn.grey{ background:#e9ecef; color:#222; }
+
+    .right-stack {
+      display: grid;
+      gap: 22px;
+    }
+
+    .table-panel {
+      overflow: hidden;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      padding: 16px 24px 22px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+
+    th {
+      padding: 12px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 16px 10px;
+      border-bottom: 1px solid #edf2ee;
+      font-size: 14px;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tenant-cell {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 170px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      color: var(--green-800);
+      background: var(--green-100);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .tenant-name {
+      font-weight: 800;
+    }
+
+    .tenant-unit {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.paid,
+    .badge.done {
+      color: #116238;
+      background: var(--green-100);
+    }
+
+    .badge.open,
+    .badge.progress {
+      color: #8a5d0f;
+      background: var(--warning-soft);
+    }
+
+    .badge.overdue,
+    .badge.urgent {
+      color: #9c3535;
+      background: var(--danger-soft);
+    }
+
+    .empty-row {
+      padding: 30px !important;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .repairs-list {
+      display: grid;
+      gap: 12px;
+      padding: 18px 24px 24px;
+    }
+
+    .repair-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 13px;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid #e5eee8;
+      border-radius: 16px;
+      background: var(--surface-soft);
+    }
+
+    .repair-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      color: #9a6810;
+      background: var(--warning-soft);
+      font-size: 19px;
+    }
+
+    .repair-title {
+      font-weight: 820;
+      font-size: 14px;
+    }
+
+    .repair-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section-footer {
+      padding: 0 24px 23px;
+    }
+    .mobile-menu {
+      display: none;
+    }
+
+    .sidebar-overlay {
+      display: none;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-panel {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 860px) {
+      :root {
+        --sidebar-width: 282px;
+      }
+
+      .sidebar {
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+      }
+
+      body.sidebar-open .sidebar {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 900;
+        display: block;
+        pointer-events: none;
+        opacity: 0;
+        background: rgba(3, 27, 14, .5);
+        transition: opacity .22s ease;
+      }
+
+      body.sidebar-open .sidebar-overlay {
+        pointer-events: auto;
+        opacity: 1;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 22px 16px 42px;
+      }
+
+      .mobile-menu {
+        display: grid;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .topbar-actions .primary-button {
+        display: none;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        gap: 12px;
+      }
+
+      .headline h1 {
+        font-size: 31px;
+      }
+
+      .headline p {
+        font-size: 14px;
+      }
+
+      .legend {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-header {
+        padding: 19px 18px 0;
+      }
+
+      .table-wrap,
+      .repairs-list {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .donut-wrap {
+        width: min(290px, 88%);
+      }
+
+      .repair-item {
+        grid-template-columns: auto 1fr;
+      }
+
+      .repair-item > .badge {
+        grid-column: 2;
+        justify-self: start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <main class="main">
-    <h1>Dashboard</h1>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Vermieter aus localStorage (Landlord Lite / Mahnung Keys) -->
-    <div class="landlord-box">
-      <div class="landlord-left">
-        <div class="landlord-title">Vermieter (aus localStorage)</div>
-        <div class="landlord-value" id="llDisplay">—</div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="brand-icon">🏠</div>
+          <span>Landlord Lite</span>
+        </div>
+
+        <button class="profile-button" id="profileButton" type="button" aria-label="Konto öffnen">
+          👤
+        </button>
       </div>
-      <div class="landlord-actions">
-        <button class="btn grey" id="btnReloadLL">Neu laden</button>
-        <button class="btn green" id="btnGoLandlord">Zu Vermieterdaten</button>
-      </div>
-    </div>
 
-    <div class="top-row">
-      <div class="pill">
-        Monat:
-        <select id="monthSelect"></select>
-      </div>
-      <div class="pill" id="tenantCountPill">Mieter: –</div>
-      <div class="pill" id="backendPill">Backend: –</div>
-    </div>
+      <p class="sidebar-subtitle">Mieterverwaltung</p>
 
-    <div class="grid">
-      <section class="card">
-        <h3>Einnahmen-Status (Mieten)</h3>
+      <nav aria-label="Hauptnavigation">
+        <div class="nav-group">
+          <button class="nav-toggle active" id="tenantMenuToggle" type="button" aria-expanded="true">
+            <span class="nav-icon">📁</span>
+            <span>Mieterverwaltung</span>
+            <span class="nav-chevron">▲</span>
+          </button>
 
-        <div class="donut-wrap">
-          <div class="donut" id="donut">
+          <div class="submenu" id="tenantSubmenu">
+            <a class="nav-link" href="index.html">
+              <span class="nav-icon">👥</span>
+              <span>Übersicht</span>
+            </a>
+
+            <a class="nav-link" href="mahnung.html">
+              <span class="nav-icon">📧</span>
+              <span>Mahnungssystem</span>
+            </a>
+
+            <a class="nav-link" href="mieterhoehung.html">
+              <span class="nav-icon">📈</span>
+              <span>Mieterhöhung</span>
+            </a>
+
+            <a class="nav-link" href="reparatur.html">
+              <span class="nav-icon">🛠️</span>
+              <span>Reparaturen</span>
+            </a>
+
+            <a class="nav-link" href="import.html">
+              <span class="nav-icon">📥</span>
+              <span>Massenimport</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="sidebar-bottom">
+          <a class="nav-link active" href="dashboard.html" aria-current="page">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+          </a>
+
+          <a class="nav-link" href="account.html">
+            <span class="nav-icon">⚙️</span>
+            <span>Konto</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:flex-start;gap:13px">
+          <button class="icon-button mobile-menu" id="mobileMenuButton" type="button" aria-label="Menü öffnen">
+            ☰
+          </button>
+
+          <div class="headline">
+            <h1>Dashboard</h1>
+            <p id="welcomeText">Willkommen zurück – hier ist dein aktueller Überblick.</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-button" id="refreshButton" type="button" title="Daten neu laden">↻</button>
+          <a class="primary-button" href="index.html" style="text-decoration:none">+ Mieter hinzufügen</a>
+        </div>
+      </header>
+      <div class="status-strip" id="statusStrip" role="status" aria-live="polite"></div>
+
+      <section class="stats-grid" aria-label="Kennzahlen">
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Monatliche Mieteinnahmen</span>
+            <span class="stat-icon">€</span>
+          </div>
+          <div class="stat-value" id="monthlyIncome">0,00 €</div>
+          <div class="stat-meta" id="incomeMeta">Aktueller Monat</div>
+        </article>
+
+        <article class="stat-card blue">
+          <div class="stat-top">
+            <span class="stat-label">Objekte</span>
+            <span class="stat-icon">🏢</span>
+          </div>
+          <div class="stat-value" id="propertiesCount">0</div>
+          <div class="stat-meta">Erfasste Wohnungen und Einheiten</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Mieter</span>
+            <span class="stat-icon">👥</span>
+          </div>
+          <div class="stat-value" id="tenantsCount">0</div>
+          <div class="stat-meta" id="tenantMeta">Aktive Mietverhältnisse</div>
+        </article>
+
+        <article class="stat-card danger">
+          <div class="stat-top">
+            <span class="stat-label">Offene Mieten</span>
+            <span class="stat-icon">!</span>
+          </div>
+          <div class="stat-value" id="openRent">0,00 €</div>
+          <div class="stat-meta" id="openRentMeta">Keine offenen Forderungen</div>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel chart-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Mietstatus</h2>
+              <p class="panel-subtitle">Verteilung der aktuellen Mietzahlungen</p>
+            </div>
+            <span class="badge paid" id="chartMonth">Dieser Monat</span>
+          </div>
+
+          <div class="donut-wrap" aria-label="Donut-Diagramm zum Mietstatus">
+            <svg class="donut-chart" viewBox="0 0 120 120" role="img">
+              <circle class="donut-track" cx="60" cy="60" r="46"></circle>
+              <circle class="donut-paid" id="donutPaid" cx="60" cy="60" r="46"></circle>
+              <circle class="donut-open" id="donutOpen" cx="60" cy="60" r="46"></circle>
+              <circle class="donut-other" id="donutOther" cx="60" cy="60" r="46"></circle>
+            </svg>
+
             <div class="donut-center">
-              <div id="donutAmount">€0</div>
-              <small id="donutSub">von €0</small>
+              <div class="donut-percent" id="paidPercent">0%</div>
+              <div class="donut-label">bezahlt</div>
             </div>
           </div>
 
           <div class="legend">
-            <div>🟢 Bezahlt: <strong id="paidText">€0</strong></div>
-            <div>🟡 Offen: <strong id="openText">€0</strong></div>
-            <div>🔴 Überfällig: <strong id="overdueText">€0</strong></div>
+            <div class="legend-item">
+              <div class="legend-head">
+                <span class="legend-dot" style="background:var(--green-500)"></span>
+                Bezahlt
+              </div>
+              <div class="legend-value" id="legendPaid">0</div>
+            </div>
+
+            <div class="legend-item">
+              <div class="legend-head">
+                <span class="legend-dot" style="background:var(--warning)"></span>
+                Offen
+              </div>
+              <div class="legend-value" id="legendOpen">0</div>
+            </div>
+
+            <div class="legend-item">
+              <div class="legend-head">
+                <span class="legend-dot" style="background:var(--danger)"></span>
+                Überfällig
+              </div>
+              <div class="legend-value" id="legendOverdue">0</div>
+            </div>
           </div>
-        </div>
+        </article>
 
-        <div class="hint">
-          Logik: Überfällig = nicht bezahlt & nach Fälligkeit. Offen = nicht bezahlt & vor/gleich Fälligkeit.
-        </div>
+        <div class="right-stack">
+          <article class="panel table-panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Letzte Zahlungen</h2>
+                <p class="panel-subtitle">Die zuletzt erfassten Mietzahlungen</p>
+              </div>
+              <a class="secondary-button" href="index.html" style="text-decoration:none">Alle ansehen</a>
+            </div>
 
-        <div id="err1" class="error" style="display:none;"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mieter</th>
+                    <th>Datum</th>
+                    <th>Betrag</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTableBody">
+                  <tr>
+                    <td class="empty-row" colspan="4">Noch keine Zahlungsdaten vorhanden.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Reparaturen</h2>
+                <p class="panel-subtitle">Aktuelle offene und laufende Fälle</p>
+              </div>
+              <a class="secondary-button" href="reparatur.html" style="text-decoration:none">Verwalten</a>
+            </div>
+
+            <div class="repairs-list" id="repairsList">
+              <div class="repair-item">
+                <div class="repair-icon">🛠️</div>
+                <div>
+                  <div class="repair-title">Keine Reparaturen vorhanden</div>
+                  <div class="repair-meta">Neue Fälle erscheinen automatisch hier.</div>
+                </div>
+                <span class="badge done">Alles erledigt</span>
+              </div>
+            </div>
+          </article>
+        </div>
       </section>
-
-      <section class="card">
-        <h3>Cashflow</h3>
-
-        <div class="stats">
-          <div class="stat">
-            <strong id="incomeVal">€0</strong>
-            <span>Income</span>
-          </div>
-          <div class="stat">
-            <strong id="expensesVal">€0</strong>
-            <span>Expenses</span>
-          </div>
-          <div class="stat">
-            <strong id="netVal">€0</strong>
-            <span>Net</span>
-          </div>
-        </div>
-
-        <div class="bars" id="bars"></div>
-
-        <div class="hint">
-          Balken: Letzte 6 Monate (wenn keine Historie vorhanden ist → Projektion aus aktueller Miete).
-        </div>
-
-        <div id="err2" class="error" style="display:none;"></div>
-      </section>
-    </div>
-  </main>
+    </main>
+  </div>
 
   <script>
-    const API_BASE = "http://127.0.0.1:3000";
+    (() => {
+      "use strict";
 
-    const donut = document.getElementById("donut");
-    const donutAmount = document.getElementById("donutAmount");
-    const donutSub = document.getElementById("donutSub");
+      /*
+        Authentifizierung:
+        - Kein localStorage
+        - Kein Token im Browsercode
+        - Cookies/Session werden über credentials: "include" mitgesendet
+      */
+      const API_BASE = (window.API_BASE || "https://api.landlord-lite.de").replace(/\/+$/, "");
 
-    const paidText = document.getElementById("paidText");
-    const openText = document.getElementById("openText");
-    const overdueText = document.getElementById("overdueText");
+      const endpoints = {
+        me: API_BASE + "/api/auth/me",
+        dashboard: API_BASE + "/api/dashboard",
+        tenants: API_BASE + "/api/tenants",
+        repairs: API_BASE + "/api/repairs"
+      };
 
-    const incomeVal = document.getElementById("incomeVal");
-    const expensesVal = document.getElementById("expensesVal");
-    const netVal = document.getElementById("netVal");
+      const state = {
+        user: null,
+        tenants: [],
+        repairs: [],
+        dashboard: null
+      };
 
-    const barsEl = document.getElementById("bars");
-    const err1 = document.getElementById("err1");
-    const err2 = document.getElementById("err2");
+      const els = {
+        statusStrip: document.getElementById("statusStrip"),
+        welcomeText: document.getElementById("welcomeText"),
+        monthlyIncome: document.getElementById("monthlyIncome"),
+        incomeMeta: document.getElementById("incomeMeta"),
+        propertiesCount: document.getElementById("propertiesCount"),
+        tenantsCount: document.getElementById("tenantsCount"),
+        tenantMeta: document.getElementById("tenantMeta"),
+        openRent: document.getElementById("openRent"),
+        openRentMeta: document.getElementById("openRentMeta"),
+        paidPercent: document.getElementById("paidPercent"),
+        legendPaid: document.getElementById("legendPaid"),
+        legendOpen: document.getElementById("legendOpen"),
+        legendOverdue: document.getElementById("legendOverdue"),
+        donutPaid: document.getElementById("donutPaid"),
+        donutOpen: document.getElementById("donutOpen"),
+        donutOther: document.getElementById("donutOther"),
+        paymentsTableBody: document.getElementById("paymentsTableBody"),
+        repairsList: document.getElementById("repairsList"),
+        refreshButton: document.getElementById("refreshButton"),
+        profileButton: document.getElementById("profileButton"),
+        tenantMenuToggle: document.getElementById("tenantMenuToggle"),
+        tenantSubmenu: document.getElementById("tenantSubmenu"),
+        mobileMenuButton: document.getElementById("mobileMenuButton"),
+        sidebarOverlay: document.getElementById("sidebarOverlay")
+      };
 
-    const tenantCountPill = document.getElementById("tenantCountPill");
-    const backendPill = document.getElementById("backendPill");
-    const monthSelect = document.getElementById("monthSelect");
+      const euro = new Intl.NumberFormat("de-DE", {
+        style: "currency",
+        currency: "EUR"
+      });
 
-    // Landlord UI
-    const llDisplay = document.getElementById("llDisplay");
-    const btnReloadLL = document.getElementById("btnReloadLL");
-    const btnGoLandlord = document.getElementById("btnGoLandlord");
+      const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
 
-    function eur(n){
-      const v = Number(n || 0);
-      return "€" + v.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    }
-    function safe(v){ return (v ?? "").toString(); }
-    function num(v){
-      if (v === null || v === undefined) return 0;
-      const x = Number(String(v).replace(",", ".").replace(/[^\d.-]/g, ""));
-      return isNaN(x) ? 0 : x;
-    }
-
-    // ====== Landlord keys (kompatibel zu deinen Seiten) ======
-    const K1_NAME = "llp_landlord_name";
-    const K1_ADDR = "llp_landlord_address";
-    const K1_CITY = "llp_landlord_city";
-
-    const K2_NAME = "landlordName";
-    const K2_ADDR = "landlordAddress";
-    const K2_CITY = "landlordZipCity";
-
-    function readFirst(keys){
-      for(const k of keys){
-        const v = localStorage.getItem(k);
-        if(v && v.trim()) return v.trim();
+      function showStatus(message, type = "loading") {
+        els.statusStrip.className = "status-strip visible " + type;
+        els.statusStrip.innerHTML =
+          (type === "loading" ? '<span class="spinner" aria-hidden="true"></span>' : "") +
+          "<span>" + escapeHtml(message) + "</span>";
       }
-      return "";
-    }
 
-    function loadLandlordDisplay(){
-      const name = readFirst([K1_NAME, K2_NAME]);
-      const addr = readFirst([K1_ADDR, K2_ADDR]);
-      const city = readFirst([K1_CITY, K2_CITY]);
-
-      if(!name && !addr && !city){
-        llDisplay.textContent = "Keine Vermieterdaten gespeichert.";
-        return;
+      function hideStatus() {
+        els.statusStrip.className = "status-strip";
+        els.statusStrip.textContent = "";
       }
-      const parts = [name, addr, city].filter(Boolean);
-      llDisplay.textContent = parts.join(" • ");
-    }
 
-    btnReloadLL.addEventListener("click", loadLandlordDisplay);
-
-    // Zielseite: nimm die passende bei dir (Mahnung oder Mieterhöhung Auto)
-    btnGoLandlord.addEventListener("click", () => {
-      // Wenn du eine dedizierte Seite hast, ändere den Link:
-      window.location.href = "mahnung.html";
-    });
-
-    // ---- Month selector (current + last 11 months)
-    function buildMonths(){
-      const now = new Date();
-      monthSelect.innerHTML = "";
-      for(let i=0;i<12;i++){
-        const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-        const value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-        const label = d.toLocaleString("de-DE", { month:"long", year:"numeric" });
-        const opt = document.createElement("option");
-        opt.value = value;
-        opt.textContent = label;
-        monthSelect.appendChild(opt);
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
       }
-    }
 
-    function parseDueDay(t){
-      const dd = num(t.dueDay || t.due_date || t.dueDate || "");
-      return dd > 0 && dd <= 31 ? dd : 3;
-    }
+      async function apiFetch(url, options = {}) {
+        const response = await fetch(url, {
+          method: options.method || "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            ...(options.body ? { "Content-Type": "application/json" } : {}),
+            ...(options.headers || {})
+          },
+          body: options.body
+        });
 
-    function isPaid(t){
-      const s = (t.paymentStatus ?? t.status ?? t.paid ?? "").toString().toLowerCase();
-      if (s === "paid" || s === "bezahlt" || s === "true" || s === "1") return true;
-      if (t.paymentStatus === true || t.paid === true) return true;
-      return false;
-    }
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("AUTH_REQUIRED");
+        }
 
-    async function fetchTenants(){
-      const endpoints = [
-        `${API_BASE}/tenants`,
-        `${API_BASE}/api/tenants`,
-        `${API_BASE}/tenant`,
-        `${API_BASE}/api/tenant`,
-      ];
+        if (!response.ok) {
+          throw new Error("HTTP_" + response.status);
+        }
 
-      let lastErr = null;
-      for (const url of endpoints){
-        try{
-          const res = await fetch(url);
-          if(!res.ok){ lastErr = new Error(`HTTP ${res.status} @ ${url}`); continue; }
-          const data = await res.json();
-          if (Array.isArray(data)) return data;
-          if (data && Array.isArray(data.tenants)) return data.tenants;
-          lastErr = new Error(`Unerwartetes JSON @ ${url}`);
-        }catch(e){
-          lastErr = e;
+        const contentType = response.headers.get("content-type") || "";
+        return contentType.includes("application/json") ? response.json() : null;
+      }
+
+      async function optionalFetch(url) {
+        try {
+          return await apiFetch(url);
+        } catch (error) {
+          if (error.message === "AUTH_REQUIRED") throw error;
+          return null;
         }
       }
-      throw lastErr || new Error("Backend nicht erreichbar");
-    }
 
-    function getRepairsExpensesForMonth(yyyyMM){
-      try{
-        const raw = localStorage.getItem("llp_repairs");
-        if(!raw) return 0;
-        const arr = JSON.parse(raw);
-        if(!Array.isArray(arr)) return 0;
-        return arr
-          .filter(x => safe(x.date).startsWith(yyyyMM))
-          .reduce((sum, x) => sum + num(x.cost), 0);
-      }catch(e){
+      function normalizeArray(data) {
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data?.items)) return data.items;
+        if (Array.isArray(data?.data)) return data.data;
+        if (Array.isArray(data?.tenants)) return data.tenants;
+        if (Array.isArray(data?.repairs)) return data.repairs;
+        return [];
+      }
+
+      function numberFrom(...values) {
+        for (const value of values) {
+          const parsed = Number(value);
+          if (Number.isFinite(parsed)) return parsed;
+        }
         return 0;
       }
-    }
 
-    function setDonut(paid, open, overdue){
-      const total = paid + open + overdue;
-      const paidPct = total ? (paid/total)*100 : 0;
-      const openPct = total ? (open/total)*100 : 0;
-      const overduePct = Math.max(0, 100 - paidPct - openPct);
+      function getTenantRent(tenant) {
+        return numberFrom(
+          tenant.monthlyRent,
+          tenant.rent,
+          tenant.currentRent,
+          tenant.netRent,
+          tenant.warmRent,
+          tenant.amount
+        );
+      }
 
-      donut.style.background = `conic-gradient(
-        #3ccf91 0% ${paidPct}%,
-        #f7c948 ${paidPct}% ${paidPct+openPct}%,
-        #ff6b6b ${paidPct+openPct}% 100%
-      )`;
+      function getTenantUnit(tenant) {
+        return (
+          tenant.unit ||
+          tenant.apartment ||
+          tenant.apartmentName ||
+          tenant.wohnung ||
+          tenant.propertyName ||
+          tenant.object ||
+          "Keine Wohnung"
+        );
+      }
+      function getTenantName(tenant) {
+        return tenant.name || tenant.tenantName || tenant.fullName || tenant.email || "Unbekannt";
+      }
 
-      donutAmount.textContent = eur(paid);
-      donutSub.textContent = `von ${eur(total)}`;
-      paidText.textContent = eur(paid);
-      openText.textContent = eur(open);
-      overdueText.textContent = eur(overdue);
-    }
+      function getPaymentStatus(tenant) {
+        const raw = String(
+          tenant.paymentStatus ||
+          tenant.rentStatus ||
+          tenant.status ||
+          tenant.paid ||
+          ""
+        ).toLowerCase();
 
-    function renderBars(series){
-      barsEl.innerHTML = "";
-      const max = Math.max(...series.map(x => Math.abs(x.value)), 1);
-
-      series.forEach(x => {
-        const col = document.createElement("div");
-        col.className = "bar-col";
-
-        const bar = document.createElement("div");
-        bar.className = "bar";
-
-        const h = Math.max(10, Math.round((Math.abs(x.value)/max)*100));
-        bar.style.height = h + "%";
-
-        if(x.value < 0){
-          bar.style.background = "linear-gradient(180deg, #ff7a7a, #d93b3b)";
+        if (
+          raw === "paid" ||
+          raw === "bezahlt" ||
+          raw === "true" ||
+          tenant.paid === true
+        ) {
+          return "paid";
         }
 
-        col.appendChild(bar);
+        if (
+          raw.includes("overdue") ||
+          raw.includes("überf") ||
+          raw.includes("ueberf") ||
+          raw.includes("mahnung")
+        ) {
+          return "overdue";
+        }
 
-        const label = document.createElement("div");
-        label.textContent = x.label;
-        col.appendChild(label);
-
-        barsEl.appendChild(col);
-      });
-    }
-
-    function last6MonthsLabels(yyyyMM){
-      const [y,m] = yyyyMM.split("-").map(Number);
-      const base = new Date(y, m-1, 1);
-      const out = [];
-      for(let i=5;i>=0;i--){
-        const d = new Date(base.getFullYear(), base.getMonth()-i, 1);
-        out.push({
-          key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`,
-          label: d.toLocaleString("de-DE", { month:"short" })
-        });
+        return "open";
       }
-      return out;
-    }
 
-    async function loadDashboard(){
-      err1.style.display = "none";
-      err2.style.display = "none";
+      function calculateFallbackDashboard() {
+        const tenants = state.tenants;
+        const activeTenants = tenants.filter(t => t.active !== false);
+        const monthlyIncome = activeTenants.reduce((sum, tenant) => sum + getTenantRent(tenant), 0);
 
-      const yyyyMM = monthSelect.value;
-      const now = new Date();
+        const units = new Set(
+          activeTenants
+            .map(getTenantUnit)
+            .filter(value => value && value !== "Keine Wohnung")
+        );
 
-      try{
-        const tenants = await fetchTenants();
-        backendPill.textContent = "Backend: OK";
-        tenantCountPill.textContent = "Mieter: " + tenants.length;
+        let paidCount = 0;
+        let openCount = 0;
+        let overdueCount = 0;
+        let openAmount = 0;
 
-        let paid = 0, open = 0, overdue = 0;
+        activeTenants.forEach(tenant => {
+          const status = getPaymentStatus(tenant);
+          if (status === "paid") paidCount += 1;
+          if (status === "open") {
+            openCount += 1;
+            openAmount += getTenantRent(tenant);
+          }
+          if (status === "overdue") {
+            overdueCount += 1;
+            openAmount += getTenantRent(tenant);
+          }
+        });
 
-        tenants.forEach(t => {
-          const rent = num(t.rent ?? t.miete ?? t.amount ?? t.mietbetrag);
+        const payments = activeTenants
+          .filter(t => t.lastPaymentDate || t.paymentDate || t.updatedAt)
+          .map(t => ({
+            tenantName: getTenantName(t),
+            unit: getTenantUnit(t),
+            date: t.lastPaymentDate || t.paymentDate || t.updatedAt,
+            amount: numberFrom(t.lastPaymentAmount, t.paymentAmount, getTenantRent(t)),
+            status: getPaymentStatus(t)
+          }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5);
 
-          const dd = parseDueDay(t);
-          const paidFlag = isPaid(t);
+        return {
+          monthlyIncome,
+          propertiesCount: units.size,
+          tenantsCount: activeTenants.length,
+          openRent: openAmount,
+          paidCount,
+          openCount,
+          overdueCount,
+          payments
+        };
+      }
 
-          if (paidFlag){
-            paid += rent;
+      function mergeDashboard() {
+        const fallback = calculateFallbackDashboard();
+        const api = state.dashboard || {};
+
+        return {
+          monthlyIncome: numberFrom(
+            api.monthlyIncome,
+            api.currentMonthlyIncome,
+            api.rentalIncome,
+            fallback.monthlyIncome
+          ),
+          propertiesCount: numberFrom(
+            api.propertiesCount,
+            api.objects,
+            api.unitsCount,
+            fallback.propertiesCount
+          ),
+          tenantsCount: numberFrom(
+            api.tenantsCount,
+            api.activeTenants,
+            fallback.tenantsCount
+          ),
+          openRent: numberFrom(
+            api.openRent,
+            api.outstandingRent,
+            api.openAmount,
+            fallback.openRent
+          ),
+          paidCount: numberFrom(api.paidCount, api.paid, fallback.paidCount),
+          openCount: numberFrom(api.openCount, api.open, fallback.openCount),
+          overdueCount: numberFrom(api.overdueCount, api.overdue, fallback.overdueCount),
+          payments: Array.isArray(api.payments)
+            ? api.payments
+            : Array.isArray(api.lastPayments)
+              ? api.lastPayments
+              : fallback.payments
+        };
+      }
+
+      function animateNumber(element, target, formatter = value => String(Math.round(value))) {
+        const start = performance.now();
+        const duration = 700;
+
+        function frame(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          element.textContent = formatter(target * eased);
+
+          if (progress < 1) {
+            requestAnimationFrame(frame);
           } else {
-            if (now.getDate() > dd) overdue += rent;
-            else open += rent;
+            element.textContent = formatter(target);
           }
-        });
+        }
 
-        setDonut(paid, open, overdue);
-
-        const income = paid;
-        const expenses = getRepairsExpensesForMonth(yyyyMM);
-        const net = income - expenses;
-
-        incomeVal.textContent = eur(income);
-        expensesVal.textContent = eur(expenses);
-        netVal.textContent = eur(net);
-
-        let cashflowHistory = null;
-        try{
-          const raw = localStorage.getItem("llp_cashflow");
-          if(raw) cashflowHistory = JSON.parse(raw);
-        }catch(e){ cashflowHistory = null; }
-
-        const months = last6MonthsLabels(yyyyMM);
-        const series = months.map(mm => {
-          if(cashflowHistory && cashflowHistory[mm.key]){
-            const inc = num(cashflowHistory[mm.key].income);
-            const exp = num(cashflowHistory[mm.key].expenses);
-            return { label: mm.label, value: inc - exp };
-          }
-          return { label: mm.label, value: net };
-        });
-
-        renderBars(series);
-
-      }catch(err){
-        backendPill.textContent = "Backend: FEHLT";
-        tenantCountPill.textContent = "Mieter: –";
-
-        err1.style.display = "block";
-        err1.textContent = "Fehler: " + err.message;
-
-        err2.style.display = "block";
-        err2.textContent = "Fehler: " + err.message;
+        requestAnimationFrame(frame);
       }
-    }
+      function updateDonut(paid, open, overdue) {
+        const total = Math.max(paid + open + overdue, 1);
+        const circumference = 2 * Math.PI * 46;
 
-    // ====== INIT ======
-    buildMonths();
-    loadLandlordDisplay();
-    monthSelect.addEventListener("change", loadDashboard);
+        const paidRatio = paid / total;
+        const openRatio = open / total;
+        const overdueRatio = overdue / total;
 
-    loadDashboard();
+        const paidLength = circumference * paidRatio;
+        const openLength = circumference * openRatio;
+        const overdueLength = circumference * overdueRatio;
+
+        els.donutPaid.style.strokeDasharray = `${paidLength} ${circumference - paidLength}`;
+        els.donutPaid.style.strokeDashoffset = "0";
+
+        els.donutOpen.style.strokeDasharray = `${openLength} ${circumference - openLength}`;
+        els.donutOpen.style.strokeDashoffset = `${-paidLength}`;
+
+        els.donutOther.style.strokeDasharray = `${overdueLength} ${circumference - overdueLength}`;
+        els.donutOther.style.strokeDashoffset = `${-(paidLength + openLength)}`;
+
+        const paidPercent = paid + open + overdue > 0
+          ? Math.round((paid / (paid + open + overdue)) * 100)
+          : 0;
+
+        animateNumber(els.paidPercent, paidPercent, value => Math.round(value) + "%");
+      }
+
+      function renderPayments(payments) {
+        if (!payments.length) {
+          els.paymentsTableBody.innerHTML =
+            '<tr><td class="empty-row" colspan="4">Noch keine Zahlungsdaten vorhanden.</td></tr>';
+          return;
+        }
+
+        els.paymentsTableBody.innerHTML = payments.slice(0, 5).map(payment => {
+          const name = payment.tenantName || payment.name || payment.tenant || "Unbekannt";
+          const unit = payment.unit || payment.apartment || payment.wohnung || "Keine Wohnung";
+          const dateValue = payment.date || payment.paymentDate || payment.createdAt;
+          const amount = numberFrom(payment.amount, payment.value, payment.rent);
+          const status = String(payment.status || "paid").toLowerCase();
+
+          const normalizedStatus =
+            status.includes("over") || status.includes("über") || status.includes("ueber")
+              ? "overdue"
+              : status.includes("open") || status.includes("offen")
+                ? "open"
+                : "paid";
+
+          const statusLabel =
+            normalizedStatus === "paid"
+              ? "Bezahlt"
+              : normalizedStatus === "overdue"
+                ? "Überfällig"
+                : "Offen";
+
+          const initials = name
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(part => part[0]?.toUpperCase())
+            .join("") || "M";
+
+          return `
+            <tr>
+              <td>
+                <div class="tenant-cell">
+                  <div class="avatar">${escapeHtml(initials)}</div>
+                  <div>
+                    <div class="tenant-name">${escapeHtml(name)}</div>
+                    <div class="tenant-unit">${escapeHtml(unit)}</div>
+                  </div>
+                </div>
+              </td>
+              <td>${dateValue ? escapeHtml(dateFormatter.format(new Date(dateValue))) : "–"}</td>
+              <td><strong>${escapeHtml(euro.format(amount))}</strong></td>
+              <td><span class="badge ${normalizedStatus}">${statusLabel}</span></td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      function normalizeRepairStatus(repair) {
+        const raw = String(repair.status || "").toLowerCase();
+        if (raw.includes("erled") || raw.includes("done") || raw.includes("closed")) return "done";
+        if (raw.includes("bearbeit") || raw.includes("progress") || raw.includes("lauf")) return "progress";
+        if (raw.includes("dring") || raw.includes("urgent")) return "urgent";
+        return "open";
+      }
+      function renderRepairs(repairs) {
+        const activeRepairs = repairs
+          .filter(repair => normalizeRepairStatus(repair) !== "done")
+          .slice(0, 4);
+
+        if (!activeRepairs.length) {
+          els.repairsList.innerHTML = `
+            <div class="repair-item">
+              <div class="repair-icon">✓</div>
+              <div>
+                <div class="repair-title">Keine offenen Reparaturen</div>
+                <div class="repair-meta">Alle gemeldeten Fälle sind erledigt.</div>
+              </div>
+              <span class="badge done">Alles erledigt</span>
+            </div>
+          `;
+          return;
+        }
+
+        els.repairsList.innerHTML = activeRepairs.map(repair => {
+          const status = normalizeRepairStatus(repair);
+          const label =
+            status === "urgent" ? "Dringend" :
+            status === "progress" ? "In Bearbeitung" : "Offen";
+
+          const title =
+            repair.problem ||
+            repair.title ||
+            repair.description ||
+            "Reparaturfall";
+
+          const tenant =
+            repair.tenantName ||
+            repair.tenant?.name ||
+            repair.tenant ||
+            "Ohne Mieterzuordnung";
+
+          const unit =
+            repair.unit ||
+            repair.apartment ||
+            repair.wohnung ||
+            "";
+
+          return `
+            <div class="repair-item">
+              <div class="repair-icon">🛠️</div>
+              <div>
+                <div class="repair-title">${escapeHtml(title)}</div>
+                <div class="repair-meta">${escapeHtml([tenant, unit].filter(Boolean).join(" · "))}</div>
+              </div>
+              <span class="badge ${status}">${label}</span>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderDashboard() {
+        const data = mergeDashboard();
+
+        animateNumber(els.monthlyIncome, data.monthlyIncome, euro.format);
+        animateNumber(els.propertiesCount, data.propertiesCount);
+        animateNumber(els.tenantsCount, data.tenantsCount);
+        animateNumber(els.openRent, data.openRent, euro.format);
+
+        els.incomeMeta.textContent = "Für " + new Intl.DateTimeFormat("de-DE", {
+          month: "long",
+          year: "numeric"
+        }).format(new Date());
+
+        els.tenantMeta.textContent =
+          data.tenantsCount === 1 ? "1 aktives Mietverhältnis" : `${data.tenantsCount} aktive Mietverhältnisse`;
+
+        els.openRentMeta.textContent =
+          data.openRent > 0 ? "Offene und überfällige Forderungen" : "Keine offenen Forderungen";
+
+        els.legendPaid.textContent = data.paidCount;
+        els.legendOpen.textContent = data.openCount;
+        els.legendOverdue.textContent = data.overdueCount;
+
+        updateDonut(data.paidCount, data.openCount, data.overdueCount);
+        renderPayments(data.payments || []);
+        renderRepairs(state.repairs);
+      }
+      async function loadDashboard() {
+        showStatus("Dashboard-Daten werden geladen …", "loading");
+        els.refreshButton.disabled = true;
+
+        try {
+          const [userResult, dashboardResult, tenantsResult, repairsResult] =
+            await Promise.all([
+              optionalFetch(endpoints.me),
+              optionalFetch(endpoints.dashboard),
+              optionalFetch(endpoints.tenants),
+              optionalFetch(endpoints.repairs)
+            ]);
+
+          state.user = userResult;
+          state.dashboard = dashboardResult;
+          state.tenants = normalizeArray(tenantsResult);
+          state.repairs = normalizeArray(repairsResult);
+
+          const userName =
+            state.user?.name ||
+            state.user?.user?.name ||
+            state.user?.email ||
+            state.user?.user?.email ||
+            "";
+
+          if (userName) {
+            const displayName = String(userName).includes("@")
+              ? String(userName).split("@")[0]
+              : String(userName).split(" ")[0];
+
+            els.welcomeText.textContent =
+              `Willkommen zurück, ${displayName} – hier ist dein aktueller Überblick.`;
+          }
+
+          renderDashboard();
+          showStatus("Dashboard wurde aktualisiert.", "success");
+
+          window.setTimeout(hideStatus, 1800);
+        } catch (error) {
+          if (error.message === "AUTH_REQUIRED") {
+            showStatus(
+              "Deine Sitzung ist nicht aktiv. Bitte melde dich erneut an.",
+              "error"
+            );
+            window.setTimeout(() => {
+              window.location.href = "Login.html";
+            }, 1600);
+            return;
+          }
+
+          showStatus(
+            "Die Daten konnten nicht vollständig geladen werden. Bitte prüfe die Render-API und die Cookie-/CORS-Einstellungen.",
+            "error"
+          );
+
+          renderDashboard();
+        } finally {
+          els.refreshButton.disabled = false;
+        }
+      }
+
+      els.tenantMenuToggle.addEventListener("click", () => {
+        const expanded = els.tenantMenuToggle.getAttribute("aria-expanded") === "true";
+        els.tenantMenuToggle.setAttribute("aria-expanded", String(!expanded));
+        els.tenantSubmenu.classList.toggle("collapsed", expanded);
+      });
+
+      els.refreshButton.addEventListener("click", loadDashboard);
+
+      els.profileButton.addEventListener("click", () => {
+        window.location.href = "account.html";
+      });
+
+      els.mobileMenuButton.addEventListener("click", () => {
+        document.body.classList.add("sidebar-open");
+      });
+
+      els.sidebarOverlay.addEventListener("click", () => {
+        document.body.classList.remove("sidebar-open");
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+          document.body.classList.remove("sidebar-open");
+        }
+      });
+
+      loadDashboard();
+    })();
   </script>
 </body>
 </html>
-
