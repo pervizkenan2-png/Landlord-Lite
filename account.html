@@ -756,14 +756,25 @@
             </div>
 
             <div class="button-row">
-              <button
-                class="button button-primary"
-                id="upgradeButton"
-                type="button"
-              >
-                Auf Pro upgraden – 9,99 €/Monat
-              </button>
-            </div>
+
+  <button
+    class="button button-primary"
+    id="upgradeButton"
+    type="button"
+  >
+    Auf Pro upgraden – 9,99 €/Monat
+  </button>
+
+  <button
+    class="button button-danger"
+    id="cancelSubscriptionButton"
+    type="button"
+    style="display:none;"
+  >
+    Abonnement kündigen
+  </button>
+
+</div>
 
             <div class="message" id="subscriptionMessage"></div>
           </div>
@@ -1093,6 +1104,7 @@
           planInterval.textContent = "pro Monat";
 
           upgradeButton.style.display = "none";
+cancelSubscriptionButton.style.display = "inline-block";
         } else {
           planTitle.textContent =
             "Landlord Lite Free";
@@ -1107,6 +1119,7 @@
           planInterval.textContent = "dauerhaft";
 
           upgradeButton.style.display = "inline-block";
+cancelSubscriptionButton.style.display = "none";
         }
       } catch (error) {
         showMessage(
@@ -1221,7 +1234,54 @@
               }
             }
           );
+cancelSubscriptionButton.addEventListener("click", async () => {
 
+  const confirmed = confirm(
+    "Möchtest du dein Pro-Abonnement wirklich kündigen? " +
+    "Du behältst Pro bis zum Ende deines bezahlten Abrechnungszeitraums."
+  );
+
+  if (!confirmed) return;
+
+  cancelSubscriptionButton.disabled = true;
+  cancelSubscriptionButton.textContent = "Wird gekündigt...";
+
+  try {
+
+    const response = await fetch(
+      API + "/api/stripe/cancel-subscription",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Kündigung fehlgeschlagen."
+      );
+    }
+
+    alert(
+      "Dein Abonnement wurde gekündigt. " +
+      "Pro bleibt bis zum Ende des aktuellen Abrechnungszeitraums aktiv."
+    );
+
+    cancelSubscriptionButton.textContent = "Abo gekündigt";
+
+  } catch (error) {
+
+    alert(error.message);
+
+    cancelSubscriptionButton.disabled = false;
+    cancelSubscriptionButton.textContent = "Abonnement kündigen";
+  }
+});
           const data = await response.json();
 
           if (!response.ok) {
