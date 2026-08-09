@@ -1234,6 +1234,7 @@ cancelSubscriptionButton.style.display = "none";
               }
             }
           );
+);
 cancelSubscriptionButton.addEventListener("click", async () => {
 
   const confirmed = confirm(
@@ -1282,6 +1283,7 @@ cancelSubscriptionButton.addEventListener("click", async () => {
     cancelSubscriptionButton.textContent = "Abonnement kündigen";
   }
 });
+
           const data = await response.json();
 
           if (!response.ok) {
