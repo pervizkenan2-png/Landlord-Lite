@@ -965,6 +965,8 @@
       document.getElementById("planInterval");
     const upgradeButton =
       document.getElementById("upgradeButton");
+    const cancelSubscriptionButton =
+      document.getElementById("cancelSubscriptionButton");
 
     const profileForm =
       document.getElementById("profileForm");
@@ -1234,54 +1236,6 @@ cancelSubscriptionButton.style.display = "none";
               }
             }
           );
-cancelSubscriptionButton.addEventListener("click", async () => {
-
-  const confirmed = confirm(
-    "Möchtest du dein Pro-Abonnement wirklich kündigen? " +
-    "Du behältst Pro bis zum Ende deines bezahlten Abrechnungszeitraums."
-  );
-
-  if (!confirmed) return;
-
-  cancelSubscriptionButton.disabled = true;
-  cancelSubscriptionButton.textContent = "Wird gekündigt...";
-
-  try {
-
-    const response = await fetch(
-      API + "/api/stripe/cancel-subscription",
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.error || "Kündigung fehlgeschlagen."
-      );
-    }
-
-    alert(
-      "Dein Abonnement wurde gekündigt. " +
-      "Pro bleibt bis zum Ende des aktuellen Abrechnungszeitraums aktiv."
-    );
-
-    cancelSubscriptionButton.textContent = "Abo gekündigt";
-
-  } catch (error) {
-
-    alert(error.message);
-
-    cancelSubscriptionButton.disabled = false;
-    cancelSubscriptionButton.textContent = "Abonnement kündigen";
-  }
-});
 
           const data = await response.json();
 
@@ -1309,6 +1263,54 @@ cancelSubscriptionButton.addEventListener("click", async () => {
 
           upgradeButton.disabled = false;
           upgradeButton.textContent = originalText;
+        }
+      }
+    );
+
+    cancelSubscriptionButton.addEventListener(
+      "click",
+      async function () {
+        const confirmed = confirm(
+          "Möchtest du dein Pro-Abonnement wirklich kündigen? " +
+          "Du behältst Pro bis zum Ende deines bezahlten Abrechnungszeitraums."
+        );
+
+        if (!confirmed) return;
+
+        cancelSubscriptionButton.disabled = true;
+        cancelSubscriptionButton.textContent = "Wird gekündigt...";
+
+        try {
+          const response = await fetch(
+            API + "/api/stripe/cancel-subscription",
+            {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+              }
+            }
+          );
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.error || "Kündigung fehlgeschlagen."
+            );
+          }
+
+          alert(
+            "Dein Abonnement wurde gekündigt. " +
+            "Pro bleibt bis zum Ende des aktuellen Abrechnungszeitraums aktiv."
+          );
+
+          cancelSubscriptionButton.textContent = "Abo gekündigt";
+          cancelSubscriptionButton.disabled = true;
+        } catch (error) {
+          alert(error.message);
+          cancelSubscriptionButton.disabled = false;
+          cancelSubscriptionButton.textContent = "Abonnement kündigen";
         }
       }
     );
