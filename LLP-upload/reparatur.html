@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Landlord Lite – Reparaturen</title>
+  <title>Landlord Lite â€“ Reparaturen</title>
 
   <style>
     :root{
@@ -202,7 +202,7 @@
 
     .muted{ color:var(--muted); font-size:12px; margin-top:6px; }
 
-    /* Fälle-Liste */
+    /* FÃ¤lle-Liste */
     .case-list{
       margin-top:10px;
       display:flex;
@@ -259,19 +259,19 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="brand">🏠 Landlord Lite</div>
+      <div class="brand">ðŸ  Landlord Lite</div>
 
       <nav class="sidebar-nav">
         <div class="nav-item" onclick="toggleSubmenu()">
-          <span class="icon">📁</span>
+          <span class="icon">ðŸ“</span>
           <span>Mieterverwaltung</span>
-          <span id="menuArrow" style="margin-left:auto;">▲</span>
+          <span id="menuArrow" style="margin-left:auto;">â–²</span>
         </div>
 
         <div id="submenu" class="submenu">
-          <a href="index.html"><span class="icon">👥</span><span>Übersicht</span></a>
-          <a href="mahnung.html"><span class="icon">📄</span><span>Mahnungsystem</span></a>
-          <a href="reparatur.html" class="active"><span class="icon">🛠</span><span>Reparaturen</span></a>
+          <a href="index.html"><span class="icon">ðŸ‘¥</span><span>Ãœbersicht</span></a>
+          <a href="mahnung.html"><span class="icon">ðŸ“„</span><span>Mahnungsystem</span></a>
+          <a href="reparatur.html" class="active"><span class="icon">ðŸ› </span><span>Reparaturen</span></a>
                   </div>
       </nav>
     </aside>
@@ -279,20 +279,20 @@
     <main class="content">
       <div class="header-row">
         <h2>Reparaturen</h2>
-        <div class="badge" id="modeBadge">● Lokal (Demo) – gespeichert im Browser</div>
+        <div class="badge" id="modeBadge">â— Lokal (Demo) â€“ gespeichert im Browser</div>
       </div>
 
       <div class="grid">
-        <!-- LINKS: Fälle -->
+        <!-- LINKS: FÃ¤lle -->
         <section class="card">
           <div class="row" style="justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Fälle</h3>
-            <button class="btn green" id="btnNewCase">＋ Neuer Fall</button>
+            <h3 style="margin:0;">FÃ¤lle</h3>
+            <button class="btn green" id="btnNewCase">ï¼‹ Neuer Fall</button>
           </div>
 
           <div class="field" style="margin-top:12px;">
-            <div class="label">Suchen (Mieter, Wohnung, Problem)…</div>
-            <input class="input" id="searchInput" placeholder="z.B. Rossetanni, Whg 45, Wasser…" />
+            <div class="label">Suchen (Mieter, Wohnung, Problem)â€¦</div>
+            <input class="input" id="searchInput" placeholder="z.B. Rossetanni, Whg 45, Wasserâ€¦" />
           </div>
 
           <div class="field">
@@ -344,7 +344,7 @@
           <div class="row">
             <div class="field">
               <div class="label">Handwerker</div>
-              <input class="input" id="contractor" placeholder="z.B. Müller GmbH" />
+              <input class="input" id="contractor" placeholder="z.B. MÃ¼ller GmbH" />
             </div>
 
             <div class="field">
@@ -355,7 +355,7 @@
 
           <div class="row">
             <div class="field">
-              <div class="label">Kosten (€)</div>
+              <div class="label">Kosten (â‚¬)</div>
               <input class="input" id="cost" type="number" step="0.01" placeholder="0.00" />
             </div>
 
@@ -375,13 +375,13 @@
 
           <div class="field full">
             <div class="label">Interne Notizen</div>
-            <textarea class="input" id="notes" placeholder="z.B. Termin, Material, Infos…"></textarea>
+            <textarea class="input" id="notes" placeholder="z.B. Termin, Material, Infosâ€¦"></textarea>
           </div>
 
           <div class="row" style="gap:12px; margin-top:8px;">
-            <button class="btn green" id="btnSaveCase">💾 Speichern</button>
-            <button class="btn grey" id="btnMarkDone">✅ Abschließen</button>
-            <button class="btn red" id="btnDeleteCase">🗑 Löschen</button>
+            <button class="btn green" id="btnSaveCase">ðŸ’¾ Speichern</button>
+            <button class="btn grey" id="btnMarkDone">âœ… AbschlieÃŸen</button>
+            <button class="btn red" id="btnDeleteCase">ðŸ—‘ LÃ¶schen</button>
           </div>
 
           <p class="muted" id="midMsg"></p>
@@ -397,7 +397,7 @@
       const arrow = document.getElementById("menuArrow");
       const isHidden = submenu.style.display === "none";
       submenu.style.display = isHidden ? "block" : "none";
-      arrow.textContent = isHidden ? "▲" : "▼";
+      arrow.textContent = isHidden ? "â–²" : "â–¼";
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -526,7 +526,7 @@
         const filtered = cases.filter(matchesFilter);
 
         if(filtered.length === 0){
-          leftHint.textContent = "Keine Fälle gefunden.";
+          leftHint.textContent = "Keine FÃ¤lle gefunden.";
           leftHint.style.display = "block";
           return;
         }
@@ -556,7 +556,7 @@
 
             const p3 = document.createElement("span");
             p3.className = "pill";
-            p3.textContent = c.date ? ("📅 " + c.date) : "📅 kein Datum";
+            p3.textContent = c.date ? ("ðŸ“… " + c.date) : "ðŸ“… kein Datum";
 
             meta.appendChild(p1);
             meta.appendChild(p2);
@@ -565,7 +565,7 @@
             const preview = document.createElement("div");
             preview.className = "muted";
             preview.style.marginTop = "6px";
-            preview.textContent = c.problem ? (c.problem.length > 70 ? c.problem.slice(0,70) + "…" : c.problem) : "(kein Problemtext)";
+            preview.textContent = c.problem ? (c.problem.length > 70 ? c.problem.slice(0,70) + "â€¦" : c.problem) : "(kein Problemtext)";
 
             item.appendChild(title);
             item.appendChild(meta);
@@ -615,7 +615,7 @@
 
       btnSaveCase.addEventListener("click", () => {
         if(!activeId){
-          msg("Bitte erst einen Fall auswählen oder 'Neuer Fall'.", true);
+          msg("Bitte erst einen Fall auswÃ¤hlen oder 'Neuer Fall'.", true);
           return;
         }
 
@@ -637,13 +637,13 @@
         Object.assign(c, data, { updatedAt: Date.now() });
         save();
         render();
-        msg("Gespeichert ✅");
+        msg("Gespeichert âœ…");
       });
 
       btnMarkDone.addEventListener("click", () => {
         const c = getActive();
         if(!c){
-          msg("Bitte erst einen Fall auswählen.", true);
+          msg("Bitte erst einen Fall auswÃ¤hlen.", true);
           return;
         }
         c.status = "abgeschlossen";
@@ -651,23 +651,23 @@
         statusEl.value = "abgeschlossen";
         save();
         render();
-        msg("Fall abgeschlossen ✅");
+        msg("Fall abgeschlossen âœ…");
       });
 
       btnDeleteCase.addEventListener("click", () => {
         const c = getActive();
         if(!c){
-          msg("Bitte erst einen Fall auswählen.", true);
+          msg("Bitte erst einen Fall auswÃ¤hlen.", true);
           return;
         }
-        if(!confirm("Diesen Fall wirklich löschen?")) return;
+        if(!confirm("Diesen Fall wirklich lÃ¶schen?")) return;
 
         cases = cases.filter(x => x.id !== activeId);
         activeId = null;
         save();
         clearForm();
         render();
-        msg("Fall gelöscht.");
+        msg("Fall gelÃ¶scht.");
       });
 
       // Live filter
@@ -690,3 +690,4 @@
   </script>
 </body>
 </html>
+

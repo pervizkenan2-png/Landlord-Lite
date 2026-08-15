@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -429,49 +429,49 @@
   <div class="layout">
     <!-- SIDEBAR -->
 <aside class="sidebar">
-  <h1><span class="logo">🏡</span> Landlord Lite</h1>
+  <h1><span class="logo">ðŸ¡</span> Landlord Lite</h1>
   <small>Mieterverwaltung</small>
 
   <nav class="sidebar-nav">
 
     <!-- Dropdown Hauptpunkt -->
     <div class="nav-item" onclick="toggleSidebarMenu()">
-      <span class="icon">📁</span>
+      <span class="icon">ðŸ“</span>
       <span>Mieterverwaltung</span>
-      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">â–¼</span>
     </div>
 
-    <!-- Untermenü -->
+    <!-- UntermenÃ¼ -->
     <div id="submenu" class="submenu">
       <a href="index.html">
-        <span class="icon">👥</span>
-        Übersicht
+        <span class="icon">ðŸ‘¥</span>
+        Ãœbersicht
       </a>
 
       <a href="mahnung.html">
-        <span class="icon">📧</span>
+        <span class="icon">ðŸ“§</span>
         Mahnungssystem
       </a>
 
       <a href="mieterhoehung.html">
-        <span class="icon">📈</span>
-        Mieterhöhung
+        <span class="icon">ðŸ“ˆ</span>
+        MieterhÃ¶hung
       </a>
 
       <a href="reparatur.html">
-        <span class="icon">🛠️</span>
+        <span class="icon">ðŸ› ï¸</span>
         Reparaturen
       </a>
 
       <a href="import.html">
-        <span class="icon">📥</span>
+        <span class="icon">ðŸ“¥</span>
         Massenimport
       </a>
     </div>
 
     <!-- Fester Punkt -->
     <a class="nav-item" href="dashboard.html">
-      <span class="icon">📊</span>
+      <span class="icon">ðŸ“Š</span>
       Dashboard
     </a>
 
@@ -504,15 +504,15 @@
               </div>
 
               <div class="field">
-                <label for="tenantSelect">Mieter für Live-Vorschau</label>
+                <label for="tenantSelect">Mieter fÃ¼r Live-Vorschau</label>
                 <select id="tenantSelect">
-                  <option value="">— Mieter auswählen —</option>
+                  <option value="">â€” Mieter auswÃ¤hlen â€”</option>
                 </select>
               </div>
 
               <div id="tenantInfo" class="tenant-info" style="display:none;"></div>
 
-              <div class="small">Platzhalter einfügen:</div>
+              <div class="small">Platzhalter einfÃ¼gen:</div>
               <div class="placeholder-row">
                 <button class="placeholder-chip" type="button" data-placeholder="{MieterName}">{MieterName}</button>
                 <button class="placeholder-chip" type="button" data-placeholder="{Wohnung}">{Wohnung}</button>
@@ -534,7 +534,7 @@
 
               <div class="btn-row">
                 <button id="saveTemplateBtn" class="btn btn-primary">Vorlage speichern</button>
-                <button id="deleteTemplateBtn" class="btn btn-danger">Vorlage löschen</button>
+                <button id="deleteTemplateBtn" class="btn btn-danger">Vorlage lÃ¶schen</button>
               </div>
             </div>
 
@@ -564,7 +564,7 @@
 
     const isOpen = menu.style.display === "block";
     menu.style.display = isOpen ? "none" : "block";
-    if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
+    if (arrow) arrow.textContent = isOpen ? "â–¼" : "â–²";
   };
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -699,7 +699,7 @@
         item.innerHTML = `
           <div class="template-title">${template.title || "Ohne Titel"}</div>
           <div class="template-meta">
-            Zuletzt geändert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}
+            Zuletzt geÃ¤ndert: ${template.updatedAt ? formatDate(new Date(template.updatedAt)) : "-"}
           </div>
         `;
 
@@ -797,14 +797,14 @@
 
     function deleteTemplate() {
       if (!activeTemplateId) {
-        showMsg("Bitte zuerst eine Vorlage auswählen.");
+        showMsg("Bitte zuerst eine Vorlage auswÃ¤hlen.");
         return;
       }
 
       const template = templates.find(t => String(t.id) === String(activeTemplateId));
       const title = template?.title || "diese Vorlage";
 
-      if (!confirm(`Vorlage "${title}" wirklich löschen?`)) return;
+      if (!confirm(`Vorlage "${title}" wirklich lÃ¶schen?`)) return;
 
       templates = templates.filter(t => String(t.id) !== String(activeTemplateId));
       saveTemplatesToStorage();
@@ -816,7 +816,7 @@
 
       renderTemplateList();
       renderPreview();
-      showMsg("Vorlage gelöscht.", "success");
+      showMsg("Vorlage gelÃ¶scht.", "success");
     }
 
     function getSelectedTenant() {
@@ -836,7 +836,7 @@
       tenantInfoEl.style.display = "block";
       tenantInfoEl.innerHTML = `
         <strong>${tenant.name || "-"}</strong>
-        Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} € | Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}
+        Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} â‚¬ | Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}
       `;
     }
 
@@ -852,12 +852,12 @@
         } catch (_) {}
       }
 
-      tenantSelectEl.innerHTML = '<option value="">— Mieter auswählen —</option>';
+      tenantSelectEl.innerHTML = '<option value="">â€” Mieter auswÃ¤hlen â€”</option>';
 
       tenantsCache.forEach(t => {
         const option = document.createElement("option");
         option.value = String(getTenantId(t));
-        option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
+        option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} â‚¬`;
         tenantSelectEl.appendChild(option);
       });
 
@@ -886,7 +886,7 @@
       return {
         "{MieterName}": tenant?.name || "",
         "{Wohnung}": tenant?.unit || "",
-        "{Mietbetrag}": tenant ? `${tenant.rent ?? 0} €` : "",
+        "{Mietbetrag}": tenant ? `${tenant.rent ?? 0} â‚¬` : "",
         "{Faelligkeit}": tenant ? formatDate(getLatestDueDate(tenant.dueDay)) : "",
         "{IBAN}": tenant?.iban || "",
         "{Status}": tenant ? (tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt") : "",
@@ -936,7 +936,7 @@
         await navigator.clipboard.writeText(text);
         showMsg("Vorschau kopiert.", "success");
       } catch (_) {
-        showMsg("Kopieren nicht möglich.");
+        showMsg("Kopieren nicht mÃ¶glich.");
       }
     }
 

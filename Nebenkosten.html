@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -401,26 +401,26 @@
 
 <body>
   <aside class="sidebar">
-    <div class="logo">🏡 Landlord Lite</div>
+    <div class="logo">ðŸ¡ Landlord Lite</div>
     <div class="sidebar-subtitle">Mieterverwaltung</div>
 
     <div class="menu-title" onclick="toggleSidebarMenu()">
-      <span>📁</span>
+      <span>ðŸ“</span>
       <span>Mieterverwaltung</span>
-      <span id="menuArrow" class="arrow">▲</span>
+      <span id="menuArrow" class="arrow">â–²</span>
     </div>
 
     <div id="submenu">
-      <a class="menu-link" href="./index.html">👥 Übersicht</a>
-      <a class="menu-link" href="./mahnung.html">💵 Mahnungssystem</a>
-      <a class="menu-link" href="./mieterhoehung.html">📈 Mieterhöhung</a>
-      <a class="menu-link active" href="./Nebenkostenabrechnung.html">🧾 Nebenkosten</a>
-      <a class="menu-link" href="./reparatur.html">🛠️ Reparaturen</a>
-      <a class="menu-link" href="./import.html">📥 Massenimport</a>
+      <a class="menu-link" href="./index.html">ðŸ‘¥ Ãœbersicht</a>
+      <a class="menu-link" href="./mahnung.html">ðŸ’µ Mahnungssystem</a>
+      <a class="menu-link" href="./mieterhoehung.html">ðŸ“ˆ MieterhÃ¶hung</a>
+      <a class="menu-link active" href="./Nebenkostenabrechnung.html">ðŸ§¾ Nebenkosten</a>
+      <a class="menu-link" href="./reparatur.html">ðŸ› ï¸ Reparaturen</a>
+      <a class="menu-link" href="./import.html">ðŸ“¥ Massenimport</a>
     </div>
 
     <a class="menu-title" href="./dashboard.html">
-      <span>📊</span>
+      <span>ðŸ“Š</span>
       <span>Dashboard</span>
     </a>
   </aside>
@@ -429,7 +429,7 @@
     <div class="topbar">
       <div>
         <h1 class="page-title">Nebenkostenabrechnung</h1>
-        <div class="page-desc">Berechne Nebenkosten fair nach Wohnfläche und speichere die Abrechnung.</div>
+        <div class="page-desc">Berechne Nebenkosten fair nach WohnflÃ¤che und speichere die Abrechnung.</div>
       </div>
 
       <button class="logout-btn" onclick="logout()">Abmelden</button>
@@ -443,14 +443,14 @@
           <h2>Abrechnung erstellen</h2>
 
           <div class="info-box">
-            Wähle einen Mieter aus MongoDB, trage Flächen, Vorauszahlungen und Kosten ein. Danach kannst du die Abrechnung berechnen, speichern oder als PDF drucken.
+            WÃ¤hle einen Mieter aus MongoDB, trage FlÃ¤chen, Vorauszahlungen und Kosten ein. Danach kannst du die Abrechnung berechnen, speichern oder als PDF drucken.
           </div>
 
           <div class="form-grid">
             <div class="field">
               <label for="tenantSelect">Mieter</label>
               <select id="tenantSelect">
-                <option value="">Mieter auswählen</option>
+                <option value="">Mieter auswÃ¤hlen</option>
               </select>
             </div>
 
@@ -460,17 +460,17 @@
             </div>
 
             <div class="field">
-              <label for="tenantArea">Wohnfläche Mieter in m²</label>
+              <label for="tenantArea">WohnflÃ¤che Mieter in mÂ²</label>
               <input type="number" id="tenantArea" placeholder="z.B. 50" />
             </div>
 
             <div class="field">
-              <label for="totalArea">Gesamtfläche Haus in m²</label>
+              <label for="totalArea">GesamtflÃ¤che Haus in mÂ²</label>
               <input type="number" id="totalArea" placeholder="z.B. 225" />
             </div>
 
             <div class="field">
-              <label for="prepaid">Gezahlte Vorauszahlungen in €</label>
+              <label for="prepaid">Gezahlte Vorauszahlungen in â‚¬</label>
               <input type="number" id="prepaid" placeholder="z.B. 1500" />
             </div>
           </div>
@@ -481,32 +481,32 @@
 
           <div class="form-grid">
             <div class="field">
-              <label for="water">Wasser €</label>
+              <label for="water">Wasser â‚¬</label>
               <input type="number" id="water" placeholder="z.B. 1200" />
             </div>
 
             <div class="field">
-              <label for="heating">Heizung €</label>
+              <label for="heating">Heizung â‚¬</label>
               <input type="number" id="heating" placeholder="z.B. 3500" />
             </div>
 
             <div class="field">
-              <label for="garbage">Müll €</label>
+              <label for="garbage">MÃ¼ll â‚¬</label>
               <input type="number" id="garbage" placeholder="z.B. 400" />
             </div>
 
             <div class="field">
-              <label for="caretaker">Hausmeister €</label>
+              <label for="caretaker">Hausmeister â‚¬</label>
               <input type="number" id="caretaker" placeholder="z.B. 1000" />
             </div>
 
             <div class="field">
-              <label for="insurance">Versicherung €</label>
+              <label for="insurance">Versicherung â‚¬</label>
               <input type="number" id="insurance" placeholder="z.B. 900" />
             </div>
 
             <div class="field">
-              <label for="propertyTax">Grundsteuer €</label>
+              <label for="propertyTax">Grundsteuer â‚¬</label>
               <input type="number" id="propertyTax" placeholder="z.B. 600" />
             </div>
           </div>
@@ -540,57 +540,57 @@
 
           <div class="result-row">
             <span>Gesamtkosten</span>
-            <strong id="resultTotalCosts">0,00 €</strong>
+            <strong id="resultTotalCosts">0,00 â‚¬</strong>
           </div>
 
           <div class="result-row">
             <span>Anteil Mieter</span>
-            <strong id="resultTenantShare">0,00 €</strong>
+            <strong id="resultTenantShare">0,00 â‚¬</strong>
           </div>
 
           <div class="result-row">
             <span>Vorauszahlungen</span>
-            <strong id="resultPrepaid">0,00 €</strong>
+            <strong id="resultPrepaid">0,00 â‚¬</strong>
           </div>
 
           <div class="final-box">
             <span id="finalText">Ergebnis:</span>
-            <span id="finalAmount">0,00 €</span>
+            <span id="finalAmount">0,00 â‚¬</span>
           </div>
         </div>
 
         <div class="card">
-          <h3>Kostenübersicht</h3>
+          <h3>KostenÃ¼bersicht</h3>
 
           <div class="cost-list">
             <div class="cost-item">
               <span>Wasser</span>
-              <strong id="previewWater">0,00 €</strong>
+              <strong id="previewWater">0,00 â‚¬</strong>
             </div>
             <div class="cost-item">
               <span>Heizung</span>
-              <strong id="previewHeating">0,00 €</strong>
+              <strong id="previewHeating">0,00 â‚¬</strong>
             </div>
             <div class="cost-item">
-              <span>Müll</span>
-              <strong id="previewGarbage">0,00 €</strong>
+              <span>MÃ¼ll</span>
+              <strong id="previewGarbage">0,00 â‚¬</strong>
             </div>
             <div class="cost-item">
               <span>Hausmeister</span>
-              <strong id="previewCaretaker">0,00 €</strong>
+              <strong id="previewCaretaker">0,00 â‚¬</strong>
             </div>
             <div class="cost-item">
               <span>Versicherung</span>
-              <strong id="previewInsurance">0,00 €</strong>
+              <strong id="previewInsurance">0,00 â‚¬</strong>
             </div>
             <div class="cost-item">
               <span>Grundsteuer</span>
-              <strong id="previewPropertyTax">0,00 €</strong>
+              <strong id="previewPropertyTax">0,00 â‚¬</strong>
             </div>
           </div>
 
           <p class="hint">
-            Hinweis: Diese Berechnung ist eine technische Hilfe und keine Rechtsberatung. Prüfe Umlageschlüssel, Mietvertrag und gesetzliche Vorgaben.
+            Hinweis: Diese Berechnung ist eine technische Hilfe und keine Rechtsberatung. PrÃ¼fe UmlageschlÃ¼ssel, Mietvertrag und gesetzliche Vorgaben.
           </p>
         </div>
       </section>
@@ -625,7 +625,7 @@
       submenu.style.display = isOpen ? "none" : "block";
 
       if (arrow) {
-        arrow.textContent = isOpen ? "▼" : "▲";
+        arrow.textContent = isOpen ? "â–¼" : "â–²";
       }
     }
 
@@ -649,7 +649,7 @@
     }
 
     function formatEuro(amount) {
-      return Number(amount || 0).toFixed(2).replace(".", ",") + " €";
+      return Number(amount || 0).toFixed(2).replace(".", ",") + " â‚¬";
     }
 
     function updatePreview() {
@@ -681,7 +681,7 @@
         tenants = await response.json();
 
         const tenantSelect = document.getElementById("tenantSelect");
-        tenantSelect.innerHTML = '<option value="">Mieter auswählen</option>';
+        tenantSelect.innerHTML = '<option value="">Mieter auswÃ¤hlen</option>';
 
         tenants.forEach(tenant => {
           const option = document.createElement("option");
@@ -703,7 +703,7 @@
       const tenant = tenants.find(t => String(getTenantId(t)) === String(tenantId));
 
       if (!tenant) {
-        showMsg("Bitte Mieter auswählen.", "error");
+        showMsg("Bitte Mieter auswÃ¤hlen.", "error");
         return;
       }
 
@@ -720,7 +720,7 @@
       const propertyTax = getValue("propertyTax");
 
       if (!year || tenantArea <= 0 || totalArea <= 0) {
-        showMsg("Bitte Jahr, Wohnfläche und Gesamtfläche ausfüllen.", "error");
+        showMsg("Bitte Jahr, WohnflÃ¤che und GesamtflÃ¤che ausfÃ¼llen.", "error");
         return;
       }
 
@@ -767,7 +767,7 @@
         finalAmount.className = "green";
       } else {
         finalText.textContent = "Ausgeglichen";
-        finalAmount.textContent = "0,00 €";
+        finalAmount.textContent = "0,00 â‚¬";
         finalAmount.className = "";
       }
 

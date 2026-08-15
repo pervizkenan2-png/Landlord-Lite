@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard – Landlord Lite</title>
+  <title>Dashboard â€“ Landlord Lite</title>
 
   <style>
     body { margin:0; font-family: Arial, sans-serif; background:#f4f6f8; }
@@ -133,7 +133,7 @@
     <div class="landlord-box">
       <div class="landlord-left">
         <div class="landlord-title">Vermieter (aus localStorage)</div>
-        <div class="landlord-value" id="llDisplay">—</div>
+        <div class="landlord-value" id="llDisplay">â€”</div>
       </div>
       <div class="landlord-actions">
         <button class="btn grey" id="btnReloadLL">Neu laden</button>
@@ -146,8 +146,8 @@
         Monat:
         <select id="monthSelect"></select>
       </div>
-      <div class="pill" id="tenantCountPill">Mieter: –</div>
-      <div class="pill" id="backendPill">Backend: –</div>
+      <div class="pill" id="tenantCountPill">Mieter: â€“</div>
+      <div class="pill" id="backendPill">Backend: â€“</div>
     </div>
 
     <div class="grid">
@@ -157,20 +157,20 @@
         <div class="donut-wrap">
           <div class="donut" id="donut">
             <div class="donut-center">
-              <div id="donutAmount">€0</div>
-              <small id="donutSub">von €0</small>
+              <div id="donutAmount">â‚¬0</div>
+              <small id="donutSub">von â‚¬0</small>
             </div>
           </div>
 
           <div class="legend">
-            <div>🟢 Bezahlt: <strong id="paidText">€0</strong></div>
-            <div>🟡 Offen: <strong id="openText">€0</strong></div>
-            <div>🔴 Überfällig: <strong id="overdueText">€0</strong></div>
+            <div>ðŸŸ¢ Bezahlt: <strong id="paidText">â‚¬0</strong></div>
+            <div>ðŸŸ¡ Offen: <strong id="openText">â‚¬0</strong></div>
+            <div>ðŸ”´ ÃœberfÃ¤llig: <strong id="overdueText">â‚¬0</strong></div>
           </div>
         </div>
 
         <div class="hint">
-          Logik: Überfällig = nicht bezahlt & nach Fälligkeit. Offen = nicht bezahlt & vor/gleich Fälligkeit.
+          Logik: ÃœberfÃ¤llig = nicht bezahlt & nach FÃ¤lligkeit. Offen = nicht bezahlt & vor/gleich FÃ¤lligkeit.
         </div>
 
         <div id="err1" class="error" style="display:none;"></div>
@@ -181,15 +181,15 @@
 
         <div class="stats">
           <div class="stat">
-            <strong id="incomeVal">€0</strong>
+            <strong id="incomeVal">â‚¬0</strong>
             <span>Income</span>
           </div>
           <div class="stat">
-            <strong id="expensesVal">€0</strong>
+            <strong id="expensesVal">â‚¬0</strong>
             <span>Expenses</span>
           </div>
           <div class="stat">
-            <strong id="netVal">€0</strong>
+            <strong id="netVal">â‚¬0</strong>
             <span>Net</span>
           </div>
         </div>
@@ -197,7 +197,7 @@
         <div class="bars" id="bars"></div>
 
         <div class="hint">
-          Balken: Letzte 6 Monate (wenn keine Historie vorhanden ist → Projektion aus aktueller Miete).
+          Balken: Letzte 6 Monate (wenn keine Historie vorhanden ist â†’ Projektion aus aktueller Miete).
         </div>
 
         <div id="err2" class="error" style="display:none;"></div>
@@ -235,7 +235,7 @@
 
     function eur(n){
       const v = Number(n || 0);
-      return "€" + v.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      return "â‚¬" + v.toLocaleString("de-DE", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
     function safe(v){ return (v ?? "").toString(); }
     function num(v){
@@ -271,14 +271,14 @@
         return;
       }
       const parts = [name, addr, city].filter(Boolean);
-      llDisplay.textContent = parts.join(" • ");
+      llDisplay.textContent = parts.join(" â€¢ ");
     }
 
     btnReloadLL.addEventListener("click", loadLandlordDisplay);
 
-    // Zielseite: nimm die passende bei dir (Mahnung oder Mieterhöhung Auto)
+    // Zielseite: nimm die passende bei dir (Mahnung oder MieterhÃ¶hung Auto)
     btnGoLandlord.addEventListener("click", () => {
-      // Wenn du eine dedizierte Seite hast, ändere den Link:
+      // Wenn du eine dedizierte Seite hast, Ã¤ndere den Link:
       window.location.href = "mahnung.html";
     });
 
@@ -466,7 +466,7 @@
 
       }catch(err){
         backendPill.textContent = "Backend: FEHLT";
-        tenantCountPill.textContent = "Mieter: –";
+        tenantCountPill.textContent = "Mieter: â€“";
 
         err1.style.display = "block";
         err1.textContent = "Fehler: " + err.message;
@@ -485,4 +485,5 @@
   </script>
 </body>
 </html>
+
 
