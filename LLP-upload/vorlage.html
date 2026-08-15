@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Landlord Lite â€“ Eigene Vorlagen</title>
+  <title>Landlord Lite – Eigene Vorlagen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- TinyMCE (Rich-Text-Editor wie Word) -->
   <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-  <!-- jsPDF fÃ¼r PDF-Export -->
+  <!-- jsPDF für PDF-Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
  <style>
@@ -132,7 +132,7 @@
     background: #26a69a;
   }
 
-  /* âœ… HIER ist der wichtigste Fix:
+  /* ✅ HIER ist der wichtigste Fix:
      Editor bekommt 2x so viel Platz wie Vorschau */
   .layout {
     display: grid;
@@ -327,12 +327,12 @@
 <body>
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h1><span class="logo">ðŸ“</span> Eigene Vorlagen</h1>
+    <h1><span class="logo">📝</span> Eigene Vorlagen</h1>
     <small>Vorlagen & Serienbriefe</small>
 
-    <a class="nav-item" href="index.html">ðŸ“ Mieterverwaltung</a>
-    <a class="nav-item" href="mahnung.html">ðŸ“§ Mahnungssystem</a>
-    <a class="nav-item active" href="vorlage.html">ðŸ“ Eigene Vorlagen</a>
+    <a class="nav-item" href="index.html">📁 Mieterverwaltung</a>
+    <a class="nav-item" href="mahnung.html">📧 Mahnungssystem</a>
+    <a class="nav-item active" href="vorlage.html">📝 Eigene Vorlagen</a>
   </aside>
 
   <!-- CONTENT -->
@@ -341,7 +341,7 @@
       <h2>Eigene Vorlagen erstellen</h2>
       <div class="badge">
         <span class="dot"></span>
-        Lokale Speicherung (nur auf diesem GerÃ¤t)
+        Lokale Speicherung (nur auf diesem Gerät)
       </div>
     </div>
 
@@ -366,27 +366,27 @@
         </div>
 
         <div class="toolbar-row">
-          <button class="btn green sm" id="btnSaveTemplate">ðŸ’¾ Vorlage speichern</button>
-          <button class="btn grey sm" id="btnSaveVersion">ðŸ“‘ Version speichern</button>
-          <button class="btn red sm" id="btnDeleteTemplate">ðŸ—‘ Vorlage lÃ¶schen</button>
+          <button class="btn green sm" id="btnSaveTemplate">💾 Vorlage speichern</button>
+          <button class="btn grey sm" id="btnSaveVersion">📑 Version speichern</button>
+          <button class="btn red sm" id="btnDeleteTemplate">🗑 Vorlage löschen</button>
         </div>
 
         <div class="placeholder-row">
-          <span>Platzhalter einfÃ¼gen:</span>
+          <span>Platzhalter einfügen:</span>
           <button class="placeholder-pill" data-placeholder="{MieterName}">{MieterName}</button>
           <button class="placeholder-pill" data-placeholder="{Wohnung}">{Wohnung}</button>
           <button class="placeholder-pill" data-placeholder="{Mietbetrag}">{Mietbetrag}</button>
-          <button class="placeholder-pill" data-placeholder="{FÃ¤lligkeit}">{FÃ¤lligkeit}</button>
+          <button class="placeholder-pill" data-placeholder="{Fälligkeit}">{Fälligkeit}</button>
           <button class="placeholder-pill" data-placeholder="{VermieterName}">{VermieterName}</button>
           <button class="placeholder-pill" data-placeholder="{AdresseVermieter}">{AdresseVermieter}</button>
         </div>
 
 <div style="margin:10px 0;">
   <label style="font-size:12px;color:#555;display:block;margin-bottom:4px;">
-    Mieter auswÃ¤hlen
+    Mieter auswählen
   </label>
   <select id="tenantSelect" class="input" style="width:260px;">
-    <option value="">-- Bitte wÃ¤hlen --</option>
+    <option value="">-- Bitte wählen --</option>
   </select>
 </div>
 
@@ -394,16 +394,16 @@
         <textarea id="editor"></textarea>
 
         <div class="toolbar-row" style="margin-top:10px;">
-          <button class="btn grey sm" id="btnExportTxt">ðŸ“„ Als TXT speichern</button>
-          <button class="btn grey sm" id="btnExportHtml">ðŸŒ Als HTML speichern</button>
-          <button class="btn grey sm" id="btnExportDoc">ðŸ“ƒ Als Word-Datei (.doc)</button>
-          <button class="btn green sm" id="btnExportPdf">ðŸ“‘ Als PDF exportieren</button>
+          <button class="btn grey sm" id="btnExportTxt">📄 Als TXT speichern</button>
+          <button class="btn grey sm" id="btnExportHtml">🌐 Als HTML speichern</button>
+          <button class="btn grey sm" id="btnExportDoc">📃 Als Word-Datei (.doc)</button>
+          <button class="btn green sm" id="btnExportPdf">📑 Als PDF exportieren</button>
         </div>
 
         <div class="versions-row">
           <span>Versionen:</span>
           <select id="versionSelect">
-            <option value="">Keine Version ausgewÃ¤hlt</option>
+            <option value="">Keine Version ausgewählt</option>
           </select>
           <button class="btn grey sm" id="btnLoadVersion">Version laden</button>
         </div>
@@ -414,7 +414,7 @@
         <h3>Live-Vorschau</h3>
         <div class="preview-box" id="previewBox">
           <p style="color:#777;font-size:0.9rem;">
-            WÃ¤hle eine Vorlage aus oder erstelle eine neue, um die Vorschau zu sehen.
+            Wähle eine Vorlage aus oder erstelle eine neue, um die Vorschau zu sehen.
           </p>
         </div>
       </div>
@@ -471,7 +471,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
       const data = await res.json();
       tenantsCache = Array.isArray(data) ? data : [];
 
-      tenantSelect.innerHTML = `<option value="">-- Bitte wÃ¤hlen --</option>`;
+      tenantSelect.innerHTML = `<option value="">-- Bitte wählen --</option>`;
       tenantsCache.forEach(t => {
         const id = t._id || t.id;
         const opt = document.createElement("option");
@@ -493,11 +493,11 @@ const res = await fetch(`${API_BASE}/api/tenants`);
     });
   }
 
-  // Platzhalter ersetzen fÃ¼r Vorschau/Export/Druck
+  // Platzhalter ersetzen für Vorschau/Export/Druck
   function applyPlaceholders(html){
     if(!selectedTenant) return html || "";
 
-    // Vermieter-Daten spÃ¤ter aus Settings
+    // Vermieter-Daten später aus Settings
     const landlordName = "VermieterName";
     const landlordAddress = "AdresseVermieter";
 
@@ -505,7 +505,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
       "{MieterName}": safe(selectedTenant.name),
       "{Wohnung}": safe(selectedTenant.unit || selectedTenant.apartment),
       "{Mietbetrag}": safe(selectedTenant.rent),
-      "{FÃ¤lligkeit}": safe(selectedTenant.dueDay),   // âœ… FIX: mit Ã¤
+      "{Fälligkeit}": safe(selectedTenant.dueDay),   // ✅ FIX: mit ä
       "{IBAN}": safe(selectedTenant.iban),
 
       "{VermieterName}": landlordName,
@@ -616,7 +616,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
       tplTitleInput.value = '';
       const edEmpty = tinymce.get('editor');
       if (edEmpty) edEmpty.setContent('');
-      previewBox.innerHTML = '<p style="color:#777;">Keine Vorlage ausgewÃ¤hlt.</p>';
+      previewBox.innerHTML = '<p style="color:#777;">Keine Vorlage ausgewählt.</p>';
       fillVersionSelect();
       return;
     }
@@ -636,7 +636,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
   }
 
   function fillVersionSelect() {
-    versionSelect.innerHTML = '<option value="">Keine Version ausgewÃ¤hlt</option>';
+    versionSelect.innerHTML = '<option value="">Keine Version ausgewählt</option>';
     if (activeIndex === null) return;
     const tpl = templates[activeIndex];
     if (!tpl.versions || !tpl.versions.length) return;
@@ -649,7 +649,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
   }
 
   // =========================
-  // Preview aktualisieren (mit Platzhalter-Ersatz wenn Mieter gewÃ¤hlt)
+  // Preview aktualisieren (mit Platzhalter-Ersatz wenn Mieter gewählt)
   // =========================
   function updatePreview() {
     const ed = tinymce.get('editor');
@@ -665,7 +665,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
     }
   }
 
-  // Platzhalter einfÃ¼gen (bleibt)
+  // Platzhalter einfügen (bleibt)
   document.querySelectorAll('.placeholder-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       const ph = btn.getAttribute('data-placeholder'); // z.B. "{MieterName}"
@@ -727,12 +727,12 @@ const res = await fetch(`${API_BASE}/api/tenants`);
   // Version laden
   btnLoadVersion.addEventListener('click', () => {
     if (activeIndex === null) {
-      showMsg('Keine Vorlage ausgewÃ¤hlt.', 'error');
+      showMsg('Keine Vorlage ausgewählt.', 'error');
       return;
     }
     const idxStr = versionSelect.value;
     if (!idxStr) {
-      showMsg('Keine Version ausgewÃ¤hlt.', 'error');
+      showMsg('Keine Version ausgewählt.', 'error');
       return;
     }
     const idx = Number(idxStr);
@@ -748,22 +748,22 @@ const res = await fetch(`${API_BASE}/api/tenants`);
     showMsg('Version geladen.', 'success');
   });
 
-  // Vorlage lÃ¶schen
+  // Vorlage löschen
   btnDeleteTemplate.addEventListener('click', () => {
     if (activeIndex === null) {
-      showMsg('Keine Vorlage ausgewÃ¤hlt.', 'error');
+      showMsg('Keine Vorlage ausgewählt.', 'error');
       return;
     }
-    if (!confirm('Diese Vorlage wirklich lÃ¶schen?')) return;
+    if (!confirm('Diese Vorlage wirklich löschen?')) return;
     templates.splice(activeIndex, 1);
     activeIndex = null;
     saveTemplates();
     renderTemplateList();
     loadActiveIntoEditor();
-    showMsg('Vorlage gelÃ¶scht.', 'success');
+    showMsg('Vorlage gelöscht.', 'success');
   });
 
-  // TXT Export (mit Platzhalter-Ersatz wenn Mieter gewÃ¤hlt)
+  // TXT Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
   btnExportTxt.addEventListener('click', () => {
     const ed = tinymce.get('editor');
     if (!ed) return;
@@ -772,7 +772,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
     downloadFile(textFinal, 'vorlage.txt', 'text/plain;charset=utf-8');
   });
 
-  // HTML Export (mit Platzhalter-Ersatz wenn Mieter gewÃ¤hlt)
+  // HTML Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
   btnExportHtml.addEventListener('click', () => {
     const ed = tinymce.get('editor');
     if (!ed) return;
@@ -781,7 +781,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
     downloadFile(htmlFinal, 'vorlage.html', 'text/html;charset=utf-8');
   });
 
-  // Word Export (mit Platzhalter-Ersatz wenn Mieter gewÃ¤hlt)
+  // Word Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
   btnExportDoc.addEventListener('click', () => {
     const ed = tinymce.get('editor');
     if (!ed) return;
@@ -797,7 +797,7 @@ const res = await fetch(`${API_BASE}/api/tenants`);
     downloadFile(docHtml, 'vorlage.doc', 'application/msword');
   });
 
-  // PDF Export (mit Platzhalter-Ersatz wenn Mieter gewÃ¤hlt)
+  // PDF Export (mit Platzhalter-Ersatz wenn Mieter gewählt)
   btnExportPdf.addEventListener('click', () => {
     const ed = tinymce.get('editor');
     if (!ed) return;
@@ -848,9 +848,8 @@ const res = await fetch(`${API_BASE}/api/tenants`);
   loadTemplates();
   renderTemplateList();
   loadActiveIntoEditor();
-  loadTenants(); // âœ… nur eine Quelle (Backend)
+  loadTenants(); // ✅ nur eine Quelle (Backend)
 </script>
 
 </body>
 </html>
-

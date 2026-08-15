@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -432,49 +432,49 @@
   <div class="layout">
    <!-- SIDEBAR -->
 <aside class="sidebar">
-  <h1><span class="logo">ðŸ¡</span> Landlord Lite</h1>
+  <h1><span class="logo">🏡</span> Landlord Lite</h1>
   <small>Mieterverwaltung</small>
 
   <nav class="sidebar-nav">
 
     <!-- Dropdown Hauptpunkt -->
     <div class="nav-item" onclick="toggleSidebarMenu()">
-      <span class="icon">ðŸ“</span>
+      <span class="icon">📁</span>
       <span>Mieterverwaltung</span>
-      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">â–¼</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
     </div>
 
-    <!-- UntermenÃ¼ -->
+    <!-- Untermenü -->
     <div id="submenu" class="submenu">
       <a href="index.html">
-        <span class="icon">ðŸ‘¥</span>
-        Ãœbersicht
+        <span class="icon">👥</span>
+        Übersicht
       </a>
 
       <a href="mahnung.html">
-        <span class="icon">ðŸ“§</span>
+        <span class="icon">📧</span>
         Mahnungssystem
       </a>
 
       <a href="mieterhoehung.html">
-        <span class="icon">ðŸ“ˆ</span>
-        MieterhÃ¶hung
+        <span class="icon">📈</span>
+        Mieterhöhung
       </a>
 
       <a href="reparatur.html">
-        <span class="icon">ðŸ› ï¸</span>
+        <span class="icon">🛠️</span>
         Reparaturen
       </a>
 
       <a href="import.html">
-        <span class="icon">ðŸ“¥</span>
+        <span class="icon">📥</span>
         Massenimport
       </a>
     </div>
 
     <!-- Fester Punkt -->
     <a class="nav-item" href="dashboard.html">
-      <span class="icon">ðŸ“Š</span>
+      <span class="icon">📊</span>
       Dashboard
     </a>
 
@@ -495,11 +495,11 @@
 
         <div class="field">
           <label for="landlordAddress">Adresse</label>
-          <input id="landlordAddress" type="text" placeholder="z.B. MusterstraÃŸe 1, 12345 Musterstadt" />
+          <input id="landlordAddress" type="text" placeholder="z.B. Musterstraße 1, 12345 Musterstadt" />
         </div>
 
         <div class="field">
-          <label for="landlordPayment">Kontoinformationen fÃ¼r Zahlung</label>
+          <label for="landlordPayment">Kontoinformationen für Zahlung</label>
           <input id="landlordPayment" type="text" placeholder="z.B. IBAN, Bankname oder Zahlungsanweisung" />
         </div>
 
@@ -507,13 +507,13 @@
       </section>
 
       <section class="card">
-        <h3>Mieter auswÃ¤hlen & Mahnung generieren</h3>
+        <h3>Mieter auswählen & Mahnung generieren</h3>
 
         <div class="grid-2">
           <div class="field">
             <label for="tenantSelect">Mieter</label>
             <select id="tenantSelect">
-              <option value="">â€” Mieter auswÃ¤hlen â€”</option>
+              <option value="">— Mieter auswählen —</option>
             </select>
           </div>
 
@@ -530,8 +530,8 @@
         <div id="tenantInfo" class="tenant-info" style="display:none;"></div>
 
         <div class="btn-row">
-          <button id="generateSelectedBtn" class="btn btn-primary">Mahnung fÃ¼r ausgewÃ¤hlten Mieter generieren</button>
-          <button id="generateAllBtn" class="btn btn-secondary">Mahnungen fÃ¼r alle offenen Mieter generieren</button>
+          <button id="generateSelectedBtn" class="btn btn-primary">Mahnung für ausgewählten Mieter generieren</button>
+          <button id="generateAllBtn" class="btn btn-secondary">Mahnungen für alle offenen Mieter generieren</button>
         </div>
       </section>
 
@@ -558,7 +558,7 @@
 
       const isOpen = menu.style.display === "block";
       menu.style.display = isOpen ? "none" : "block";
-      if (arrow) arrow.textContent = isOpen ? "â–¼" : "â–²";
+      if (arrow) arrow.textContent = isOpen ? "▼" : "▲";
     };
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -691,12 +691,12 @@
 
         const openTenants = tenantsCache.filter(t => t.status !== "paid");
 
-        tenantSelect.innerHTML = '<option value="">â€” Mieter auswÃ¤hlen â€”</option>';
+        tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
 
         openTenants.forEach(t => {
           const option = document.createElement("option");
           option.value = String(getTenantId(t));
-          option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} â‚¬`;
+          option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent ?? 0} €`;
           tenantSelect.appendChild(option);
         });
 
@@ -729,9 +729,9 @@
         tenantInfo.style.display = "block";
         tenantInfo.innerHTML = `
           <strong>${tenant.name || "-"}</strong>
-          Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} â‚¬ | FÃ¤lligkeit: ${formatDate(dueDate)}
+          Wohnung: ${tenant.unit || "-"} | Miete: ${tenant.rent ?? 0} € | Fälligkeit: ${formatDate(dueDate)}
           <br>
-          Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}${overdueDays ? ` | ÃœberfÃ¤llig seit ${overdueDays} Tagen` : ""}
+          Status: ${tenant.status === "paid" ? "Bezahlt" : "Nicht bezahlt"}${overdueDays ? ` | Überfällig seit ${overdueDays} Tagen` : ""}
         `;
       }
 
@@ -751,14 +751,14 @@
         let deadline = "";
 
         if (level === "2") {
-          intro = `trotz meiner bereits erfolgten 1. Mahnung ist die Miete fÃ¼r die unten genannte Wohnung weiterhin offen.`;
+          intro = `trotz meiner bereits erfolgten 1. Mahnung ist die Miete für die unten genannte Wohnung weiterhin offen.`;
           deadline = "Ich fordere Sie daher erneut auf, den offenen Betrag innerhalb von 7 Tagen zu begleichen.";
         } else if (level === "3") {
           intro = `trotz meiner bisherigen Aufforderungen ist die Miete weiterhin nicht bei mir eingegangen.`;
-          deadline = "Hiermit erhalten Sie die letzte Mahnung. Ich fordere Sie auf, den offenen Betrag spÃ¤testens innerhalb von 5 Tagen vollstÃ¤ndig zu begleichen.";
+          deadline = "Hiermit erhalten Sie die letzte Mahnung. Ich fordere Sie auf, den offenen Betrag spätestens innerhalb von 5 Tagen vollständig zu begleichen.";
         } else {
-          intro = `die Miete fÃ¼r die unten genannte Wohnung ist trotz FÃ¤lligkeit bisher nicht eingegangen.`;
-          deadline = "Bitte Ã¼berweisen Sie den offenen Betrag innerhalb von 7 Tagen.";
+          intro = `die Miete für die unten genannte Wohnung ist trotz Fälligkeit bisher nicht eingegangen.`;
+          deadline = "Bitte überweisen Sie den offenen Betrag innerhalb von 7 Tagen.";
         }
 
         const paymentBlock = landlord.payment
@@ -780,14 +780,14 @@ Sehr geehrte Damen und Herren,
 
 ${intro}
 
-Offener Betrag: ${tenant.rent ?? 0} â‚¬
-FÃ¤lligkeit: ${formatDate(dueDate)}${overdueDays ? `
-ÃœberfÃ¤llig seit: ${overdueDays} Tagen` : ""}
+Offener Betrag: ${tenant.rent ?? 0} €
+Fälligkeit: ${formatDate(dueDate)}${overdueDays ? `
+Überfällig seit: ${overdueDays} Tagen` : ""}
 
 ${deadline}${paymentBlock}
 Sollte die Zahlung bereits erfolgt sein, betrachten Sie dieses Schreiben bitte als gegenstandslos.
 
-Mit freundlichen GrÃ¼ÃŸen
+Mit freundlichen Grüßen
 
 ${landlord.name || "Vermieter / Verwaltung"}`.trim();
       }
@@ -797,7 +797,7 @@ ${landlord.name || "Vermieter / Verwaltung"}`.trim();
 
         const tenant = getSelectedTenant();
         if (!tenant) {
-          showMsg("Bitte zuerst einen Mieter auswÃ¤hlen.");
+          showMsg("Bitte zuerst einen Mieter auswählen.");
           return;
         }
 
@@ -832,7 +832,7 @@ ${landlord.name || "Vermieter / Verwaltung"}`.trim();
           await navigator.clipboard.writeText(text);
           showMsg("Text wurde kopiert.", "success");
         } catch (_) {
-          showMsg("Kopieren nicht mÃ¶glich.");
+          showMsg("Kopieren nicht möglich.");
         }
       }
 

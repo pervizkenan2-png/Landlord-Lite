@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Landlord Lite â€“ Mieterverwaltung</title>
+  <title>Landlord Lite – Mieterverwaltung</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -420,70 +420,70 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h1><span class="logo">ðŸ¡</span> Landlord Lite</h1>
+    <h1><span class="logo">🏡</span> Landlord Lite</h1>
     <small>Mieterverwaltung</small>
 
     <nav class="sidebar-nav">
       <!-- Hauptpunkt Mieterverwaltung (zum Auf- und Zuklappen) -->
       <div class="nav-item" onclick="toggleSidebarMenu()">
-        <span class="icon">ðŸ“</span>
+        <span class="icon">📁</span>
         <span>Mieterverwaltung</span>
-        <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">â–¼</span>
+        <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
       </div>
 
       <!-- Unterpunkte -->
       <div id="submenu" class="submenu">
         <a href="index.html">
-          <span class="icon">ðŸ‘¥</span>
-          <span>Ãœbersicht</span>
+          <span class="icon">👥</span>
+          <span>Übersicht</span>
         </a>
         <a href="mahnung.html">
-          <span class="icon">ðŸ“§</span>
+          <span class="icon">📧</span>
           <span>Mahnungssystem</span>
         </a>
         <a href="reparatur.html">
-          <span class="icon">ðŸ› ï¸</span>
+          <span class="icon">🛠️</span>
           <span>Reparaturen</span>
         </a>
         <a href="mieterhoehung.html">
-          <span class="icon">ðŸ“ˆ</span>
-          <span>MieterhÃ¶hung</span>
+          <span class="icon">📈</span>
+          <span>Mieterhöhung</span>
         </a>
      <a class="nav-item" href="import.html">
-  <span class="icon">ðŸ“¥</span>
+  <span class="icon">📥</span>
   <span>Massenimport</span>
 </a>
      </div>
 <div id="submenu" class="submenu">
   <a href="index.html">
-    <span class="icon">ðŸ‘¥</span>
-    <span>Ãœbersicht</span>
+    <span class="icon">👥</span>
+    <span>Übersicht</span>
   </a>
 
   <a href="mahnung.html">
-    <span class="icon">ðŸ’¬</span>
+    <span class="icon">💬</span>
     <span>Mahnungssystem</span>
   </a>
 
   <a href="reparatur.html">
-    <span class="icon">ðŸ› </span>
+    <span class="icon">🛠</span>
     <span>Reparaturen</span>
   </a>
 
   <a href="mieterhoehung.html">
-    <span class="icon">ðŸ“ˆ</span>
-    <span>MieterhÃ¶hung</span>
+    <span class="icon">📈</span>
+    <span>Mieterhöhung</span>
   </a>
 
   <a href="import.html">
-    <span class="icon">ðŸ“¥</span>
+    <span class="icon">📥</span>
     <span>Massenimport</span>
   </a>
 </div>
 
-<!-- HIER kommt dein neuer Punkt, auÃŸerhalb vom Dropdown -->
+<!-- HIER kommt dein neuer Punkt, außerhalb vom Dropdown -->
 <a class="nav-item" href="dashboard.html">
-  <span class="icon">ðŸ“Š</span>
+  <span class="icon">📊</span>
   <span>Dashboard</span>
 </a>
 
@@ -502,9 +502,9 @@
 
     <div id="msg"></div>
 
-    <!-- MIETER HINZUFÃœGEN -->
+    <!-- MIETER HINZUFÜGEN -->
     <section class="card">
-      <h3 class="card-title">Mieter hinzufÃ¼gen</h3>
+      <h3 class="card-title">Mieter hinzufügen</h3>
       <form id="tenantForm">
         <div>
           <label for="name">Name</label>
@@ -517,14 +517,14 @@
             <input id="unit" placeholder="z.B. Whg 3A" required />
           </div>
           <div>
-            <label for="rent">Miete (â‚¬)</label>
+            <label for="rent">Miete (€)</label>
             <input id="rent" type="number" min="0" step="1" placeholder="z.B. 750" required />
           </div>
         </div>
 
         <div class="form-row-2">
           <div>
-            <label for="dueDay">FÃ¤lligkeitstag (1â€“31)</label>
+            <label for="dueDay">Fälligkeitstag (1–31)</label>
             <input id="dueDay" type="number" min="1" max="31" placeholder="z.B. 1" required />
           </div>
           <div>
@@ -545,19 +545,19 @@
       </form>
     </section>
 
-    <!-- ÃœBERSICHT -->
-    <h3 class="section-title">Ãœbersicht</h3>
+    <!-- ÜBERSICHT -->
+    <h3 class="section-title">Übersicht</h3>
 
     <div class="card">
       <div class="small-label">Filter & Sortierung</div>
       <div class="filter-bar">
-        <input id="searchInput" type="text" placeholder="ðŸ” Nach Name, Wohnung oder Betrag suchen..." />
+        <input id="searchInput" type="text" placeholder="🔍 Nach Name, Wohnung oder Betrag suchen..." />
         <select id="sortSelect">
-          <option value="">Sortieren nachâ€¦</option>
+          <option value="">Sortieren nach…</option>
           <option value="name">Name</option>
           <option value="unit">Wohnung</option>
           <option value="rent">Miete</option>
-          <option value="dueDay">FÃ¤lligkeitstag</option>
+          <option value="dueDay">Fälligkeitstag</option>
           <option value="status">Status</option>
         </select>
       </div>
@@ -577,7 +577,7 @@
     <div class="modal">
       <header>
         <h3>Mieter bearbeiten</h3>
-        <button class="modal-close" id="editCloseBtn">âœ•</button>
+        <button class="modal-close" id="editCloseBtn">✕</button>
       </header>
 
       <div>
@@ -587,10 +587,10 @@
         <label for="editUnit">Wohnung</label>
         <input id="editUnit" />
 
-        <label for="editRent">Miete (â‚¬)</label>
+        <label for="editRent">Miete (€)</label>
         <input id="editRent" type="number" min="0" />
 
-        <label for="editDueDay">FÃ¤lligkeitstag (1â€“31)</label>
+        <label for="editDueDay">Fälligkeitstag (1–31)</label>
         <input id="editDueDay" type="number" min="1" max="31" />
 
         <label for="editIban">IBAN (optional)</label>
@@ -618,7 +618,7 @@
     const arrow = document.getElementById('menuArrow');
     const isOpen = menu.style.display === 'block';
     menu.style.display = isOpen ? 'none' : 'block';
-    if (arrow) arrow.textContent = isOpen ? 'â–¼' : 'â–²';
+    if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
   }
 
   const msgEl = document.getElementById('msg');
@@ -657,13 +657,13 @@
     }, 4000);
   }
 
-  // âœ… zentrale URL aus config.js
+  // ✅ zentrale URL aus config.js
   const TENANTS_URL = window.TENANTS_URL; // z.B. https://xxx.onrender.com/api/tenants
   if (!TENANTS_URL) {
     showMsg('config.js fehlt oder window.TENANTS_URL ist leer', 'error');
   }
 
-  // ID Helper (Backend gibt meistens _id zurÃ¼ck)
+  // ID Helper (Backend gibt meistens _id zurück)
   function getTenantId(t) {
     return t._id || t.id;
   }
@@ -723,7 +723,7 @@
       const overdueDays = getOverdueInfo(t.dueDay);
       const statusText = t.status === 'paid' ? 'Bezahlt' : 'Nicht bezahlt';
       const overdueLabel = overdueDays
-        ? ` â€¢ ÃœberfÃ¤llig seit ${overdueDays} Tag${overdueDays === 1 ? '' : 'en'}`
+        ? ` • Überfällig seit ${overdueDays} Tag${overdueDays === 1 ? '' : 'en'}`
         : '';
       const ibanText = t.iban ? ` | IBAN: ${t.iban}` : '';
 
@@ -731,7 +731,7 @@
         <div class="tenant-main">
           <strong>${t.name || '-'}</strong>
           <div class="tenant-meta">
-            Wohnung: ${t.unit || '-'} | Miete: ${t.rent ?? 0} â‚¬ | FÃ¤lligkeit: ${t.dueDay || '-'}${ibanText}
+            Wohnung: ${t.unit || '-'} | Miete: ${t.rent ?? 0} € | Fälligkeit: ${t.dueDay || '-'}${ibanText}
           </div>
           <div class="tenant-status">
             <span class="badge-inline">${statusText}${overdueLabel}</span>
@@ -742,11 +742,11 @@
           <button class="btn-small" data-action="toggle-status">
             ${t.status === 'paid' ? 'Als offen markieren' : 'Als bezahlt markieren'}
           </button>
-          <button class="btn-icon" data-action="edit">âœï¸</button>
-          <button class="btn-icon btn-danger" data-action="delete">ðŸ—‘ï¸</button>
+          <button class="btn-icon" data-action="edit">✏️</button>
+          <button class="btn-icon btn-danger" data-action="delete">🗑️</button>
 
           <!-- Mahnung -->
-          <button class="btn-small green" data-action="mahnung">ðŸ“„ Mahnung</button>
+          <button class="btn-small green" data-action="mahnung">📄 Mahnung</button>
         </div>
       `;
 
@@ -777,7 +777,7 @@
 
       tenantsCache = await res.json();
 
-      // fÃ¼r vorlage.html / mahnung / etc
+      // für vorlage.html / mahnung / etc
       localStorage.setItem('llp_tenants_v1', JSON.stringify(tenantsCache));
 
       renderTenants();
@@ -854,19 +854,19 @@
     if (!TENANTS_URL) return;
 
     const id = getTenantId(tenant);
-    if (!confirm(`Mieter "${tenant.name}" wirklich lÃ¶schen?`)) return;
+    if (!confirm(`Mieter "${tenant.name}" wirklich löschen?`)) return;
 
     try {
       const res = await fetch(`${TENANTS_URL}/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const txt = await res.text();
-        showMsg('Fehler beim LÃ¶schen: ' + txt);
+        showMsg('Fehler beim Löschen: ' + txt);
         return;
       }
-      showMsg('Mieter gelÃ¶scht.', 'success');
+      showMsg('Mieter gelöscht.', 'success');
       await loadTenants();
     } catch (err) {
-      showMsg('Netzwerkfehler beim LÃ¶schen: ' + err.message);
+      showMsg('Netzwerkfehler beim Löschen: ' + err.message);
     }
   }
 
@@ -947,4 +947,3 @@
 </script>
 </body>
 </html>
-

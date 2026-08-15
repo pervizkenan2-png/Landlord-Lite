@@ -1,9 +1,9 @@
-﻿  <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Landlord Lite - MieterhÃ¶hung</title>
+  <title>Landlord Lite - Mieterhöhung</title>
 
   <script>
     const token = localStorage.getItem("token");
@@ -296,41 +296,41 @@
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <h1>ðŸ¡ Landlord Lite</h1>
+      <h1>🏡 Landlord Lite</h1>
       <small>Mieterverwaltung</small>
 
       <nav>
         <div class="nav-item" onclick="toggleSidebarMenu()">
-          <span>ðŸ“</span>
+          <span>📁</span>
           <span>Mieterverwaltung</span>
-          <span id="menuArrow" style="margin-left:auto;">â–¼</span>
+          <span id="menuArrow" style="margin-left:auto;">▼</span>
         </div>
 
         <div id="submenu" class="submenu">
-          <a href="index.html">ðŸ‘¥ Ãœbersicht</a>
-          <a href="mahnung.html">ðŸ“§ Mahnungssystem</a>
-          <a href="mieterhoehung.html">ðŸ“ˆ MieterhÃ¶hung</a>
-          <a href="reparatur.html">ðŸ› ï¸ Reparaturen</a>
-          <a href="import.html">ðŸ“¥ Massenimport</a>
+          <a href="index.html">👥 Übersicht</a>
+          <a href="mahnung.html">📧 Mahnungssystem</a>
+          <a href="mieterhoehung.html">📈 Mieterhöhung</a>
+          <a href="reparatur.html">🛠️ Reparaturen</a>
+          <a href="import.html">📥 Massenimport</a>
         </div>
 
-        <a class="nav-item" href="dashboard.html">ðŸ“Š Dashboard</a>
+        <a class="nav-item" href="dashboard.html">📊 Dashboard</a>
       </nav>
     </aside>
 
     <main class="main">
-      <h1 class="page-title">MieterhÃ¶hung</h1>
+      <h1 class="page-title">Mieterhöhung</h1>
       <div id="msg" class="msg"></div>
 
       <div class="grid">
         <section>
           <div class="card">
-            <h3>Mieter auswÃ¤hlen</h3>
+            <h3>Mieter auswählen</h3>
 
             <div class="field">
               <label for="tenantSelect">Mieter aus MongoDB</label>
               <select id="tenantSelect">
-                <option value="">â€” Mieter auswÃ¤hlen â€”</option>
+                <option value="">— Mieter auswählen —</option>
               </select>
             </div>
 
@@ -342,14 +342,14 @@
 
             <div class="row">
               <div class="field">
-                <label for="currentRent">Aktuelle Miete (â‚¬)</label>
+                <label for="currentRent">Aktuelle Miete (€)</label>
                 <input id="currentRent" type="number" step="0.01" placeholder="z.B. 750" />
               </div>
 
               <div class="field">
                 <label for="increaseType">Berechnungsmethode</label>
                 <select id="increaseType">
-                  <option value="percent">ErhÃ¶hung in Prozent</option>
+                  <option value="percent">Erhöhung in Prozent</option>
                   <option value="amount">Neue Miete direkt eingeben</option>
                 </select>
               </div>
@@ -357,50 +357,50 @@
 
             <div class="row">
               <div class="field" id="percentField">
-                <label for="increasePercent">ErhÃ¶hung (%)</label>
+                <label for="increasePercent">Erhöhung (%)</label>
                 <input id="increasePercent" type="number" step="0.01" placeholder="z.B. 8" />
               </div>
 
               <div class="field" id="newRentField">
-                <label for="newRent">Neue Miete (â‚¬)</label>
+                <label for="newRent">Neue Miete (€)</label>
                 <input id="newRent" type="number" step="0.01" placeholder="z.B. 810" />
               </div>
             </div>
 
             <div class="row">
               <div class="field">
-                <label for="effectiveDate">ErhÃ¶hung ab</label>
+                <label for="effectiveDate">Erhöhung ab</label>
                 <input id="effectiveDate" type="date" />
               </div>
 
               <div class="field">
-                <label for="reason">BegrÃ¼ndung</label>
+                <label for="reason">Begründung</label>
                 <select id="reason">
-                  <option value="vergleichsmiete">Anpassung an die ortsÃ¼bliche Vergleichsmiete</option>
+                  <option value="vergleichsmiete">Anpassung an die ortsübliche Vergleichsmiete</option>
                   <option value="modernisierung">Modernisierung / Verbesserung der Wohnung</option>
                   <option value="kosten">Gestiegene Kosten</option>
-                  <option value="frei">Eigene BegrÃ¼ndung</option>
+                  <option value="frei">Eigene Begründung</option>
                 </select>
               </div>
             </div>
 
             <div class="field">
-              <label for="customReason">Eigene BegrÃ¼ndung / Zusatztext</label>
+              <label for="customReason">Eigene Begründung / Zusatztext</label>
               <input id="customReason" type="text" placeholder="Optionaler Zusatztext..." />
             </div>
 
             <div class="result-box">
               <div class="result-item">
                 <strong>Alte Miete</strong>
-                <span id="oldRentResult">0,00 â‚¬</span>
+                <span id="oldRentResult">0,00 €</span>
               </div>
               <div class="result-item">
                 <strong>Neue Miete</strong>
-                <span id="newRentResult">0,00 â‚¬</span>
+                <span id="newRentResult">0,00 €</span>
               </div>
               <div class="result-item">
                 <strong>Differenz</strong>
-                <span id="diffResult">0,00 â‚¬</span>
+                <span id="diffResult">0,00 €</span>
               </div>
             </div>
 
@@ -414,7 +414,7 @@
           <div class="card">
             <h3>Hinweise</h3>
             <div class="warn-box">
-              Dies ist keine Rechtsberatung. PrÃ¼fe vor einer echten MieterhÃ¶hung die gesetzlichen Voraussetzungen,
+              Dies ist keine Rechtsberatung. Prüfe vor einer echten Mieterhöhung die gesetzlichen Voraussetzungen,
               Fristen, Kappungsgrenzen, Vergleichsmiete und ob eine Zustimmung des Mieters erforderlich ist.
             </div>
           </div>
@@ -424,7 +424,7 @@
           <h3>Generierter Brief</h3>
 
           <div class="field">
-            <textarea id="letterText" placeholder="Hier erscheint der MieterhÃ¶hungsbrief..."></textarea>
+            <textarea id="letterText" placeholder="Hier erscheint der Mieterhöhungsbrief..."></textarea>
           </div>
 
           <div class="btn-row">
@@ -435,7 +435,7 @@
         </section>
       </div>
 <section class="card">
-  <h3>MieterhÃ¶hungs-Historie</h3>
+  <h3>Mieterhöhungs-Historie</h3>
 
   <div class="field">
     <select id="historyFilter">
@@ -462,7 +462,7 @@ function toggleSidebarMenu() {
   submenu.style.display = isOpen ? "none" : "block";
 
   if (arrow) {
-    arrow.textContent = isOpen ? "â–¼" : "â–²";
+    arrow.textContent = isOpen ? "▼" : "▲";
   }
 }
 
@@ -567,11 +567,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return '<div class="history-item">' +
         '<strong>' + (item.tenantName || "-") + '</strong><br>' +
         'Wohnung: ' + (item.unit || "-") + '<br>' +
-        'Alte Miete: ' + Number(item.oldRent || 0).toFixed(2) + ' â‚¬<br>' +
-        'Neue Miete: ' + Number(item.newRent || 0).toFixed(2) + ' â‚¬<br>' +
-        'ErhÃ¶hung: ' + Number(item.difference || 0).toFixed(2) + ' â‚¬ (' +
+        'Alte Miete: ' + Number(item.oldRent || 0).toFixed(2) + ' €<br>' +
+        'Neue Miete: ' + Number(item.newRent || 0).toFixed(2) + ' €<br>' +
+        'Erhöhung: ' + Number(item.difference || 0).toFixed(2) + ' € (' +
         Number(item.percent || 0).toFixed(2) + ' %)<br>' +
-        'GÃ¼ltig ab: ' + (item.effectiveDate || "-") +
+        'Gültig ab: ' + (item.effectiveDate || "-") +
         '</div>';
     }).join("");
   }
@@ -590,12 +590,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       tenants = await res.json();
 
-      tenantSelect.innerHTML = '<option value="">â€” Mieter auswÃ¤hlen â€”</option>';
+      tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
 
       tenants.forEach(t => {
         const option = document.createElement("option");
         option.value = getTenantId(t);
-        option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent || 0} â‚¬`;
+        option.textContent = `${t.name || "-"} | ${t.unit || "-"} | ${t.rent || 0} €`;
         tenantSelect.appendChild(option);
       });
 
@@ -618,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="tenant-card">
         <h3>${tenant.name || "-"}</h3>
         <p>Wohnung: ${tenant.unit || "-"}</p>
-        <p>Aktuelle Miete: ${Number(tenant.rent || 0).toFixed(2)} â‚¬</p>
+        <p>Aktuelle Miete: ${Number(tenant.rent || 0).toFixed(2)} €</p>
         <p>Status: ${tenant.status || "-"}</p>
       </div>
     `;
@@ -643,9 +643,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const diff = newRentValue - oldRent;
 
-    oldRentResult.textContent = oldRent.toFixed(2) + " â‚¬";
-    newRentResult.textContent = newRentValue.toFixed(2) + " â‚¬";
-    diffResult.textContent = diff.toFixed(2) + " â‚¬";
+    oldRentResult.textContent = oldRent.toFixed(2) + " €";
+    newRentResult.textContent = newRentValue.toFixed(2) + " €";
+    diffResult.textContent = diff.toFixed(2) + " €";
   }
 
   calculateBtn.addEventListener("click", calculateRent);
@@ -656,7 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tenant = getSelectedTenant();
 
     if (!tenant) {
-      showMsg("Bitte zuerst einen Mieter auswÃ¤hlen.");
+      showMsg("Bitte zuerst einen Mieter auswählen.");
       return;
     }
 
@@ -666,7 +666,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const newRentValue = Number(newRent.value) || 0;
 
     if (newRentValue <= oldRent) {
-      showMsg("Die neue Miete muss hÃ¶her sein als die aktuelle Miete.");
+      showMsg("Die neue Miete muss höher sein als die aktuelle Miete.");
       return;
     }
 
@@ -681,42 +681,42 @@ An:
 ${tenant.name || "-"}
 Wohnung: ${tenant.unit || "-"}
 
-Betreff: MieterhÃ¶hung gemÃ¤ÃŸ Â§ 558 BGB
+Betreff: Mieterhöhung gemäß § 558 BGB
 
 Sehr geehrte Damen und Herren,
 
-hiermit mÃ¶chte ich Sie darÃ¼ber informieren, dass die monatliche Nettokaltmiete fÃ¼r die oben genannte Wohnung angepasst wird.
+hiermit möchte ich Sie darüber informieren, dass die monatliche Nettokaltmiete für die oben genannte Wohnung angepasst wird.
 
-Die bisherige monatliche Miete betrÃ¤gt:
-${oldRent.toFixed(2)} â‚¬
+Die bisherige monatliche Miete beträgt:
+${oldRent.toFixed(2)} €
 
-Die neue monatliche Miete betrÃ¤gt ab dem ${effectiveDate.value || "-"}:
-${newRentValue.toFixed(2)} â‚¬
+Die neue monatliche Miete beträgt ab dem ${effectiveDate.value || "-"}:
+${newRentValue.toFixed(2)} €
 
-Dies entspricht einer ErhÃ¶hung um:
-${diff.toFixed(2)} â‚¬ (${percentIncrease} %)
+Dies entspricht einer Erhöhung um:
+${diff.toFixed(2)} € (${percentIncrease} %)
 
-BegrÃ¼ndung der MieterhÃ¶hung:
+Begründung der Mieterhöhung:
 ${reason.value}
 
 ${customReason.value || ""}
 
-Die Anpassung erfolgt unter BerÃ¼cksichtigung der gesetzlichen Regelungen sowie der aktuellen ortsÃ¼blichen Vergleichsmiete.
+Die Anpassung erfolgt unter Berücksichtigung der gesetzlichen Regelungen sowie der aktuellen ortsüblichen Vergleichsmiete.
 
-Ich bitte Sie, die neue MiethÃ¶he ab dem oben genannten Zeitpunkt bei Ihren zukÃ¼nftigen Zahlungen zu berÃ¼cksichtigen.
+Ich bitte Sie, die neue Miethöhe ab dem oben genannten Zeitpunkt bei Ihren zukünftigen Zahlungen zu berücksichtigen.
 
-Sollte Ihre Zustimmung erforderlich sein, bitte ich Sie hÃ¶flich um eine schriftliche BestÃ¤tigung innerhalb der gesetzlichen Frist.
+Sollte Ihre Zustimmung erforderlich sein, bitte ich Sie höflich um eine schriftliche Bestätigung innerhalb der gesetzlichen Frist.
 
-FÃ¼r RÃ¼ckfragen stehe ich Ihnen selbstverstÃ¤ndlich gerne zur VerfÃ¼gung.
+Für Rückfragen stehe ich Ihnen selbstverständlich gerne zur Verfügung.
 
-Mit freundlichen GrÃ¼ÃŸen
+Mit freundlichen Grüßen
 
 Vermieter / Hausverwaltung
 `;
 
     letterText.value = text.trim();
 
-    showMsg("Professioneller MieterhÃ¶hungsbrief wurde generiert.", "success");
+    showMsg("Professioneller Mieterhöhungsbrief wurde generiert.", "success");
   }
 
   generateBtn.addEventListener("click", generateLetter);
@@ -726,7 +726,7 @@ Vermieter / Hausverwaltung
       const tenant = getSelectedTenant();
 
       if (!tenant) {
-        showMsg("Bitte zuerst einen Mieter auswÃ¤hlen.");
+        showMsg("Bitte zuerst einen Mieter auswählen.");
         return;
       }
 

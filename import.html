@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Landlord Lite â€“ Massenimport</title>
+  <title>Landlord Lite – Massenimport</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- SheetJS fÃ¼r Excel/CSV-Parsing -->
+  <!-- SheetJS für Excel/CSV-Parsing -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -278,37 +278,37 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h1><span class="logo">ðŸ¡</span> Landlord Lite</h1>
+    <h1><span class="logo">🏡</span> Landlord Lite</h1>
     <small>Mieterverwaltung</small>
 
     <nav class="sidebar-nav">
       <div class="nav-item">
-        <span class="icon">ðŸ“</span>
+        <span class="icon">📁</span>
         <span>Mieterverwaltung</span>
       </div>
       <div class="submenu">
         <a href="index.html">
-          <span class="icon">ðŸ‘¥</span>
-          <span>Ãœbersicht</span>
+          <span class="icon">👥</span>
+          <span>Übersicht</span>
         </a>
         <a href="mahnung.html">
-          <span class="icon">ðŸ“§</span>
+          <span class="icon">📧</span>
           <span>Mahnungssystem</span>
         </a>
         <a href="reparatur.html">
-          <span class="icon">ðŸ› ï¸</span>
+          <span class="icon">🛠️</span>
           <span>Reparaturen</span>
         </a>
         <a href="mieterhoehung.html">
-          <span class="icon">ðŸ“ˆ</span>
-          <span>MieterhÃ¶hung</span>
+          <span class="icon">📈</span>
+          <span>Mieterhöhung</span>
         </a>
         <a href="kuendigung.html">
-          <span class="icon">ðŸ“„</span>
-          <span>KÃ¼ndigung</span>
+          <span class="icon">📄</span>
+          <span>Kündigung</span>
         </a>
         <a href="import.html" class="active">
-          <span class="icon">ðŸ“¥</span>
+          <span class="icon">📥</span>
           <span>Massenimport</span>
         </a>
       </div>
@@ -329,13 +329,13 @@
 
     <!-- Schritt 1: Datei -->
     <section class="card">
-      <h3 class="card-title">1. Datei auswÃ¤hlen</h3>
+      <h3 class="card-title">1. Datei auswählen</h3>
       <div class="upload-row">
         <div>
           <div class="file-input-label">Excel oder CSV hochladen</div>
           <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
           <div class="hint">
-            UnterstÃ¼tzt: .xlsx, .xls, .csv â€“ erste Zeile sollte die SpaltenÃ¼berschrift sein (z.B. Name, Wohnung, Miete â€¦)
+            Unterstützt: .xlsx, .xls, .csv – erste Zeile sollte die Spaltenüberschrift sein (z.B. Name, Wohnung, Miete …)
           </div>
         </div>
         <div id="dropzone" class="dropzone">
@@ -348,10 +348,10 @@
     <section class="card">
       <h3 class="card-title">2. Spalten zuordnen & Vorschau</h3>
       <p style="font-size:0.85rem;">
-        Wir versuchen die Spalten automatisch zu erkennen. Du kannst die Zuordnung pro Spalte Ã¤ndern.
+        Wir versuchen die Spalten automatisch zu erkennen. Du kannst die Zuordnung pro Spalte ändern.
       </p>
       <div id="previewWrapper">
-        <!-- Tabelle wird hier per JS eingefÃ¼gt -->
+        <!-- Tabelle wird hier per JS eingefügt -->
       </div>
       <div id="importInfo"></div>
     </section>
@@ -360,7 +360,7 @@
     <section class="card">
       <h3 class="card-title">3. Import starten</h3>
       <p style="font-size:0.85rem;">
-        Name und Wohnung sind Pflichtfelder. Fehlt eines davon in einer Zeile, wird diese Zele Ã¼bersprungen.
+        Name und Wohnung sind Pflichtfelder. Fehlt eines davon in einer Zeile, wird diese Zele übersprungen.
       </p>
       <button id="startImportBtn" class="btn btn-primary" disabled>Import starten</button>
     </section>
@@ -380,11 +380,11 @@
     let columnMapping = [];   // pro Spalte: welches Feld?
 
     const FIELDS = [
-      {key: '', label: 'â€“ ignorieren â€“'},
+      {key: '', label: '– ignorieren –'},
       {key: 'name', label: 'Name (Pflicht)'},
       {key: 'unit', label: 'Wohnung (Pflicht)'},
-      {key: 'rent', label: 'Miete (â‚¬)'},
-      {key: 'dueDay', label: 'FÃ¤lligkeitstag (1â€“31)'},
+      {key: 'rent', label: 'Miete (€)'},
+      {key: 'dueDay', label: 'Fälligkeitstag (1–31)'},
       {key: 'status', label: 'Status (paid/unpaid)'},
       {key: 'iban', label: 'IBAN'}
     ];
@@ -425,7 +425,7 @@
     });
 
     function handleFile(file) {
-      setStatus('Lese Datei â€¦');
+      setStatus('Lese Datei …');
       rows = [];
       columnMapping = [];
       startImportBtn.disabled = true;
@@ -449,7 +449,7 @@
           autoMapColumns();
           renderPreview();
           startImportBtn.disabled = false;
-          setStatus('Datei geladen. Bitte Zuordnung prÃ¼fen und dann â€žImport startenâ€œ klicken.', 'success');
+          setStatus('Datei geladen. Bitte Zuordnung prüfen und dann „Import starten“ klicken.', 'success');
         } catch (err) {
           console.error(err);
           setStatus('Fehler beim Lesen der Datei: ' + err.message, 'error');
@@ -472,7 +472,7 @@
 
         if (h.includes('miete') || h.includes('betrag') || h.includes('amount')) return 'rent';
 
-        if (h.includes('fÃ¤llig') || h.includes('faellig') || h.includes('due')) return 'dueDay';
+        if (h.includes('fällig') || h.includes('faellig') || h.includes('due')) return 'dueDay';
 
         if (h.includes('status')) return 'status';
 
@@ -530,7 +530,7 @@
       });
 
       const totalRows = rows.length - 1;
-      importInfo.innerHTML = `Gefundene Zeilen (ohne Ãœberschrift): <strong>${totalRows}</strong>`;
+      importInfo.innerHTML = `Gefundene Zeilen (ohne Überschrift): <strong>${totalRows}</strong>`;
     }
 
     function escapeHtml(str) {
@@ -554,7 +554,7 @@
       let skippedNoNameOrUnit = 0;
 
       dataRows.forEach(r => {
-        // leere Zeile Ã¼berspringen
+        // leere Zeile überspringen
         if (r.every(cell => String(cell).trim() === '')) return;
 
         const tenant = {
@@ -599,7 +599,7 @@
       });
 
       if (!tenantsToImport.length) {
-        setStatus('Keine gÃ¼ltigen Zeilen gefunden (Name und Wohnung fehlen).', 'error');
+        setStatus('Keine gültigen Zeilen gefunden (Name und Wohnung fehlen).', 'error');
         startImportBtn.disabled = false;
         return;
       }
@@ -607,13 +607,13 @@
       importInfo.innerHTML =
         `Bereit zum Import: <span class="good">${tenantsToImport.length} Mieter</span>` +
         (skippedNoNameOrUnit
-          ? ` â€“ Ã¼bersprungen (ohne Name/Wohnung): <span class="bad">${skippedNoNameOrUnit}</span>`
+          ? ` – übersprungen (ohne Name/Wohnung): <span class="bad">${skippedNoNameOrUnit}</span>`
           : '');
 
       let ok = 0;
       let failed = 0;
 
-      setStatus('Import lÃ¤uft â€¦');
+      setStatus('Import läuft …');
 
       for (const t of tenantsToImport) {
         try {
@@ -635,4 +635,3 @@
   </script>
 </body>
 </html>
-

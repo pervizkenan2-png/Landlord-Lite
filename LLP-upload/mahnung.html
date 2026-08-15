@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Landlord Lite â€“ Mahnungssystem</title>
+  <title>Landlord Lite – Mahnungssystem</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- jsPDF fÃ¼r PDF-Download -->
+  <!-- jsPDF für PDF-Download -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
@@ -22,7 +22,7 @@
       background: var(--bg);
     }
 
-    /* SIDEBAR â€“ wie index.html */
+    /* SIDEBAR – wie index.html */
     .sidebar {
       width: 230px;
       background: linear-gradient(180deg, #2e7d32, #1b5e20);
@@ -177,7 +177,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <h1>
-    <span class="logo">ðŸ¡</span> Landlord Lite
+    <span class="logo">🏡</span> Landlord Lite
   </h1>
   <small>Mahnungssystem</small>
 
@@ -185,20 +185,20 @@
 
     <!-- Mieterverwaltung -->
     <a class="nav-item" href="index.html">
-      <span class="icon">ðŸ“</span>
+      <span class="icon">📁</span>
       <span>Mieterverwaltung</span>
     </a>
 
     <!-- Mahnungssystem -->
     <a class="nav-item active" href="mahnung.html">
-      <span class="icon">ðŸ“§</span>
+      <span class="icon">📧</span>
       <span>Mahnungssystem</span>
     </a>
 
     <!-- Eigene Vorlagen
  (NEU) -->
     <a class="nav-item" href="vorlage.html">
-      <span class="icon">ðŸ“</span>
+      <span class="icon">📝</span>
       <span>Eigene Vorlagen</span>
     </a>
 
@@ -224,9 +224,9 @@
         </div>
       </div>
       <label for="landlordAddress">Adresse</label>
-      <input id="landlordAddress" placeholder="z.B. MusterstraÃŸe 1" />
+      <input id="landlordAddress" placeholder="z.B. Musterstraße 1" />
 
-      <label for="landlordContact">Kontoinformationen (fÃ¼r Zahlung)</label>
+      <label for="landlordContact">Kontoinformationen (für Zahlung)</label>
       <input id="landlordContact" placeholder="z.B. IBAN, BIC oder Bankname" />
 
       <button class="btn btn-primary" id="saveLandlordBtn">Vermieterdaten speichern</button>
@@ -234,16 +234,16 @@
 
     <!-- Mieter-Auswahl -->
     <section class="card">
-      <h3 class="card-title">Mieter auswÃ¤hlen & Mahnung generieren</h3>
+      <h3 class="card-title">Mieter auswählen & Mahnung generieren</h3>
 
       <label for="tenantSelect">Mieter</label>
       <select id="tenantSelect">
-        <option value="">â€” Mieter auswÃ¤hlen â€”</option>
+        <option value="">— Mieter auswählen —</option>
       </select>
 
       <div style="margin-top:8px;">
-        <button class="btn btn-primary" id="btnSingle">Mahnung fÃ¼r ausgewÃ¤hlten Mieter generieren</button>
-        <button class="btn btn-secondary" id="btnAll">Mahnungen fÃ¼r alle offenen Mieter generieren</button>
+        <button class="btn btn-primary" id="btnSingle">Mahnung für ausgewählten Mieter generieren</button>
+        <button class="btn btn-secondary" id="btnAll">Mahnungen für alle offenen Mieter generieren</button>
       </div>
     </section>
 
@@ -254,7 +254,7 @@
 
       <div style="margin-top:8px;">
         <button class="btn btn-primary" id="btnPdf">Als PDF herunterladen</button>
-        <button class="btn btn-secondary" id="btnMail">In E-Mail Ã¶ffnen</button>
+        <button class="btn btn-secondary" id="btnMail">In E-Mail öffnen</button>
       </div>
     </section>
   </main>
@@ -321,11 +321,11 @@
           return;
         }
         tenants = await res.json();
-        tenantSelect.innerHTML = '<option value="">â€” Mieter auswÃ¤hlen â€”</option>';
+        tenantSelect.innerHTML = '<option value="">— Mieter auswählen —</option>';
         tenants.forEach(t => {
           const opt = document.createElement('option');
           opt.value = t._id;
-          opt.textContent = `${t.name} â€“ Wohnung ${t.unit} (${t.rent} â‚¬)`;
+          opt.textContent = `${t.name} – Wohnung ${t.unit} (${t.rent} €)`;
           tenantSelect.appendChild(opt);
         });
       } catch (err) {
@@ -347,11 +347,11 @@
         name: landlordNameEl.value.trim() || '[Name des Vermieters/der Verwaltung]',
         address: landlordAddressEl.value.trim() || '[Adresse des Vermieters]',
         city: landlordCityEl.value.trim() || '[PLZ, Ort des Vermieters]',
-        contact: landlordContactEl.value.trim() || '[Kontoinformationen fÃ¼r die Mietzahlung]'
+        contact: landlordContactEl.value.trim() || '[Kontoinformationen für die Mietzahlung]'
       };
     }
 
-    // JuraRat-Ã¤hnlicher Langtext â€“ Platzhalter ersetzt
+    // JuraRat-ähnlicher Langtext – Platzhalter ersetzt
     function buildLongLetter(tenant, overdueDays) {
       const l = getLandlordProfile();
       const today = new Date();
@@ -361,8 +361,8 @@
       const tenantAddress = tenant.unit ? `Wohnung ${tenant.unit}` : '[Adresse des Mieters]';
       const tenantCity = '[PLZ, Ort]';
       const mietObjekt = tenant.unit ? `Wohnung ${tenant.unit}` : '[Mietobjekt]';
-      const betrag = tenant.rent != null ? `${tenant.rent} â‚¬` : '[HÃ¶he des ausstehenden Betrags]';
-      const faelligkeit = tenant.dueDay ? `${tenant.dueDay}. (aktueller Monat)` : '[Datum der FÃ¤lligkeit]';
+      const betrag = tenant.rent != null ? `${tenant.rent} €` : '[Höhe des ausstehenden Betrags]';
+      const faelligkeit = tenant.dueDay ? `${tenant.dueDay}. (aktueller Monat)` : '[Datum der Fälligkeit]';
 
       return `
 ${l.name}
@@ -375,25 +375,25 @@ ${tenantCity}
 
 [Ort], ${datum}
 
-1. Mahnung fÃ¼r die Miete des ${mietObjekt}
+1. Mahnung für die Miete des ${mietObjekt}
 
-Leider mÃ¼ssen wir feststellen, dass die vereinbarte Mietzahlung fÃ¼r die Immobilie ${tenantAddress} auch nach Ablauf der Zahlungsfrist nicht auf unserem Konto eingegangen ist.
+Leider müssen wir feststellen, dass die vereinbarte Mietzahlung für die Immobilie ${tenantAddress} auch nach Ablauf der Zahlungsfrist nicht auf unserem Konto eingegangen ist.
 
-GemÃ¤ÃŸ der vertraglichen Vereinbarungen ist die Miete spÃ¤testens bis zum dritten Werktag eines jeden Monats fÃ¤llig. FÃ¼r den aktuellen Abrechnungszeitraum war die Miete spÃ¤testens am ${faelligkeit} zu zahlen. Bis heute ist jedoch kein Zahlungseingang feststellbar. Dieser Umstand stellt einen erheblichen ZahlungsrÃ¼ckstand dar, der umgehend beglichen werden muss.
+Gemäß der vertraglichen Vereinbarungen ist die Miete spätestens bis zum dritten Werktag eines jeden Monats fällig. Für den aktuellen Abrechnungszeitraum war die Miete spätestens am ${faelligkeit} zu zahlen. Bis heute ist jedoch kein Zahlungseingang feststellbar. Dieser Umstand stellt einen erheblichen Zahlungsrückstand dar, der umgehend beglichen werden muss.
 
-Der aktuelle MietrÃ¼ckstand belÃ¤uft sich auf ${betrag}${overdueDays > 0 ? ` und ist seit ${overdueDays} Tag(en) Ã¼berfÃ¤llig` : ''}.
+Der aktuelle Mietrückstand beläuft sich auf ${betrag}${overdueDays > 0 ? ` und ist seit ${overdueDays} Tag(en) überfällig` : ''}.
 
-In Anbetracht der bereits vergangenen Zeit und der ausstehenden Mietzahlung mÃ¶chten wir Sie eindringlich daran erinnern, dass dieser ZahlungsrÃ¼ckstand unverzÃ¼glich ausgeglichen werden muss. Wir sind bestrebt, eine einvernehmliche LÃ¶sung zu finden, um weitere Schritte zur KlÃ¤rung dieser Angelegenheit zu vermeiden.
+In Anbetracht der bereits vergangenen Zeit und der ausstehenden Mietzahlung möchten wir Sie eindringlich daran erinnern, dass dieser Zahlungsrückstand unverzüglich ausgeglichen werden muss. Wir sind bestrebt, eine einvernehmliche Lösung zu finden, um weitere Schritte zur Klärung dieser Angelegenheit zu vermeiden.
 
-Wir fordern Sie daher auf, den offenen Betrag innerhalb der nÃ¤chsten 7 Tage nach Erhalt dieses Schreibens auf folgendes Konto zu Ã¼berweisen:
+Wir fordern Sie daher auf, den offenen Betrag innerhalb der nächsten 7 Tage nach Erhalt dieses Schreibens auf folgendes Konto zu überweisen:
 
 ${l.contact}
 
-Sollten Sie die Zahlung bereits veranlasst haben, betrachten Sie dieses Schreiben bitte als gegenstandslos. In diesem Fall bitten wir Sie jedoch, uns den Zahlungsbeleg oder das Datum der Ãœberweisung kurz mitzuteilen.
+Sollten Sie die Zahlung bereits veranlasst haben, betrachten Sie dieses Schreiben bitte als gegenstandslos. In diesem Fall bitten wir Sie jedoch, uns den Zahlungsbeleg oder das Datum der Überweisung kurz mitzuteilen.
 
-Sollte innerhalb der genannten Frist kein Zahlungseingang festzustellen sein, behalten wir uns vor, weitere rechtliche Schritte einzuleiten, was unter anderem zusÃ¤tzliche Kosten und gegebenenfalls die Einleitung eines gerichtlichen Mahnverfahrens zur Folge haben kann.
+Sollte innerhalb der genannten Frist kein Zahlungseingang festzustellen sein, behalten wir uns vor, weitere rechtliche Schritte einzuleiten, was unter anderem zusätzliche Kosten und gegebenenfalls die Einleitung eines gerichtlichen Mahnverfahrens zur Folge haben kann.
 
-Mit freundlichen GrÃ¼ÃŸen
+Mit freundlichen Grüßen
 
 ${l.name}
       `.trim();
@@ -408,7 +408,7 @@ ${l.name}
     btnSingle.addEventListener('click', () => {
       const id = tenantSelect.value;
       if (!id) {
-        showMsg('Bitte zuerst einen Mieter auswÃ¤hlen.');
+        showMsg('Bitte zuerst einen Mieter auswählen.');
         return;
       }
       const t = tenants.find(x => x._id === id);
@@ -419,7 +419,7 @@ ${l.name}
       const overdue = getOverdueDays(t);
       const text = buildLongLetter(t, overdue);
       outputEl.value = text;
-      showMsg('Mahnung fÃ¼r ausgewÃ¤hlten Mieter generiert.', 'success');
+      showMsg('Mahnung für ausgewählten Mieter generiert.', 'success');
     });
 
     btnAll.addEventListener('click', () => {
@@ -436,7 +436,7 @@ ${l.name}
         combined += text + '\n\n----------------------------------------\n\n';
       });
       outputEl.value = combined.trim();
-      showMsg('Mahnungen fÃ¼r alle offenen Mieter generiert.', 'success');
+      showMsg('Mahnungen für alle offenen Mieter generiert.', 'success');
     });
 
     // PDF Download
@@ -462,7 +462,7 @@ ${l.name}
       }
     });
 
-    // E-Mail Ã¶ffnen
+    // E-Mail öffnen
     btnMail.addEventListener('click', () => {
       const text = outputEl.value.trim();
       if (!text) {
@@ -476,5 +476,4 @@ ${l.name}
   </script>
 </body>
 </html>
-
 
