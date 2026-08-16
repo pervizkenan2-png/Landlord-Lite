@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <script>
@@ -8,7 +8,7 @@
   }
 </script>
   <meta charset="UTF-8" />
-  <title>Landlord Lite â€“ Mieterverwaltung</title>
+  <title>Landlord Lite – Mieterverwaltung</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -448,39 +448,39 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
 
-<a href="account.html" class="account-btn">ðŸ‘¤</a>
+<a href="account.html" class="account-btn">👤</a>
 
-  <h1><span class="logo">ðŸ¡</span> Landlord Lite</h1>
+  <h1><span class="logo">🏡</span> Landlord Lite</h1>
   <small>Mieterverwaltung</small>
 
   <nav class="sidebar-nav">
 
     <!-- Dropdown Hauptpunkt -->
     <div class="nav-item" onclick="toggleSidebarMenu()">
-      <span class="icon">ðŸ“</span>
+      <span class="icon">📁</span>
       <span>Mieterverwaltung</span>
-      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">â–¼</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
     </div>
 
-    <!-- UntermenÃ¼ -->
+    <!-- Untermenü -->
     <div id="submenu" class="submenu">
       <a href="index.html">
-        <span class="icon">ðŸ‘¥</span>
-        Ãœbersicht
+        <span class="icon">👥</span>
+        Übersicht
       </a>
 
       <a href="mahnung.html">
-        <span class="icon">ðŸ“§</span>
+        <span class="icon">📧</span>
         Mahnungssystem
       </a>
 
       <a href="mieterhoehung.html">
-        <span class="icon">ðŸ“ˆ</span>
-        MieterhÃ¶hung
+        <span class="icon">📈</span>
+        Mieterhöhung
       </a>
 
       <a href="reparatur.html">
-        <span class="icon">ðŸ› ï¸</span>
+        <span class="icon">🛠️</span>
         Reparaturen
       </a>
 
@@ -489,7 +489,7 @@
 
     <!-- Fester Punkt -->
     <a class="nav-item" href="dashboard.html">
-      <span class="icon">ðŸ“Š</span>
+      <span class="icon">📊</span>
       Dashboard
     </a>
 
@@ -507,9 +507,9 @@
 
     <div id="msg"></div>
 
-    <!-- MIETER HINZUFÃœGEN -->
+    <!-- MIETER HINZUFÜGEN -->
     <section class="card">
-      <h3 class="card-title">Mieter hinzufÃ¼gen</h3>
+      <h3 class="card-title">Mieter hinzufügen</h3>
       <form id="tenantForm">
         <div>
           <label for="name">Name</label>
@@ -522,14 +522,14 @@
             <input id="unit" placeholder="z.B. Whg 3A" required />
           </div>
           <div>
-            <label for="rent">Miete (â‚¬)</label>
+            <label for="rent">Miete (€)</label>
             <input id="rent" type="number" min="0" step="1" placeholder="z.B. 750" required />
           </div>
         </div>
 
         <div class="form-row-2">
           <div>
-            <label for="dueDay">FÃ¤lligkeitstag (1â€“31)</label>
+            <label for="dueDay">Fälligkeitstag (1–31)</label>
             <input id="dueDay" type="number" min="1" max="31" placeholder="z.B. 1" required />
           </div>
           <div>
@@ -550,19 +550,19 @@
       </form>
     </section>
 
-    <!-- ÃœBERSICHT -->
-    <h3 class="section-title">Ãœbersicht</h3>
+    <!-- ÜBERSICHT -->
+    <h3 class="section-title">Übersicht</h3>
 
     <div class="card">
       <div class="small-label">Filter & Sortierung</div>
       <div class="filter-bar">
-        <input id="searchInput" type="text" placeholder="ðŸ” Nach Name, Wohnung oder Betrag suchen..." />
+        <input id="searchInput" type="text" placeholder="🔍 Nach Name, Wohnung oder Betrag suchen..." />
         <select id="sortSelect">
-          <option value="">Sortieren nachâ€¦</option>
+          <option value="">Sortieren nach…</option>
           <option value="name">Name</option>
           <option value="unit">Wohnung</option>
           <option value="rent">Miete</option>
-          <option value="dueDay">FÃ¤lligkeitstag</option>
+          <option value="dueDay">Fälligkeitstag</option>
           <option value="status">Status</option>
         </select>
       </div>
@@ -582,7 +582,7 @@
     <div class="modal">
       <header>
         <h3>Mieter bearbeiten</h3>
-        <button class="modal-close" id="editCloseBtn">âœ•</button>
+        <button class="modal-close" id="editCloseBtn">✕</button>
       </header>
 
       <div>
@@ -592,10 +592,10 @@
         <label for="editUnit">Wohnung</label>
         <input id="editUnit" />
 
-        <label for="editRent">Miete (â‚¬)</label>
+        <label for="editRent">Miete (€)</label>
         <input id="editRent" type="number" min="0" />
 
-        <label for="editDueDay">FÃ¤lligkeitstag (1â€“31)</label>
+        <label for="editDueDay">Fälligkeitstag (1–31)</label>
         <input id="editDueDay" type="number" min="1" max="31" />
 
         <label for="editIban">IBAN (optional)</label>
@@ -624,7 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.replace = "login.html";
   }
 
-  // Token automatisch an jeden Request anhÃ¤ngen
+  // Token automatisch an jeden Request anhängen
   const _fetch = window.fetch;
   window.fetch = function(url, options = {}) {
     options.headers = {
@@ -645,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
   menu.style.display = isOpen ? 'none' : 'block';
 
   if (arrow) {
-    arrow.textContent = isOpen ? 'â–¼' : 'â–²';
+    arrow.textContent = isOpen ? '▼' : '▲';
   }
 };
 
@@ -751,7 +751,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const overdueDays = getOverdueInfo(t.dueDay);
       const statusText = t.status === 'paid' ? 'Bezahlt' : 'Nicht bezahlt';
       const overdueLabel = overdueDays
-        ? ` â€¢ ÃœberfÃ¤llig seit ${overdueDays} Tag${overdueDays === 1 ? '' : 'en'}`
+        ? ` • Überfällig seit ${overdueDays} Tag${overdueDays === 1 ? '' : 'en'}`
         : '';
       const ibanText = t.iban ? ` | IBAN: ${t.iban}` : '';
 
@@ -759,7 +759,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="tenant-main">
           <strong>${t.name || '-'}</strong>
           <div class="tenant-meta">
-            Wohnung: ${t.unit || '-'} | Miete: ${t.rent ?? 0} â‚¬ | FÃ¤lligkeit: ${t.dueDay || '-'}${ibanText}
+            Wohnung: ${t.unit || '-'} | Miete: ${t.rent ?? 0} € | Fälligkeit: ${t.dueDay || '-'}${ibanText}
           </div>
           <div class="tenant-status">
             <span class="badge-inline">${statusText}${overdueLabel}</span>
@@ -770,9 +770,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <button class="btn-small" data-action="toggle-status">
             ${t.status === 'paid' ? 'Als offen markieren' : 'Als bezahlt markieren'}
           </button>
-          <button class="btn-icon" data-action="edit">âœï¸</button>
-          <button class="btn-icon btn-danger" data-action="delete">ðŸ—‘ï¸</button>
-          <button class="btn-small green" data-action="mahnung">ðŸ“„ Mahnung</button>
+          <button class="btn-icon" data-action="edit">✏️</button>
+          <button class="btn-icon btn-danger" data-action="delete">🗑️</button>
+          <button class="btn-small green" data-action="mahnung">📄 Mahnung</button>
         </div>
       `;
 
@@ -822,7 +822,7 @@ if (res.status === 401) {
  if (tenantForm) {
   tenantForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    alert("submit lÃ¤uft");
+    alert("submit läuft");
 
     if (!TENANTS_URL) return;
 
@@ -894,7 +894,7 @@ await loadTenants();
   if (!TENANTS_URL) return;
 
   const id = getTenantId(tenant);
-  if (!confirm(`Mieter "${tenant.name}" wirklich lÃ¶schen?`)) return;
+  if (!confirm(`Mieter "${tenant.name}" wirklich löschen?`)) return;
 
   try {
     const res = await fetch(`${TENANTS_URL}/${id}`, {
@@ -906,15 +906,15 @@ await loadTenants();
 
     if (!res.ok) {
       const txt = await res.text();
-      showMsg('Fehler beim LÃ¶schen: ' + txt);
+      showMsg('Fehler beim Löschen: ' + txt);
       return;
     }
 
-    showMsg('Mieter gelÃ¶scht.', 'success');
+    showMsg('Mieter gelöscht.', 'success');
     await loadTenants();
   } catch (err) {
     console.error('DELETE TENANT ERROR:', err);
-    showMsg('Netzwerkfehler beim LÃ¶schen: ' + err.message);
+    showMsg('Netzwerkfehler beim Löschen: ' + err.message);
   }
 }
 
@@ -994,4 +994,3 @@ await loadTenants();
 </body>
 </html>
 <!-- fix -->
-
