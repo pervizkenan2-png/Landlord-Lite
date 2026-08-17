@@ -1,0 +1,309 @@
+[1mdiff --git a/dashboard.html b/dashboard.html[m
+[1mindex c195848..7a87475 100644[m
+[1m--- a/dashboard.html[m
+[1m+++ b/dashboard.html[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-<!DOCTYPE html>[m
+[32m+[m[32m﻿<!DOCTYPE html>[m
+ <html lang="de">[m
+ <head>[m
+   <meta charset="UTF-8" />[m
+[36m@@ -769,15 +769,11 @@[m [mflex-direction:column;[m
+   <aside class="sidebar">[m
+     <div class="brand-row">[m
+       <div class="brand">[m
+[31m-        <div class="brand-icon">🏡</div>[m
+[32m+[m[32m        <div class="brand-icon">ðŸ¡</div>[m
+         <div class="brand-name">Landlord Lite</div>[m
+       </div>[m
+ [m
+[31m-      <a[m
+[31m-        href="account.html"[m
+[31m-        class="account-btn"[m
+[31m-        aria-label="Account"[m
+[31m-      >👤</a>[m
+[32m+[m[41m      [m
+     </div>[m
+ [m
+     <div class="sidebar-subtitle">[m
+[36m@@ -786,29 +782,29 @@[m [mflex-direction:column;[m
+ [m
+     <nav>[m
+       <div class="nav-item" id="menuToggle">[m
+[31m-        <span class="nav-icon">📁</span>[m
+[32m+[m[32m        <span class="nav-icon">ðŸ“</span>[m
+         <span>Mieterverwaltung</span>[m
+[31m-        <span class="arrow" id="menuArrow">▲</span>[m
+[32m+[m[32m        <span class="arrow" id="menuArrow">â–²</span>[m
+       </div>[m
+ [m
+       <div class="submenu" id="submenu">[m
+         <a href="index.html">[m
+[31m-          <span class="nav-icon">👥</span>[m
+[31m-          Übersicht[m
+[32m+[m[32m          <span class="nav-icon">ðŸ‘¥</span>[m
+[32m+[m[32m          Ãœbersicht[m
+         </a>[m
+ [m
+         <a href="mahnung.html">[m
+[31m-          <span class="nav-icon">💶</span>[m
+[32m+[m[32m          <span class="nav-icon">ðŸ’¶</span>[m
+           Mahnungssystem[m
+         </a>[m
+ [m
+         <a href="mieterhoehung.html">[m
+[31m-          <span class="nav-icon">📈</span>[m
+[31m-          Mieterhöhung[m
+[32m+[m[32m          <span class="nav-icon">ðŸ“ˆ</span>[m
+[32m+[m[32m          MieterhÃ¶hung[m
+         </a>[m
+ [m
+         <a href="reparatur.html">[m
+[31m-          <span class="nav-icon">🛠️</span>[m
+[32m+[m[32m          <span class="nav-icon">ðŸ› ï¸</span>[m
+           Reparaturen[m
+         </a>[m
+ [m
+[36m@@ -816,7 +812,7 @@[m [mflex-direction:column;[m
+       </div>[m
+ [m
+       <a class="nav-item active" href="dashboard.html">[m
+[31m-        <span class="nav-icon">📊</span>[m
+[32m+[m[32m        <span class="nav-icon">ðŸ“Š</span>[m
+         <span>Dashboard</span>[m
+       </a>[m
+     </nav>[m
+[36m@@ -824,12 +820,12 @@[m [mflex-direction:column;[m
+ [m
+ <div class="sidebar-bottom">[m
+   <a href="support.html" class="bottom-link">[m
+[31m-    <span>❓</span>[m
+[32m+[m[32m    <span>â“</span>[m
+     <span>Support</span>[m
+   </a>[m
+ [m
+   <a href="account.html" class="bottom-link">[m
+[31m-    <span>⚙️</span>[m
+[32m+[m[32m    <span>âš™ï¸</span>[m
+     <span>Kontoeinstellungen</span>[m
+   </a>[m
+ </div>[m
+[36m@@ -863,7 +859,7 @@[m [mflex-direction:column;[m
+               Mieter gesamt[m
+             </div>[m
+ [m
+[31m-            <div class="stat-icon">👥</div>[m
+[32m+[m[32m            <div class="stat-icon">ðŸ‘¥</div>[m
+           </div>[m
+ [m
+           <div[m
+[36m@@ -872,7 +868,7 @@[m [mflex-direction:column;[m
+           >0</div>[m
+ [m
+           <div class="stat-note">[m
+[31m-            Aktuell angelegte Mietverhältnisse[m
+[32m+[m[32m            Aktuell angelegte MietverhÃ¤ltnisse[m
+           </div>[m
+         </article>[m
+ [m
+[36m@@ -882,7 +878,7 @@[m [mflex-direction:column;[m
+               Wohnungen[m
+             </div>[m
+ [m
+[31m-            <div class="stat-icon">🏢</div>[m
+[32m+[m[32m            <div class="stat-icon">ðŸ¢</div>[m
+           </div>[m
+ [m
+           <div[m
+[36m@@ -901,13 +897,13 @@[m [mflex-direction:column;[m
+               Monatliche Miete[m
+             </div>[m
+ [m
+[31m-            <div class="stat-icon">💶</div>[m
+[32m+[m[32m            <div class="stat-icon">ðŸ’¶</div>[m
+           </div>[m
+ [m
+           <div[m
+             class="stat-value loading"[m
+             id="monthlyRent"[m
+[31m-          >0,00 €</div>[m
+[32m+[m[32m          >0,00 â‚¬</div>[m
+ [m
+           <div class="stat-note">[m
+             Summe aller hinterlegten Mieten[m
+[36m@@ -920,13 +916,13 @@[m [mflex-direction:column;[m
+               Offene Mieten[m
+             </div>[m
+ [m
+[31m-            <div class="stat-icon">⚠️</div>[m
+[32m+[m[32m            <div class="stat-icon">âš ï¸</div>[m
+           </div>[m
+ [m
+           <div[m
+             class="stat-value loading"[m
+             id="openRent"[m
+[31m-          >0,00 €</div>[m
+[32m+[m[32m          >0,00 â‚¬</div>[m
+ [m
+           <div class="stat-note">[m
+             <span id="openCount">0</span>[m
+[36m@@ -940,12 +936,12 @@[m [mflex-direction:column;[m
+             <div>[m
+               <h2>Mietstatus</h2>[m
+               <p>[m
+[31m-                Verhältnis zwischen bezahlten und[m
+[32m+[m[32m                VerhÃ¤ltnis zwischen bezahlten und[m
+                 offenen Mieten.[m
+               </p>[m
+             </div>[m
+ [m
+[31m-            <div class="panel-icon">📊</div>[m
+[32m+[m[32m            <div class="panel-icon">ðŸ“Š</div>[m
+           </div>[m
+ [m
+           <div class="chart-layout">[m
+[36m@@ -976,7 +972,7 @@[m [mflex-direction:column;[m
+                   class="legend-value"[m
+                   id="paidRent"[m
+                 >[m
+[31m-                  0,00 €[m
+[32m+[m[32m                  0,00 â‚¬[m
+                 </div>[m
+               </div>[m
+ [m
+[36m@@ -992,7 +988,7 @@[m [mflex-direction:column;[m
+                   class="legend-value"[m
+                   id="legendOpenRent"[m
+                 >[m
+[31m-                  0,00 €[m
+[32m+[m[32m                  0,00 â‚¬[m
+                 </div>[m
+               </div>[m
+             </div>[m
+[36m@@ -1004,7 +1000,7 @@[m [mflex-direction:column;[m
+             <div>[m
+               <h2>Letzte Mieter</h2>[m
+               <p>[m
+[31m-                Zuletzt angelegte Mietverhältnisse.[m
+[32m+[m[32m                Zuletzt angelegte MietverhÃ¤ltnisse.[m
+               </p>[m
+             </div>[m
+ [m
+[36m@@ -1021,7 +1017,7 @@[m [mflex-direction:column;[m
+             id="tenantList"[m
+           >[m
+             <div class="empty">[m
+[31m-              Mieter werden geladen …[m
+[32m+[m[32m              Mieter werden geladen â€¦[m
+             </div>[m
+           </div>[m
+         </article>[m
+[36m@@ -1051,7 +1047,7 @@[m [mflex-direction:column;[m
+             id="repairList"[m
+           >[m
+             <div class="empty">[m
+[31m-              Reparaturen werden geladen …[m
+[32m+[m[32m              Reparaturen werden geladen â€¦[m
+             </div>[m
+           </div>[m
+         </article>[m
+[36m@@ -1061,12 +1057,12 @@[m [mflex-direction:column;[m
+             <div>[m
+               <h2>Schnellzugriff</h2>[m
+               <p>[m
+[31m-                Häufig verwendete Bereiche[m
+[31m-                direkt öffnen.[m
+[32m+[m[32m                HÃ¤ufig verwendete Bereiche[m
+[32m+[m[32m                direkt Ã¶ffnen.[m
+               </p>[m
+             </div>[m
+ [m
+[31m-            <div class="panel-icon">⚡</div>[m
+[32m+[m[32m            <div class="panel-icon">âš¡</div>[m
+           </div>[m
+ [m
+           <div class="quick-actions">[m
+[36m@@ -1074,7 +1070,7 @@[m [mflex-direction:column;[m
+               href="index.html"[m
+               class="quick-action"[m
+             >[m
+[31m-              <span>👥</span>[m
+[32m+[m[32m              <span>ðŸ‘¥</span>[m
+               Mieter verwalten[m
+             </a>[m
+ [m
+[36m@@ -1082,7 +1078,7 @@[m [mflex-direction:column;[m
+               href="mahnung.html"[m
+               class="quick-action"[m
+             >[m
+[31m-              <span>💶</span>[m
+[32m+[m[32m              <span>ðŸ’¶</span>[m
+               Mahnungen[m
+             </a>[m
+ [m
+[36m@@ -1090,15 +1086,15 @@[m [mflex-direction:column;[m
+               href="mieterhoehung.html"[m
+               class="quick-action"[m
+             >[m
+[31m-              <span>📈</span>[m
+[31m-              Mieterhöhung[m
+[32m+[m[32m              <span>ðŸ“ˆ</span>[m
+[32m+[m[32m              MieterhÃ¶hung[m
+             </a>[m
+ [m
+             <a[m
+               href="reparatur.html"[m
+               class="quick-action"[m
+             >[m
+[31m-              <span>🛠️</span>[m
+[32m+[m[32m              <span>ðŸ› ï¸</span>[m
+               Reparaturen[m
+             </a>[m
+ [m
+[36m@@ -1108,7 +1104,7 @@[m [mflex-direction:column;[m
+               href="account.html"[m
+               class="quick-action"[m
+             >[m
+[31m-              <span>👤</span>[m
+[32m+[m[32m              <span>ðŸ‘¤</span>[m
+               Mein Konto[m
+             </a>[m
+           </div>[m
+[36m@@ -1146,9 +1142,9 @@[m [mflex-direction:column;[m
+         if ([m
+           submenu.classList.contains("closed")[m
+         ) {[m
+[31m-          menuArrow.textContent = "▼";[m
+[32m+[m[32m          menuArrow.textContent = "â–¼";[m
+         } else {[m
+[31m-          menuArrow.textContent = "▲";[m
+[32m+[m[32m          menuArrow.textContent = "â–²";[m
+         }[m
+       }[m
+     );[m
+[36m@@ -1468,7 +1464,7 @@[m [mflex-direction:column;[m
+                 <div class="list-person">[m
+ [m
+                   <div class="repair-avatar">[m
+[31m-                    🛠️[m
+[32m+[m[32m                    ðŸ› ï¸[m
+                   </div>[m
+ [m
+                   <div class="list-copy">[m
+[36m@@ -1699,7 +1695,7 @@[m [mflex-direction:column;[m
+         removeLoading();[m
+ [m
+         showError([m
+[31m-          "Dashboard konnte nicht vollständig geladen werden."[m
+[32m+[m[32m          "Dashboard konnte nicht vollstÃ¤ndig geladen werden."[m
+         );[m
+       }[m
+     }[m
+[36m@@ -1708,4 +1704,4 @@[m [mflex-direction:column;[m
+   </script>[m
+ [m
+   <script src="sidebar.js"></script>
+</body>[m
+[31m-</html>[m
+\ No newline at end of file[m
+[32m+[m[32m</html>[m
