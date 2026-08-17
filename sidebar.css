@@ -1,52 +1,241 @@
-/* ===== LANDLORD LITE – GEMEINSAME SIDEBAR ===== */
+/* ==================================================
+   LANDLORD LITE – GEMEINSAME SIDEBAR
+   Desktop + Mobile
+   ================================================== */
+
+
+/* ================= DESKTOP ================= */
 
 .sidebar {
     width: 260px;
     min-height: 100vh;
     background: linear-gradient(180deg, #238b32 0%, #126622 100%);
-    color: white;
+    color: #fff;
     padding: 24px 20px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Logo / Landlord Lite */
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-name {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.sidebar-subtitle {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+
+/* Navigation */
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 42px;
+    padding: 9px 12px;
+
+    color: #fff;
+    text-decoration: none;
+
+    border-radius: 8px;
     box-sizing: border-box;
 }
 
-/* Handy */
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+/* Untermenü */
+
+.submenu {
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.submenu a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px 8px 28px;
+
+    color: #fff;
+    text-decoration: none;
+
+    border-radius: 8px;
+}
+
+.submenu a:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+
+/* Support + Kontoeinstellungen */
+
+.sidebar-bottom {
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.bottom-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 40px;
+    padding: 8px 10px;
+
+    color: #fff;
+    text-decoration: none;
+
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.bottom-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+/* ==================================================
+   MOBILE
+   ================================================== */
+
 @media (max-width: 768px) {
 
+    /*
+       Auf dem Handy wird aus der großen Desktop-Sidebar
+       eine kompakte Navigation oben.
+    */
+
     .sidebar {
-        width: 100%;
-        min-height: auto;
-        padding: 16px 20px;
+        width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+
+        position: relative !important;
+        inset: auto !important;
+
+        padding: 14px 16px !important;
+
+        display: block;
+
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
     }
 
+
+    /* Logo kompakter */
+
     .brand-row {
-        margin-bottom: 10px;
+        margin: 0 0 3px 0;
     }
 
     .brand-name {
-        font-size: 24px;
+        font-size: 21px;
     }
 
     .sidebar-subtitle {
-        font-size: 14px;
-        margin-bottom: 14px;
+        font-size: 12px;
+        margin: 2px 0 10px;
     }
 
-    .nav-item,
-    .bottom-link {
-        min-height: 44px;
-        padding: 9px 12px;
+
+    /* Hauptnavigation */
+
+    .nav-item {
+        min-height: 36px;
+        padding: 6px 8px;
+        margin: 1px 0;
+
+        font-size: 14px;
     }
+
+
+    /* Untermenü deutlich kompakter */
 
     .submenu {
-        margin-top: 4px;
+        margin: 1px 0 4px;
     }
 
     .submenu a {
-        padding: 8px 12px;
+        min-height: 32px;
+
+        padding: 5px 8px 5px 24px;
+
+        font-size: 13px;
     }
 
+
+    /* Support + Konto */
+
     .sidebar-bottom {
-        position: static;
-        margin-top: 10px;
+        position: static !important;
+
+        margin-top: 6px;
+        padding-top: 6px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .bottom-link {
+        min-height: 34px;
+
+        padding: 5px 8px;
+
+        font-size: 13px;
+    }
+
+
+    /*
+       Verhindert, dass alte Desktop-Regeln auf manchen
+       Seiten Platz links für die Sidebar reservieren.
+    */
+
+    .main,
+    .main-content,
+    main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+}
+
+
+/* ================= KLEINE HANDYS ================= */
+
+@media (max-width: 480px) {
+
+    .sidebar {
+        padding: 12px 14px !important;
+    }
+
+    .brand-name {
+        font-size: 20px;
+    }
+
+    .nav-item {
+        font-size: 13px;
+    }
+
+    .submenu a {
+        font-size: 12px;
     }
 }
