@@ -1,0 +1,52 @@
+/* ===== LANDLORD LITE – GEMEINSAME SIDEBAR ===== */
+
+.sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #238b32 0%, #126622 100%);
+    color: white;
+    padding: 24px 20px;
+    box-sizing: border-box;
+}
+
+/* Handy */
+@media (max-width: 768px) {
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        padding: 16px 20px;
+    }
+
+    .brand-row {
+        margin-bottom: 10px;
+    }
+
+    .brand-name {
+        font-size: 24px;
+    }
+
+    .sidebar-subtitle {
+        font-size: 14px;
+        margin-bottom: 14px;
+    }
+
+    .nav-item,
+    .bottom-link {
+        min-height: 44px;
+        padding: 9px 12px;
+    }
+
+    .submenu {
+        margin-top: 4px;
+    }
+
+    .submenu a {
+        padding: 8px 12px;
+    }
+
+    .sidebar-bottom {
+        position: static;
+        margin-top: 10px;
+    }
+}
