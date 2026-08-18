@@ -293,3 +293,34 @@
         display: none !important;
     }
 }
+/* ===== SIDEBAR BOTTOM FIX ===== */
+
+/* Sidebar als Spalte aufbauen */
+.sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Support + Kontoeinstellungen ganz nach unten */
+.sidebar-bottom {
+    margin-top: auto !important;
+    padding-top: 18px !important;
+}
+
+/* Auch auf dem Handy unten halten */
+@media (max-width: 768px) {
+    .sidebar.open {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100dvh !important;
+        min-height: 100dvh !important;
+        overflow-y: auto !important;
+    }
+
+    .sidebar-bottom {
+        margin-top: auto !important;
+        padding-top: 18px !important;
+        padding-bottom: 24px !important;
+    }
+}
+

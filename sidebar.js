@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const supportLink = document.createElement("a");
     supportLink.href = "support.html";
     supportLink.className = "bottom-link";
-    supportLink.textContent = "Support";
+    supportLink.textContent = "❓Support";
 
     sidebarBottom.appendChild(supportLink);
   }
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const accountLink = document.createElement("a");
     accountLink.href = "account.html";
     accountLink.className = "bottom-link";
-    accountLink.textContent = "Kontoeinstellungen";
+    accountLink.textContent = "⚙️Kontoeinstellungen";
 
     sidebarBottom.appendChild(accountLink);
   }
