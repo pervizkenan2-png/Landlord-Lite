@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Landlord Lite – Reparaturen</title>
+  <title>Landlord Lite â€“ Reparaturen</title>
 
  <style>
     :root {
@@ -578,37 +578,37 @@ form {
   <div class="layout">
     <!-- SIDEBAR -->
 <aside class="sidebar">
-  <h1><span class="logo">🏡</span> Landlord Lite</h1>
+  <h1><span class="logo">ðŸ¡</span> Landlord Lite</h1>
   <small>Mieterverwaltung</small>
 
   <nav class="sidebar-nav">
 
     <!-- Dropdown Hauptpunkt -->
     <div class="nav-item" onclick="toggleSidebarMenu()">
-      <span class="icon">📁</span>
+      <span class="icon">ðŸ“</span>
       <span>Mieterverwaltung</span>
-      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">▼</span>
+      <span id="menuArrow" style="margin-left:auto;font-size:0.85rem;">â–¼</span>
     </div>
 
-    <!-- Untermenü -->
+    <!-- UntermenÃ¼ -->
     <div id="submenu" class="submenu">
       <a href="index.html">
-        <span class="icon">👥</span>
-        Übersicht
+        <span class="icon">ðŸ‘¥</span>
+        Ãœbersicht
       </a>
 
       <a href="mahnung.html">
-        <span class="icon">📧</span>
+        <span class="icon">ðŸ“§</span>
         Mahnungssystem
       </a>
 
       <a href="mieterhoehung.html">
-        <span class="icon">📈</span>
-        Mieterhöhung
+        <span class="icon">ðŸ“ˆ</span>
+        MieterhÃ¶hung
       </a>
 
       <a href="reparatur.html">
-        <span class="icon">🛠️</span>
+        <span class="icon">ðŸ› ï¸</span>
         Reparaturen
       </a>
 
@@ -617,11 +617,15 @@ form {
 
     <!-- Fester Punkt -->
     <a class="nav-item" href="dashboard.html">
-      <span class="icon">📊</span>
+      <span class="icon">ðŸ“Š</span>
       Dashboard
     </a>
 
   </nav>
+<div class="sidebar-bottom">
+    <a href="support.html" class="bottom-link">❓ <span>Support</span></a>
+    <a href="account.html" class="bottom-link">⚙️ <span>Kontoeinstellungen</span></a>
+</div>
 </aside>
     <main class="content">
       <div class="header-row">
@@ -629,16 +633,16 @@ form {
              </div>
 
       <div class="grid">
-        <!-- LINKS: Fälle -->
+        <!-- LINKS: FÃ¤lle -->
         <section class="card">
           <div class="row" style="justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Fälle</h3>
-            <button class="btn green" id="btnNewCase">＋ Neuer Fall</button>
+            <h3 style="margin:0;">FÃ¤lle</h3>
+            <button class="btn green" id="btnNewCase">ï¼‹ Neuer Fall</button>
           </div>
 
           <div class="field" style="margin-top:12px;">
-            <div class="label">Suchen (Mieter, Wohnung, Problem)…</div>
-            <input class="input" id="searchInput" placeholder="z.B. Rossetanni, Whg 45, Wasser…" />
+            <div class="label">Suchen (Mieter, Wohnung, Problem)â€¦</div>
+            <input class="input" id="searchInput" placeholder="z.B. Rossetanni, Whg 45, Wasserâ€¦" />
           </div>
 
           <div class="field">
@@ -690,7 +694,7 @@ form {
           <div class="row">
             <div class="field">
               <div class="label">Handwerker</div>
-              <input class="input" id="contractor" placeholder="z.B. Müller GmbH" />
+              <input class="input" id="contractor" placeholder="z.B. MÃ¼ller GmbH" />
             </div>
 
             <div class="field">
@@ -701,7 +705,7 @@ form {
 
           <div class="row">
             <div class="field">
-              <div class="label">Kosten (€)</div>
+              <div class="label">Kosten (â‚¬)</div>
               <input class="input" id="cost" type="number" step="0.01" placeholder="0.00" />
             </div>
 
@@ -721,13 +725,13 @@ form {
 
           <div class="field full">
             <div class="label">Interne Notizen</div>
-            <textarea class="input" id="notes" placeholder="z.B. Termin, Material, Infos…"></textarea>
+            <textarea class="input" id="notes" placeholder="z.B. Termin, Material, Infosâ€¦"></textarea>
           </div>
 
           <div class="row" style="gap:12px; margin-top:8px;">
-            <button class="btn green" id="btnSaveCase">💾 Speichern</button>
-            <button class="btn grey" id="btnMarkDone">✅ Abschließen</button>
-            <button class="btn red" id="btnDeleteCase">🗑 Löschen</button>
+            <button class="btn green" id="btnSaveCase">ðŸ’¾ Speichern</button>
+            <button class="btn grey" id="btnMarkDone">âœ… AbschlieÃŸen</button>
+            <button class="btn red" id="btnDeleteCase">ðŸ—‘ LÃ¶schen</button>
           </div>
 
           <p class="muted" id="midMsg"></p>
@@ -750,7 +754,7 @@ function toggleSidebarMenu() {
   submenu.style.display = isHidden ? "block" : "none";
 
   if (arrow) {
-    arrow.textContent = isHidden ? "▲" : "▼";
+    arrow.textContent = isHidden ? "â–²" : "â–¼";
   }
 }
 
@@ -956,7 +960,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!filtered.length) {
       caseListEl.innerHTML = '<div class="case-item">Keine Reparaturen gefunden.</div>';
-      if (leftHint) leftHint.textContent = "Keine Fälle vorhanden.";
+      if (leftHint) leftHint.textContent = "Keine FÃ¤lle vorhanden.";
       return;
     }
 
@@ -972,7 +976,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <strong>${safe(c.tenant || c.tenantName) || "Unbekannt"}</strong><br>
         ${safe(c.status) ? statusLabel(normalizeStatus(c.status)) : "Offen"}
         ${safe(c.paid) ? " | Bezahlt: " + safe(c.paid) : ""}
-        ${safe(c.date || c.reportedAt) ? " | 📅 " + safe(c.date || c.reportedAt) : " | 📅 kein Datum"}
+        ${safe(c.date || c.reportedAt) ? " | ðŸ“… " + safe(c.date || c.reportedAt) : " | ðŸ“… kein Datum"}
         <br>
         ${safe(c.problem) || "(kein Problemtext)"}
       `;
@@ -1064,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnMarkDone) {
     btnMarkDone.addEventListener("click", async () => {
       if (!activeId) {
-        msg("Bitte zuerst einen Fall auswählen.", true);
+        msg("Bitte zuerst einen Fall auswÃ¤hlen.", true);
         return;
       }
 
@@ -1077,7 +1081,7 @@ document.addEventListener("DOMContentLoaded", () => {
         msg("Fall abgeschlossen.");
       } catch (err) {
         console.error(err);
-        msg("Fehler beim Abschließen.", true);
+        msg("Fehler beim AbschlieÃŸen.", true);
       }
     });
   }
@@ -1085,20 +1089,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnDeleteCase) {
     btnDeleteCase.addEventListener("click", async () => {
       if (!activeId) {
-        msg("Bitte zuerst einen Fall auswählen.", true);
+        msg("Bitte zuerst einen Fall auswÃ¤hlen.", true);
         return;
       }
 
-      if (!confirm("Fall wirklich löschen?")) return;
+      if (!confirm("Fall wirklich lÃ¶schen?")) return;
 
       try {
         await deleteCase(activeId);
         clearForm();
         await loadCases();
-        msg("Fall gelöscht.");
+        msg("Fall gelÃ¶scht.");
       } catch (err) {
         console.error(err);
-        msg("Fehler beim Löschen.", true);
+        msg("Fehler beim LÃ¶schen.", true);
       }
     });
   }
@@ -1115,3 +1119,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 ```
+
