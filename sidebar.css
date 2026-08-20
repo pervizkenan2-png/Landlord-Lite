@@ -1,20 +1,41 @@
 /* =========================================================
    LANDLORD LITE – GEMEINSAME SIDEBAR
-   Desktop + Mobile Slide-Menü
    ========================================================= */
 
-/* ---------- DESKTOP ---------- */
+/* ===== DESKTOP ===== */
 
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
     width: 260px;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #238b32 0%, #126622 100%);
-    color: white;
+    height: 100vh;
+
     padding: 24px 20px;
     box-sizing: border-box;
-    position: relative;
-    z-index: 10;
+
+    background: linear-gradient(180deg, #238b32 0%, #126622 100%);
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    z-index: 1000;
 }
+
+/* Rechter Inhalt scrollt, Sidebar bleibt stehen */
+.main {
+    margin-left: 260px !important;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+
+/* ===== LOGO ===== */
 
 .brand-row {
     display: flex;
@@ -24,62 +45,116 @@
 }
 
 .brand-name {
+    color: white;
     font-size: 24px;
     font-weight: 700;
-    color: white;
 }
 
 .sidebar-subtitle {
+    color: rgba(255, 255, 255, 0.78);
     font-size: 14px;
-    color: rgba(255,255,255,.75);
     margin-bottom: 24px;
+}
+
+
+/* ===== NAVIGATION ===== */
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
 }
 
 .nav-item,
 .bottom-link {
+    width: 100%;
+    min-height: 44px;
+
     display: flex;
     align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px;
+    box-sizing: border-box;
+
+    border-radius: 10px;
+
     color: white;
     text-decoration: none;
-    min-height: 44px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    box-sizing: border-box;
-    transition: background .2s ease;
+
+    transition: background 0.2s ease;
 }
 
 .nav-item:hover,
-.bottom-link:hover {
-    background: rgba(255,255,255,.10);
+.bottom-link:hover,
+.submenu a:hover {
+    background: rgba(255, 255, 255, 0.10);
 }
 
 .nav-item.active {
-    background: rgba(255,255,255,.14);
+    background: rgba(255, 255, 255, 0.14);
 }
 
+
+/* ===== UNTERMENÜ ===== */
+
 .submenu {
-    margin-top: 6px;
+    margin-top: 4px;
+    margin-bottom: 8px;
 }
 
 .submenu a {
     display: flex;
     align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px;
+    box-sizing: border-box;
+
+    border-radius: 8px;
+
     color: white;
     text-decoration: none;
-    padding: 9px 12px;
+}
+
+
+/* =========================================================
+   SUPPORT + KONTOEINSTELLUNGEN
+   ========================================================= */
+
+/* Wird von sidebar.js erzeugt, falls auf der Seite nicht vorhanden */
+.sidebar-bottom {
+    width: 100%;
+
+    margin-top: auto !important;
+    padding-top: 18px;
+    padding-bottom: 6px;
+
+    box-sizing: border-box;
+}
+
+.sidebar-bottom .bottom-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    min-height: 42px;
+
+    padding: 8px 10px;
+    margin-top: 4px;
+
+    color: white !important;
+    text-decoration: none !important;
+
     border-radius: 10px;
 }
 
-.submenu a:hover {
-    background: rgba(255,255,255,.10);
-}
 
-.sidebar-bottom {
-    margin-top: 30px;
-}
+/* ===== MOBILE ELEMENTE AUF DESKTOP VERSTECKEN ===== */
 
-.bottom-link {
-    margin-top: 4px;
+.mobile-menu-btn,
+.sidebar-overlay {
+    display: none;
 }
 
 
@@ -89,27 +164,23 @@
 
 @media (max-width: 768px) {
 
-    /*
-       WICHTIG:
-       Der eigentliche Seiteninhalt bleibt immer an seiner
-       normalen Position und nimmt die volle Breite ein.
-    */
-
     body {
         margin-left: 0 !important;
         padding-left: 0 !important;
     }
 
+    /* Inhalt nutzt komplette Breite */
     .main {
         width: 100% !important;
         max-width: 100% !important;
+
         margin-left: 0 !important;
-        padding-left: 0;
+
         box-sizing: border-box;
     }
 
 
-    /* ---------- SIDEBAR ---------- */
+    /* ===== AUSFAHRBARE SIDEBAR ===== */
 
     .sidebar {
         position: fixed !important;
@@ -118,31 +189,25 @@
         left: 0 !important;
 
         width: min(82vw, 300px) !important;
+
         height: 100dvh !important;
         min-height: 100dvh !important;
 
         margin: 0 !important;
         padding: 22px 18px;
 
+        display: flex !important;
+        flex-direction: column !important;
+
         overflow-y: auto;
         overflow-x: hidden;
 
         transform: translateX(-105%);
-        transition: transform .25s ease;
-
-        /*
-           Overlay = 9000
-           Sidebar = 9001
-           Button = 9002
-
-           Dadurch liegt das Overlay NICHT über den Links.
-        */
+        transition: transform 0.25s ease;
 
         z-index: 9001 !important;
 
-        box-shadow: 8px 0 30px rgba(0,0,0,.22);
-
-        pointer-events: auto;
+        box-shadow: 8px 0 30px rgba(0, 0, 0, 0.22);
     }
 
     .sidebar.open {
@@ -150,65 +215,33 @@
     }
 
 
-    /* ---------- SIDEBAR INHALT ---------- */
-
-    .brand-row {
-        margin-bottom: 8px;
-    }
-
-    .brand-name {
-        font-size: 22px;
-    }
-
-    .sidebar-subtitle {
-        font-size: 14px;
-        margin-bottom: 18px;
-    }
-
-    .nav-item,
-    .bottom-link {
-        min-height: 44px;
-        padding: 9px 10px;
-        position: relative;
-        z-index: 1;
-        pointer-events: auto;
-    }
-
-    .submenu {
-        margin-top: 4px;
-    }
-
-    .submenu a {
-        padding: 9px 10px;
-        position: relative;
-        z-index: 1;
-        pointer-events: auto;
-    }
-
+    /* Support + Konto bleiben unten */
     .sidebar-bottom {
-        position: static !important;
-        margin-top: 20px;
+        margin-top: auto !important;
+        padding-top: 18px;
+        padding-bottom: 18px;
     }
 
 
-    /* ---------- DUNKLER HINTERGRUND ---------- */
+    /* ===== DUNKLER HINTERGRUND ===== */
 
     .sidebar-overlay {
-        position: fixed;
+        display: block;
 
+        position: fixed;
         inset: 0;
 
-        background: rgba(0,0,0,.38);
-
-        z-index: 9000;
+        background: rgba(0, 0, 0, 0.38);
 
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
 
         transition:
-            opacity .25s ease,
-            visibility .25s ease;
+            opacity 0.25s ease,
+            visibility 0.25s ease;
+
+        z-index: 9000;
     }
 
     .sidebar-overlay.open {
@@ -218,7 +251,7 @@
     }
 
 
-    /* ---------- MENÜBUTTON ---------- */
+    /* ===== MENÜBUTTON ===== */
 
     .mobile-menu-btn {
         position: fixed;
@@ -248,7 +281,7 @@
 
         z-index: 9002;
 
-        box-shadow: 0 5px 18px rgba(0,0,0,.20);
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.20);
     }
 
     .mobile-menu-btn span {
@@ -261,12 +294,12 @@
         border-radius: 20px;
 
         transition:
-            transform .2s ease,
-            opacity .2s ease;
+            transform 0.2s ease,
+            opacity 0.2s ease;
     }
 
 
-    /* Hamburger -> X */
+    /* Hamburger wird beim Öffnen zu X */
 
     .mobile-menu-btn.open span:nth-child(1) {
         transform: translateY(7px) rotate(45deg);
@@ -280,47 +313,43 @@
         transform: translateY(-7px) rotate(-45deg);
     }
 }
-
-
-/* =========================================================
-   DESKTOP
-   ========================================================= */
+/* ===== DESKTOP INHALT NEBEN SIDEBAR ===== */
 
 @media (min-width: 769px) {
+    body {
+        padding-left: 260px !important;
+        box-sizing: border-box !important;
+    }
 
-    .mobile-menu-btn,
-    .sidebar-overlay {
-        display: none !important;
+    .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 }
-/* ===== SIDEBAR BOTTOM FIX ===== */
+/* ===== SIDEBAR IMMER KOMPLETTE BILDSCHIRMHÖHE ===== */
 
-/* Sidebar als Spalte aufbauen */
-.sidebar {
-    display: flex !important;
-    flex-direction: column !important;
-}
+@media (min-width: 769px) {
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
 
-/* Support + Kontoeinstellungen ganz nach unten */
-.sidebar-bottom {
-    margin-top: auto !important;
-    padding-top: 18px !important;
-}
+        width: 260px !important;
 
-/* Auch auf dem Handy unten halten */
-@media (max-width: 768px) {
-    .sidebar.open {
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+
+        overflow-y: auto !important;
+
         display: flex !important;
         flex-direction: column !important;
-        height: 100dvh !important;
-        min-height: 100dvh !important;
-        overflow-y: auto !important;
     }
 
     .sidebar-bottom {
         margin-top: auto !important;
-        padding-top: 18px !important;
-        padding-bottom: 24px !important;
+        flex-shrink: 0 !important;
     }
 }
-
