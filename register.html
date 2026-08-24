@@ -16,19 +16,22 @@ html, body {
 }
 
 body {
+  margin: 0;
   min-height: 100vh;
   font-family: Arial, sans-serif;
   background: linear-gradient(180deg, #2e7d32, #4caf60);
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
 }
 
 .box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
   width: calc(100% - 28px);
   max-width: 680px;
-  margin: 0 auto;
 
   background: white;
   padding: 55px 50px;
