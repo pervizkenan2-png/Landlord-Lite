@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mieterakte – Landlord Lite</title>
+</head>
+
+<body>
+
+  <a href="index.html">← Zurück zur Mieterverwaltung</a>
+
+  <h1>Mieterakte</h1>
+
+  <div id="mieter">
+    Mieter wird geladen...
+  </div>
+<script src="config.js"></script>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const tenantId = params.get('id');
+
+  const mieterEl = document.getElementById('mieter');
+
+  async function loadTenant() {
+    if (!tenantId) {
+      mieterEl.innerHTML = 'Keine Mieter-ID gefunden.';
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+
+const res = await fetch(`${window.TENANTS_URL}/${tenantId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+
+      if (!res.ok) {
+        throw new Error('Mieter konnte nicht geladen werden.');
+      }
+
+      const tenant = await res.json();
+
+      mieterEl.innerHTML = `
+  <h2>${tenant.name || '-'}</h2>
+
+  <p><strong>Wohnung:</strong> ${tenant.unit || '-'}</p>
+  <p><strong>Miete:</strong> ${tenant.rent ?? 0} €</p>
+  <p><strong>Mietbeginn:</strong> ${tenant.leaseStart ? new Date(tenant.leaseStart).toLocaleDateString('de-DE') : '-'}</p>
+  <p><strong>Fälligkeit:</strong> ${tenant.dueDay || '-'}</p>
+  <p><strong>Status:</strong> ${tenant.status === 'paid' ? 'Bezahlt' : 'Nicht bezahlt'}</p>
+  <p><strong>IBAN:</strong> ${tenant.iban || '-'}</p>
+
+  <hr>
+
+  <h3>Mietzahlungen</h3>
+
+  <div id="payments">
+    Mietzahlungen werden geladen...
+  </div>
+`;
+      
+const paymentsEl = document.getElementById('payments');
+
+const now = new Date();
+
+const monthName = now.toLocaleDateString('de-DE', {
+  month: 'long',
+  year: 'numeric'
+});
+
+paymentsEl.innerHTML = `
+  <p>
+    <strong>${monthName}:</strong>
+    ${tenant.status === 'paid' ? '✅ Bezahlt' : '🔴 Offen'}
+  </p>
+`;
+    } catch (err) {
+      console.error(err);
+      mieterEl.innerHTML = 'Fehler beim Laden des Mieters.';
+    }
+  }
+
+  loadTenant();
+</script>
+</body>
+</html>
