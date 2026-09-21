@@ -736,9 +736,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const total = list.length;
-    const unpaid = list.filter(t => t.status === 'unpaid').length;
-    const paid = list.filter(t => t.status === 'paid').length;
 
+const now = new Date();
+const monthKey =
+  `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+const isTenantPaid = (tenant) => {
+  const payment = (tenant.payments || []).find(
+    p => p.month === monthKey
+  );
+
+  return payment?.paid === true;
+};
+
+const paid = list.filter(t => isTenantPaid(t)).length;
+const unpaid = list.filter(t => !isTenantPaid(t)).length;
     if (statTotal) statTotal.textContent = `${total} Mieter`;
     if (statUnpaid) statUnpaid.textContent = `${unpaid} offen`;
     if (statPaid) statPaid.textContent = `${paid} bezahlt`;
@@ -754,10 +766,11 @@ document.addEventListener("DOMContentLoaded", () => {
     list.forEach(t => {
       const id = getTenantId(t);
       const card = document.createElement('div');
-      card.className = `tenant-card ${t.status === 'paid' ? 'paid' : 'unpaid'}`;
+     const isPaid = isTenantPaid(t);
+card.className = `tenant-card ${isPaid ? 'paid' : 'unpaid'}`;
 
       const overdueDays = getOverdueInfo(t.dueDay);
-      const statusText = t.status === 'paid' ? 'Bezahlt' : 'Nicht bezahlt';
+      const statusText = isPaid ? 'Bezahlt' : 'Nicht bezahlt';
       const overdueLabel = overdueDays
         ? ` • Überfällig seit ${overdueDays} Tag${overdueDays === 1 ? '' : 'en'}`
         : '';
@@ -776,7 +789,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="tenant-actions">
           <button class="btn-small" data-action="toggle-status">
-            ${t.status === 'paid' ? 'Als offen markieren' : 'Als bezahlt markieren'}
+           ${isPaid ? 'Als offen markieren' : 'Als bezahlt markieren'}
           </button>
           <button class="btn-icon" data-action="edit">✏️</button>
           <button class="btn-icon btn-danger" data-action="delete">🗑️</button>
@@ -879,7 +892,27 @@ await loadTenants();
   if (!TENANTS_URL) return;
 
   const id = getTenantId(tenant);
-  const newStatus = tenant.status === 'paid' ? 'unpaid' : 'paid';
+
+  const now = new Date();
+  const monthKey =
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const currentPayment = (tenant.payments || []).find(
+    payment => payment.month === monthKey
+  );
+
+  const newPaidStatus = !(currentPayment?.paid === true);
+
+  const updatedPayments = [
+    ...(tenant.payments || []).filter(
+      payment => payment.month !== monthKey
+    ),
+    {
+      month: monthKey,
+      paid: newPaidStatus,
+      paidAt: newPaidStatus ? new Date() : null
+    }
+  ];
 
   try {
     const res = await fetch(`${TENANTS_URL}/${id}`, {
@@ -888,7 +921,10 @@ await loadTenants();
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       },
-      body: JSON.stringify({ status: newStatus })
+      body: JSON.stringify({
+        payments: updatedPayments,
+        status: newPaidStatus ? 'paid' : 'unpaid'
+      })
     });
 
     if (!res.ok) {
@@ -897,8 +933,9 @@ await loadTenants();
       return;
     }
 
-    showMsg('Status aktualisiert.', 'success');
+    showMsg('Zahlungsstatus aktualisiert.', 'success');
     await loadTenants();
+
   } catch (err) {
     console.error('TOGGLE STATUS ERROR:', err);
     showMsg('Netzwerkfehler beim Status-Update: ' + err.message);

@@ -4,87 +4,392 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mieterakte – Landlord Lite</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f4;
+      color: #1f2937;
+    }
+
+    .topbar {
+      background: #2e7d32;
+      color: white;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .back-link {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    .card h2,
+    .card h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+
+    .tenant-name {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .info-item {
+      background: #f8faf8;
+      border: 1px solid #e3ebe3;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .label {
+      display: block;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 16px;
+      border: 1px solid #e3ebe3;
+      border-radius: 10px;
+      background: #f8faf8;
+    }
+
+    .payment-status {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .paid {
+      color: #2e7d32;
+    }
+
+    .unpaid {
+      color: #c62828;
+    }
+
+    button {
+      border: none;
+      background: #2e7d32;
+      color: white;
+      padding: 11px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #256628;
+    }
+
+    .loading,
+    .error {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .error {
+      color: #c62828;
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .tenant-name {
+        font-size: 24px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <a href="index.html">← Zurück zur Mieterverwaltung</a>
-
-  <h1>Mieterakte</h1>
-
-  <div id="mieter">
-    Mieter wird geladen...
+  <div class="topbar">
+    <h1>Mieterakte</h1>
+    <a class="back-link" href="index.html">← Zurück zur Mieterverwaltung</a>
   </div>
-<script src="config.js"></script>
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const tenantId = params.get('id');
+  <div class="container">
+    <div id="mieter" class="card loading">
+      Mieter wird geladen...
+    </div>
+  </div>
 
-  const mieterEl = document.getElementById('mieter');
+  <script src="config.js"></script>
 
-  async function loadTenant() {
-    if (!tenantId) {
-      mieterEl.innerHTML = 'Keine Mieter-ID gefunden.';
-      return;
-    }
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const tenantId = params.get('id');
+    const mieterEl = document.getElementById('mieter');
 
-    try {
-      const token = localStorage.getItem('token');
-
-const res = await fetch(`${window.TENANTS_URL}/${tenantId}`, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-});
-
-      if (!res.ok) {
-        throw new Error('Mieter konnte nicht geladen werden.');
+    async function loadTenant() {
+      if (!tenantId) {
+        mieterEl.innerHTML = '<div class="error">Keine Mieter-ID gefunden.</div>';
+        return;
       }
 
-      const tenant = await res.json();
+      try {
+        const token = localStorage.getItem('token');
 
-      mieterEl.innerHTML = `
-  <h2>${tenant.name || '-'}</h2>
+        const res = await fetch(`${window.TENANTS_URL}/${tenantId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
-  <p><strong>Wohnung:</strong> ${tenant.unit || '-'}</p>
-  <p><strong>Miete:</strong> ${tenant.rent ?? 0} €</p>
-  <p><strong>Mietbeginn:</strong> ${tenant.leaseStart ? new Date(tenant.leaseStart).toLocaleDateString('de-DE') : '-'}</p>
-  <p><strong>Fälligkeit:</strong> ${tenant.dueDay || '-'}</p>
-  <p><strong>Status:</strong> ${tenant.status === 'paid' ? 'Bezahlt' : 'Nicht bezahlt'}</p>
-  <p><strong>IBAN:</strong> ${tenant.iban || '-'}</p>
+        if (!res.ok) {
+          throw new Error('Mieter konnte nicht geladen werden.');
+        }
 
-  <hr>
+        const tenant = await res.json();
 
-  <h3>Mietzahlungen</h3>
+        const now = new Date();
 
-  <div id="payments">
-    Mietzahlungen werden geladen...
-  </div>
-`;
-      
-const paymentsEl = document.getElementById('payments');
+        const monthKey =
+          `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-const now = new Date();
+        const monthName = now.toLocaleDateString('de-DE', {
+          month: 'long',
+          year: 'numeric'
+        });
 
-const monthName = now.toLocaleDateString('de-DE', {
-  month: 'long',
-  year: 'numeric'
-});
+        const currentPayment = (tenant.payments || []).find(
+          payment => payment.month === monthKey
+        );
 
-paymentsEl.innerHTML = `
-  <p>
-    <strong>${monthName}:</strong>
-    ${tenant.status === 'paid' ? '✅ Bezahlt' : '🔴 Offen'}
-  </p>
-`;
-    } catch (err) {
-      console.error(err);
-      mieterEl.innerHTML = 'Fehler beim Laden des Mieters.';
-    }
+        const isPaid = currentPayment?.paid === true;
+
+        mieterEl.classList.remove('loading');
+
+        mieterEl.innerHTML = `
+          <h2 class="tenant-name">${tenant.name || '-'}</h2>
+
+          <div class="info-grid">
+
+            <div class="info-item">
+              <span class="label">Wohnung</span>
+              <span class="value">${tenant.unit || '-'}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Miete</span>
+              <span class="value">${tenant.rent ?? 0} €</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Mietbeginn</span>
+              <span class="value">
+                ${
+                  tenant.leaseStart
+                    ? new Date(tenant.leaseStart).toLocaleDateString('de-DE')
+                    : '-'
+                }
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Fälligkeit</span>
+              <span class="value">${tenant.dueDay || '-'}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Status</span>
+              <span class="value">
+                ${isPaid ? 'Bezahlt' : 'Nicht bezahlt'}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">IBAN</span>
+              <span class="value">${tenant.iban || '-'}</span>
+            </div>
+
+          </div>
+        `;
+
+        const paymentsCard = document.createElement('div');
+        paymentsCard.className = 'card';
+
+const paymentHistory = tenant.payments || [];
+const leaseStart = tenant.leaseStart
+  ? new Date(tenant.leaseStart)
+  : null;
+const allMonths = [];
+
+if (leaseStart) {
+  const cursor = new Date(
+    leaseStart.getFullYear(),
+    leaseStart.getMonth(),
+    1
+  );
+
+  while (cursor <= now) {
+    const key =
+      `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+
+    allMonths.push(key);
+    cursor.setMonth(cursor.getMonth() + 1);
   }
+}
+const previousPayments = allMonths
+  .filter(month => month < monthKey)
+  .map(month => {
+    const savedPayment = paymentHistory.find(
+      payment => payment.month === month
+    );
 
-  loadTenant();
-</script>
+    return {
+      month: month,
+      paid: savedPayment?.paid === true,
+      paidAt: savedPayment?.paidAt || null
+    };
+  });
+ const historyHtml = previousPayments
+  .slice()
+.filter(payment => payment.month !== monthKey)
+  .sort((a, b) => b.month.localeCompare(a.month))
+  .map(payment => {
+    const [year, month] = payment.month.split('-');
+
+    const name = new Date(
+      Number(year),
+      Number(month) - 1
+    ).toLocaleDateString('de-DE', {
+      month: 'long',
+      year: 'numeric'
+    });
+
+    return `<p><strong>${name}:</strong> ${
+      payment.paid ? '✅ Bezahlt' : '🔴 Offen'
+    }</p>`;
+  })
+  .join(''); 
+
+        paymentsCard.innerHTML = `
+          <h3>Mietzahlungen</h3>
+
+${historyHtml}
+
+          <div class="payment-row">
+            <div>
+              <strong>${monthName}</strong><br>
+              <span class="payment-status ${isPaid ? 'paid' : 'unpaid'}">
+                ${isPaid ? '✅ Bezahlt' : '🔴 Offen'}
+              </span>
+            </div>
+
+            ${
+              !isPaid
+                ? '<button id="markPaidBtn">Als bezahlt markieren</button>'
+                : ''
+            }
+          </div>
+        `;
+
+        document.querySelector('.container').appendChild(paymentsCard);
+
+        const markPaidBtn = document.getElementById('markPaidBtn');
+
+        markPaidBtn?.addEventListener('click', async () => {
+          const updatedPayments = [
+            ...(tenant.payments || []).filter(
+              payment => payment.month !== monthKey
+            ),
+            {
+              month: monthKey,
+              paid: true,
+              paidAt: new Date()
+            }
+          ];
+
+          const updateRes = await fetch(
+            `${window.TENANTS_URL}/${tenantId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                payments: updatedPayments
+              })
+            }
+          );
+
+          if (!updateRes.ok) {
+            alert('Zahlung konnte nicht gespeichert werden.');
+            return;
+          }
+
+          location.reload();
+        });
+
+      } catch (err) {
+        console.error(err);
+
+        mieterEl.innerHTML = `
+          <div class="error">
+            Fehler beim Laden des Mieters.
+          </div>
+        `;
+      }
+    }
+
+    loadTenant();
+  </script>
+
 </body>
 </html>
