@@ -1,6 +1,50 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  .mobile-nav {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .mobile-nav {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      justify-content: space-around;
+      padding: 12px 5px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      box-shadow: 0 -3px 15px rgba(0,0,0,0.08);
+      z-index: 9999;
+    }
+
+    .mobile-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      color: #728078;
+      font-size: 22px;
+    }
+
+    .mobile-nav a span {
+      font-size: 11px;
+    }
+
+    .mobile-nav a.active {
+      color: #217a3d;
+    }
+
+    body {
+      padding-bottom: 85px;
+    }
+  }
+</style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | Landlord Lite</title>
@@ -766,7 +810,14 @@ flex-direction:column;
 </head>
 
 <body>
-  <aside class="sidebar">
+
+  <<nav class="mobile-nav">
+  <a href="dashboard.html" class="active">⌂<span>Start</span></a>
+  <a href="index.html">♙<span>Mieter</span></a>
+  <a href="mahnung.html">▤<span>Mahnungen</span></a>
+  <a href="reparatur.html">⚒<span>Reparaturen</span></a>
+</nav>
+aside class="sidebar">
     <div class="brand-row">
       <div class="brand">
         <div class="brand-icon">🏡</div>
