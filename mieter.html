@@ -312,71 +312,123 @@ const previousPayments = allMonths
       year: 'numeric'
     });
 
-    return `<p><strong>${name}:</strong> ${
-      payment.paid ? '✅ Bezahlt' : '🔴 Offen'
-    }</p>`;
-  })
-  .join(''); 
+    return `
+  <div class="payment-row">
+    <div>
+      <strong>${name}</strong><br>
+      <span class="payment-status ${payment.paid ? 'paid' : 'unpaid'}">
+        ${payment.paid ? '✅ Bezahlt' : '🔴 Offen'}
+      </span>
+    </div>
 
-        paymentsCard.innerHTML = `
-          <h3>Mietzahlungen</h3>
+    <button
+      class="historyPaymentBtn"
+      data-month="${payment.month}"
+      data-paid="${payment.paid}"
+    >
+      ${payment.paid ? 'Als offen markieren' : 'Als bezahlt markieren'}
+    </button>
+  </div>
+`;
+})
+.join('');
+paymentsCard.innerHTML = `
+  <h3>Mietzahlungen</h3>
 
-${historyHtml}
+  ${historyHtml}
 
-          <div class="payment-row">
-            <div>
-              <strong>${monthName}</strong><br>
-              <span class="payment-status ${isPaid ? 'paid' : 'unpaid'}">
-                ${isPaid ? '✅ Bezahlt' : '🔴 Offen'}
-              </span>
-            </div>
+  <div class="payment-row">
+    <div>
+      <strong>${monthName}</strong><br>
+      <span class="payment-status ${isPaid ? 'paid' : 'unpaid'}">
+        ${isPaid ? '✅ Bezahlt' : '🔴 Offen'}
+      </span>
+    </div>
 
-            ${
-              !isPaid
-                ? '<button id="markPaidBtn">Als bezahlt markieren</button>'
-                : ''
-            }
-          </div>
-        `;
+    <button id="markPaidBtn">
+      ${isPaid ? 'Als offen markieren' : 'Als bezahlt markieren'}
+    </button>
+  </div>
+`;
 
-        document.querySelector('.container').appendChild(paymentsCard);
+        document.querySelectorAll('.payments-card').forEach(card => card.remove());
 
-        const markPaidBtn = document.getElementById('markPaidBtn');
+paymentsCard.innerHTML = `
+  <h3>Mietzahlungen</h3>
 
-        markPaidBtn?.addEventListener('click', async () => {
-          const updatedPayments = [
-            ...(tenant.payments || []).filter(
-              payment => payment.month !== monthKey
-            ),
-            {
-              month: monthKey,
-              paid: true,
-              paidAt: new Date()
-            }
-          ];
+  <div class="payment-row">
+    <div>
+      <strong>${monthName}</strong><br>
+      <span class="payment-status ${isPaid ? 'paid' : 'unpaid'}">
+        ${isPaid ? '✅ Bezahlt' : '🔴 Offen'}
+      </span>
+    </div>
 
-          const updateRes = await fetch(
-            `${window.TENANTS_URL}/${tenantId}`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-              },
-              body: JSON.stringify({
-                payments: updatedPayments
-              })
-            }
-          );
+    <button
+      class="paymentToggleBtn"
+      data-month="${monthKey}"
+      data-paid="${isPaid}"
+    >
+      ${isPaid ? 'Als offen markieren' : 'Als bezahlt markieren'}
+    </button>
+  </div>
 
-          if (!updateRes.ok) {
-            alert('Zahlung konnte nicht gespeichert werden.');
-            return;
-          }
+  ${historyHtml}
+`;
 
-          location.reload();
-        });
+document.querySelectorAll('.payments-card').forEach(card => card.remove());
 
+paymentsCard.classList.add('payments-card');
+document.querySelector('.container').appendChild(paymentsCard);
+
+paymentsCard.querySelectorAll(
+  '.paymentToggleBtn, .historyPaymentBtn'
+).forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const selectedMonth = btn.dataset.month;
+    const currentlyPaid = btn.dataset.paid === 'true';
+
+    btn.disabled = true;
+
+    try {
+      const updatedPayments = [
+        ...(tenant.payments || []).filter(
+          payment => payment.month !== selectedMonth
+        ),
+        {
+          month: selectedMonth,
+          paid: !currentlyPaid,
+          paidAt: !currentlyPaid ? new Date() : null
+        }
+      ];
+
+      const updateRes = await fetch(
+        `${window.TENANTS_URL}/${tenantId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            payments: updatedPayments
+          })
+        }
+      );
+
+      if (!updateRes.ok) {
+        throw new Error('Zahlungsstatus konnte nicht gespeichert werden.');
+      }
+
+      await loadTenant();
+
+    } catch (err) {
+      console.error(err);
+      alert('Zahlungsstatus konnte nicht gespeichert werden.');
+      btn.disabled = false;
+    }
+  });
+});    
       } catch (err) {
         console.error(err);
 
